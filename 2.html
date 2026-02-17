@@ -67,6 +67,15 @@
       background: transparent; border: 1px solid #555; color: #ccc;
       padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 16px;
   }
+  
+  /* --- زر الرئيسية الجديد --- */
+  .home-btn {
+      background: #263238; border: 1px solid #455a64; color: #eceff1;
+      padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;
+      margin-left: 8px; font-weight: bold; transition: 0.2s;
+  }
+  .home-btn:hover { background: #37474f; color: #fff; border-color: #607d8b; }
+
   /* أزرار التنقل بالتاريخ */
   .nav-btn {
       background: transparent; border: none; color: #ffca28; font-size: 18px;
@@ -258,7 +267,10 @@
 </div>
 
 <div class="info-bar">
-    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    <div style="display: flex; align-items: center;">
+        <button class="home-btn" onclick="goHome()">🏠 الرئيسية</button>
+        <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    </div>
     <div style="display:flex; align-items:center;">
         <!-- أزرار التنقل بالتاريخ -->
         <button class="nav-btn" onclick="changeDate(-1)">◀</button>
@@ -956,6 +968,12 @@ function resetDay() {
     // عند إنهاء اليوم، نعيد التاريخ للتاريخ الحالي الفعلي
     initDate();
     saveData(true); calc();
+}
+
+function goHome() {
+    if(confirm('هل تريد العودة للقائمة الرئيسية؟ (تأكد من حفظ البيانات)')) {
+        window.location.href = 'index.html'; 
+    }
 }
 </script>
 </body>
