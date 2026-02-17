@@ -66,16 +66,15 @@
         <h3 style="margin:0 0 10px 0; color:#fff">نظام 2026</h3>
         <div class="status-text" id="status">جاري الاتصال...</div>
         <div class="progress-bar" id="pBar"><div class="progress-fill" id="pFill"></div></div>
-        <div class="error-msg" id="errorBox"></div>
     </div>
 
 <script>
     // ============================================================
-    // 1. الإعدادات
+    // الإعدادات
     // ============================================================
     const REPO_URL = "https://raw.githubusercontent.com/minaibrahimfawzy-droid/Manzoma-pro/main/";
     
-    // قائمة الملفات
+    // أسماء ملفاتك
     const APP_FILES = [
         "home.html", 
         "Nabatshia.html", 
@@ -87,32 +86,38 @@
     ];
 
     // ============================================================
-    // 2. كود الزر (HTML صريح) - هيتحط في الصفحات الفرعية فقط
+    // 1. كود إصلاح الشاشة (عشان الكلام ميكبرش)
     // ============================================================
-    const HOME_BUTTON_HTML = `
-        <div onclick="window.go('home.html')" 
-             style="position:fixed; bottom:20px; left:20px; width:60px; height:60px; 
+    const FIX_LAYOUT = '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">';
+
+    // ============================================================
+    // 2. كود زر الرجوع (HTML ثابت)
+    // ============================================================
+    // الزر ده هيتحط في كل الصفحات ما عدا home.html
+    const HOME_BTN = `
+        <div id="sys-home-floater" onclick="window.go('home.html')" 
+             style="position:fixed; bottom:20px; left:20px; width:55px; height:55px; 
              background:#238636; color:white; border-radius:50%; 
-             text-align:center; line-height:60px; font-size:30px; 
-             box-shadow: 0 0 20px rgba(0,0,0,0.8); z-index:2147483647 !important; 
-             cursor:pointer; border: 3px solid #fff; display:block;">
+             text-align:center; line-height:55px; font-size:28px; 
+             box-shadow: 0 5px 15px rgba(0,0,0,0.6); z-index:2147483647 !important; 
+             cursor:pointer; border: 2px solid #fff; display:block;">
              🏠
         </div>
     `;
 
     // ============================================================
-    // 3. كود الجافاسكريبت (للتنقل وزر الموبايل) - هيتحط في كل الصفحات
+    // 3. سكربت التشغيل والتنقل
     // ============================================================
     const LOGIC_SCRIPT = `
     <script>
         window.go = function(pageName) {
-            // لو رايحين للرئيسية
+            // توجيه index لـ home
             if(pageName === "index.html" || pageName === "home.html") {
                 pageName = "home.html";
-                // مسح الهيستوري عشان زر الموبايل يخرج لو ضغطت رجوع في الرئيسية
+                // مسح الهيستوري عشان لو داس رجوع وهو في الرئيسية يخرج أو يقف مكانه
                 history.replaceState(null, null, " ");
             } else {
-                // لو رايحين لصفحة فرعية، ضيف خطوة للهيستوري عشان زر الرجوع يشتغل
+                // لو صفحة فرعية، سجلها في التاريخ
                 history.pushState({p: pageName}, null, "#"+pageName);
             }
 
@@ -122,14 +127,12 @@
                 document.write(storedPage);
                 document.close();
             } else {
-                // لو الصفحة مش موجودة ارجع للرئيسية
                 window.go("home.html");
             }
         };
 
-        // التقاط زر الرجوع الخاص بالموبايل
+        // منع الخروج عند الضغط على زر الرجوع في الموبايل
         window.onpopstate = function(event) {
-            // أي رجوع هيرميك على الرئيسية
             window.go("home.html");
         };
 
@@ -138,7 +141,7 @@
     `;
 
     // ============================================================
-    // 4. دالة التحميل والتشغيل
+    // دالة التحميل
     // ============================================================
     const uiStatus = document.getElementById("status");
     const uiPBar = document.getElementById("pBar");
@@ -146,56 +149,65 @@
 
     async function bootSystem() {
         
-        // !!! تنظيف إجباري للنسخة القديمة لضمان ظهور الزر !!!
-        // (السطر ده هيمسح الكاش عشان ينزل الملفات الجديدة اللي فيها الزر)
-        if(!sessionStorage.getItem("cleaned_once")) {
+        // خطوة مهمة: مسح النسخة القديمة لإجبار التحديث وحل المشاكل
+        // السطر ده هيشتغل مرة واحدة بس عشان نضمن إن الملفات اتصلحت
+        if(!sessionStorage.getItem("repair_done")) {
             localStorage.removeItem("sys_version");
-            sessionStorage.setItem("cleaned_once", "true");
+            sessionStorage.setItem("repair_done", "true");
         }
 
         let localVer = parseFloat(localStorage.getItem("sys_version")) || 0;
 
         if (navigator.onLine) {
-            uiStatus.innerText = "فحص التحديثات...";
             try {
-                // إضافة timestamp لمنع الكاش من السيرفر
+                // طلب ملف الإصدار
                 const vResponse = await fetch(REPO_URL + "version.json?t=" + Date.now());
                 if (vResponse.ok) {
                     const vData = await vResponse.json();
                     const remoteVer = parseFloat(vData.version);
 
-                    // لو فيه تحديث أو لو النسخة ممسوحة
+                    // لو فيه تحديث أو لو دي أول مرة بعد المسح
                     if (remoteVer > localVer || localVer === 0) {
-                        uiStatus.innerText = `تحديث النظام...`;
+                        uiStatus.innerText = `جاري إصلاح الملفات وتحديث النظام...`;
                         uiPBar.style.display = "block";
                         
                         let count = 0;
                         for (const fileName of APP_FILES) {
                             count++;
-                            uiStatus.innerText = `جاري تجهيز: ${fileName}`;
+                            uiStatus.innerText = `معالجة: ${fileName}`;
                             uiPFill.style.width = Math.round((count / APP_FILES.length) * 100) + "%";
                             
                             const fResponse = await fetch(REPO_URL + fileName + "?t=" + Date.now());
-                            if (!fResponse.ok) throw new Error("فشل تحميل: " + fileName);
+                            if (!fResponse.ok) throw new Error("فشل: " + fileName);
                             
                             let content = await fResponse.text();
 
-                            // === هنا السحر: دمج الكود داخل الملف ===
-                            
-                            // 1. إضافة كود الجافاسكريبت (Logic) للكل
+                            // ----------------------------------------------------
+                            // 1. إصلاح مشكلة الحجم الكبير (نضيف Viewport غصب عن الملف)
+                            // ----------------------------------------------------
+                            if (!content.includes("viewport")) {
+                                // بنحطه في أول الملف عشان المتصفح يشوفه فوراً
+                                content = FIX_LAYOUT + content;
+                            }
+
+                            // ----------------------------------------------------
+                            // 2. إضافة السكربت الأساسي لكل الملفات
+                            // ----------------------------------------------------
                             if(content.includes("</body>")) {
                                 content = content.replace("</body>", LOGIC_SCRIPT + "</body>");
                             } else {
                                 content += LOGIC_SCRIPT;
                             }
 
-                            // 2. إضافة "زر الرجوع" للصفحات الفرعية فقط (أي صفحة غير home.html)
+                            // ----------------------------------------------------
+                            // 3. إضافة زر الرجوع (لكل الملفات ما عدا الرئيسية)
+                            // ----------------------------------------------------
                             if (fileName !== "home.html") {
-                                // بنحط الزر في آخر الصفحة عشان يظهر فوق الكل
+                                // بنضيف الزر كـ HTML مباشر
                                 if(content.includes("</body>")) {
-                                    content = content.replace("</body>", HOME_BUTTON_HTML + "</body>");
+                                    content = content.replace("</body>", HOME_BTN + "</body>");
                                 } else {
-                                    content += HOME_BUTTON_HTML;
+                                    content += HOME_BTN;
                                 }
                             }
 
@@ -203,26 +215,27 @@
                         }
                         
                         localStorage.setItem("sys_version", remoteVer);
-                        uiStatus.innerText = "✅ تم التحديث بنجاح!";
+                        uiStatus.innerText = "✅ تم الإصلاح والتحديث!";
                         await new Promise(r => setTimeout(r, 800));
                     }
                 }
             } catch (err) {
                 console.log("Error", err);
-                uiStatus.innerText = "لا يوجد اتصال بالإنترنت...";
+                uiStatus.innerText = "فشل الاتصال، جاري المحاولة...";
             }
         }
 
-        // التشغيل
+        // تشغيل الصفحة الرئيسية
         setTimeout(() => {
             const startPage = localStorage.getItem("sys_file_home.html");
-
             if (startPage) {
                 document.open();
                 document.write(startPage);
                 document.close();
             } else {
-                uiStatus.innerHTML = "<span style='color:red'>خطأ: يرجى الاتصال بالإنترنت لأول مرة</span>";
+                // لو مفيش نت والملفات مش موجودة
+                uiPBar.style.display = "none";
+                uiStatus.innerHTML = "<span style='color:#da3633; font-weight:bold;'>⚠️ خطأ: يجب توصيل الإنترنت لإصلاح الملفات</span>";
             }
         }, 1000);
     }
