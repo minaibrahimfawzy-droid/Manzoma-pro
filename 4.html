@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اللمات - الإصدار الذكي (فصل الكاش والفيزا)</title>
+    <title>اللمات - الإصدار الذكي (المتبقي لكل حارة)</title>
     <style>
         /* --- 1. أساسيات التصميم --- */
         :root {
@@ -112,6 +112,14 @@
             color: #000 !important; 
             font-size: 1rem !important;
             font-weight: bold; 
+        }
+
+        /* تنسيق صف المتبقي */
+        .remaining-row td {
+            background-color: #e3f2fd; /* لون أزرق فاتح مميز */
+            color: #0d6efd;
+            border-top: 3px double #adb5bd;
+            font-weight: bold;
         }
 
         .lemma-delete-btn { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--danger); cursor: pointer; display: none; }
@@ -329,7 +337,7 @@
                 <table class="sheet-table">
                     <thead class="sheet-header" id="sheetHeader"></thead>
                     <tbody id="sheetBody"></tbody>
-                    <tfoot id="sheetFooter" class="footer-row"></tfoot>
+                    <tfoot id="sheetFooter"></tfoot>
                 </table>
             </div>
 
@@ -591,7 +599,7 @@
             renderSheet(); renderFinanceLists(); calculateTotals(); updateReportHeader();
         }
 
-        // 6. رسم الجدول
+        // 6. رسم الجدول (مع صف المتبقي الذكي)
         function renderSheet() {
             const header = document.getElementById('sheetHeader');
             const body = document.getElementById('sheetBody');
@@ -612,7 +620,27 @@
             let bHTML = '';
             let colTotals = {}; lanes.forEach(l => colTotals[l.name] = 0);
             let running = {}; lanes.forEach(l => running[l.name] = 0);
+            
+            // 1. حساب القيم الأخيرة لكل حارة بشكل مستقل
+            let lastValues = {};
+            let totalLastValues = 0;
 
+            lanes.forEach(lane => {
+                // فلترة الترانزكشنز لهذه الحارة فقط
+                const laneTxs = currentTransactions.filter(t => t.lane === lane.name);
+                
+                if (laneTxs.length > 0) {
+                    // البحث عن الترانزكشن صاحب أعلى رقم لمة
+                    const lastTx = laneTxs.reduce((prev, current) => (prev.lemma > current.lemma) ? prev : current);
+                    const val = (lastTx.amount || 0) + (lastTx.visa || 0);
+                    lastValues[lane.name] = val;
+                    totalLastValues += val;
+                } else {
+                    lastValues[lane.name] = 0;
+                }
+            });
+
+            // 2. بناء جسم الجدول
             for (let i = 1; i <= currentLemmaCount; i++) {
                 bHTML += `<tr>
                     <td class="lemma-col text-center">${i}
@@ -642,14 +670,27 @@
             }
             body.innerHTML = bHTML;
 
-            // بناء الفوتر (سطر الإجمالي) مع إمكانية التعديل
-            let fHTML = '<tr><td class="text-warning">ج</td>';
+            // بناء الفوتر
+            let fHTML = '';
+
+            // 3. صف "المتبقي" (يعرض آخر قيمة تم إدخالها في كل حارة)
+            fHTML += `<tr class="remaining-row">
+                        <td class="text-center" style="background:#cfe2ff; color:#000;">المتبقي</td>`;
+            lanes.forEach(l => {
+                const val = lastValues[l.name];
+                fHTML += `<td class="text-center">${val > 0 ? val : '-'}</td>`;
+            });
+            fHTML += `<td class="text-center">${totalLastValues > 0 ? totalLastValues : '-'}</td></tr>`;
+
+            // 4. صف الإجمالي "ج"
+            fHTML += `<tr class="footer-row"><td class="text-warning">ج</td>`;
             let grand = 0;
             lanes.forEach(l => { 
                 fHTML += `<td class="footer-cell-interactive" onclick="openTotalAdjustModal('${l.name}')" title="اضغط لتعديل الإجمالي">${colTotals[l.name]}</td>`; 
                 grand += colTotals[l.name]; 
             });
             fHTML += `<td class="grand-total-cell">${grand.toLocaleString()}</td></tr>`;
+            
             footer.innerHTML = fHTML;
         }
 
@@ -699,7 +740,7 @@
         }
         function addNewLemmaRow() { currentLemmaCount++; autoSave(); }
 
-        // --- وظائف تعديل الإجمالي الذكي (معدلة للفصل) ---
+        // --- وظائف تعديل الإجمالي الذكي (معدلة لدمج اللمة) ---
         function openTotalAdjustModal(laneName) {
             // 1. حساب الإجمالي الحالي للحارة (كاش وفيزا منفصلين)
             let currCash = 0;
@@ -775,26 +816,14 @@
             // تحذير بسيط لو الأرقام بالسالب
             if ((targetTotal < (currCash + currVisa)) && !confirm("المجموع الجديد أقل من الحالي! هل أنت متأكد؟")) return;
 
-            // 1. معالجة فرق الكاش (في لمة مستقلة إذا وجد)
-            if (diffCash !== 0) {
+            // دمج التسوية في لمة واحدة (كاش + فيزا)
+            if (diffCash !== 0 || diffVisa !== 0) {
                 currentLemmaCount++;
                 currentTransactions.push({ 
-                    id: Date.now(), // ID مميز
+                    id: Date.now(),
                     lane: lane, 
                     lemma: currentLemmaCount, 
                     amount: diffCash, 
-                    visa: 0 
-                });
-            }
-
-            // 2. معالجة فرق الفيزا (في لمة مستقلة إذا وجد)
-            if (diffVisa !== 0) {
-                currentLemmaCount++;
-                currentTransactions.push({ 
-                    id: Date.now() + 10, // إضافة وقت بسيط لضمان اختلاف الـ ID
-                    lane: lane, 
-                    lemma: currentLemmaCount, 
-                    amount: 0, 
                     visa: diffVisa 
                 });
             }
