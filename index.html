@@ -81,20 +81,74 @@
 
 <script>
     // ============================================================
-    // إعدادات الرابط والملفات
+    // الرابط والملفات
     // ============================================================
     const REPO_URL = "https://raw.githubusercontent.com/minaibrahimfawzy-droid/Manzoma-pro/main/";
-
-    const APP_FILES = [
-        "home.html",      // الشاشة الرئيسية
-        "Nabatshia.html", 
-        "2.html",         
-        "3.html",         
-        "4.html",         
-        "5.html",         
-        "6.html"          
-    ];
+    const APP_FILES = ["home.html", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html"];
+    
     // ============================================================
+    // كود الحقن (المسؤول عن الزر والتنقل)
+    // ============================================================
+    const INJECTED_SCRIPT = `
+    <script>
+        // دالة التنقل
+        window.go = function(pageName) {
+            if(pageName === "index.html") pageName = "home.html";
+            localStorage.setItem("sys_current_page", pageName);
+
+            if(pageName !== "home.html") {
+                history.pushState({page: pageName}, null, "#" + pageName);
+            } else {
+                history.replaceState(null, null, " ");
+            }
+
+            const storedPage = localStorage.getItem("sys_file_" + pageName);
+            if(storedPage) {
+                document.open();
+                document.write(storedPage);
+                document.close();
+            } else {
+                window.go("home.html");
+            }
+        };
+
+        window.onpopstate = function(event) {
+            window.go("home.html");
+        };
+
+        // دالة إظهار الزر العائم
+        function showHomeBtn() {
+            const currentPage = localStorage.getItem("sys_current_page");
+            // نظهر الزر فقط لو الصفحة مش home.html
+            if(currentPage && currentPage !== "home.html") {
+                // التأكد من عدم وجود الزر مسبقاً لتجنب التكرار
+                if(document.getElementById('sys-home-btn')) return;
+
+                const btn = document.createElement("div");
+                btn.id = 'sys-home-btn';
+                btn.innerHTML = "🏠";
+                // جعلنا الـ z-index عالي جداً (999999) ليظهر فوق كل شيء
+                btn.style.cssText = "position:fixed; bottom:20px; left:20px; width:50px; height:50px; background:#238636; color:white; border-radius:50%; text-align:center; line-height:50px; font-size:24px; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.6); z-index:999999; border: 2px solid #fff; transition: transform 0.2s;";
+                
+                btn.onmousedown = function(){ btn.style.transform = "scale(0.9)"; };
+                btn.onmouseup = function(){ btn.style.transform = "scale(1)"; };
+                btn.onclick = function() { window.go('home.html'); };
+                
+                document.body.appendChild(btn);
+            }
+        }
+
+        // تشغيل الدالة فور تحميل الصفحة
+        if(document.body) {
+            showHomeBtn();
+        } else {
+            window.addEventListener('DOMContentLoaded', showHomeBtn);
+            window.addEventListener('load', showHomeBtn);
+        }
+
+        document.oncontextmenu = function(){return false;};
+    <\/script>
+    `;
 
     const uiStatus = document.getElementById("status");
     const uiError = document.getElementById("errorBox");
@@ -102,78 +156,13 @@
     const uiPFill = document.getElementById("pFill");
     const uiSpinner = document.getElementById("spinner");
 
-    // ============================================================
-    // كود الحقن المطور (يتحكم في التنقل + زر الرجوع + الزر العائم)
-    // ============================================================
-    const INJECTED_SCRIPT = `
-    <script>
-        // دالة التنقل بين الصفحات
-        window.go = function(pageName) {
-            if(pageName === "index.html") pageName = "home.html";
-            
-            // تسجيل الصفحة الحالية للتحكم في ظهور الزر العائم
-            localStorage.setItem("sys_current_page", pageName);
-
-            // إضافة سجل للتاريخ عشان زر الموبايل يشتغل
-            if(pageName !== "home.html") {
-                // لو رايحين لصفحة فرعية بنضيفها للتاريخ
-                history.pushState({page: pageName}, null, "#" + pageName);
-            } else {
-                // لو راجعين للرئيسية، بننظف الرابط شكلياً
-                history.replaceState(null, null, " ");
-            }
-
-            // تحميل المحتوى من الذاكرة
-            const storedPage = localStorage.getItem("sys_file_" + pageName);
-            if(storedPage) {
-                document.open();
-                document.write(storedPage);
-                document.close();
-            } else {
-                alert("⛔ الملف غير موجود: " + pageName);
-                // لو الملف مش موجود ارجع للرئيسية
-                window.go("home.html");
-            }
-        };
-
-        // تفعيل زر الرجوع في الموبايل (Hardware Back Button)
-        window.onpopstate = function(event) {
-            // مهما كنت فين، زر الرجوع في الموبايل هيرجعك للرئيسية
-            // إلا لو كنت أصلاً في الرئيسية مش هيعمل حاجة (أو هيخرج حسب المتصفح)
-            window.go("home.html");
-        };
-
-        // كود الزر العائم (زر الهوم 🏠)
-        (function() {
-            const currentPage = localStorage.getItem("sys_current_page");
-            
-            // الشرط: اظهر الزر فقط لو الصفحة مش home.html
-            if(currentPage && currentPage !== "home.html") {
-                const btn = document.createElement("div");
-                btn.innerHTML = "🏠";
-                // تنسيق الزر (أسفل اليسار - لون أخضر - ظل)
-                btn.style.cssText = "position:fixed; bottom:20px; left:20px; width:50px; height:50px; background:#238636; color:white; border-radius:50%; text-align:center; line-height:50px; font-size:24px; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.5); z-index:9999; border: 2px solid #fff; transition: transform 0.2s;";
-                
-                // تأثير بسيط عند الضغط
-                btn.onmousedown = function(){ btn.style.transform = "scale(0.9)"; };
-                btn.onmouseup = function(){ btn.style.transform = "scale(1)"; };
-                
-                // عند النقر يروح للرئيسية
-                btn.onclick = function() { window.go('home.html'); };
-                
-                document.body.appendChild(btn);
-            }
-        })();
-
-        // منع القائمة المنسدلة (كليك يمين)
-        document.oncontextmenu = function(){return false;};
-    <\/script>
-    `;
-
     async function bootSystem() {
+        // !!! هام جداً: هذا السطر يمسح الإصدار القديم لإجبار التحميل الجديد !!!
+        // بعد أن يعمل الكود وتتأكد أن الزر ظهر، يمكنك حذف هذا السطر مستقبلاً لتسريع الفتح
+        localStorage.removeItem("sys_version"); 
+
         let localVer = parseFloat(localStorage.getItem("sys_version")) || 0;
 
-        // 1. الاتصال والتحديث
         if (navigator.onLine) {
             uiStatus.innerText = "فحص التحديثات...";
             try {
@@ -182,8 +171,9 @@
                     const vData = await vResponse.json();
                     const remoteVer = parseFloat(vData.version);
 
-                    if (remoteVer > localVer) {
-                        uiStatus.innerText = `تحديث متوفر (v${remoteVer})...`;
+                    // بما أننا مسحنا الإصدار المحلي، الشرط ده هيتحقق دائماً الآن
+                    if (remoteVer > localVer || localVer === 0) {
+                        uiStatus.innerText = `تحديث ملفات النظام...`;
                         uiPBar.style.display = "block";
                         
                         let count = 0;
@@ -197,7 +187,6 @@
                             
                             let content = await fResponse.text();
 
-                            // حقن السكربت داخل كل ملف يتم تحميله
                             if(content.includes("</body>")) {
                                 content = content.replace("</body>", INJECTED_SCRIPT + "</body>");
                             } else {
@@ -217,15 +206,12 @@
             }
         }
 
-        // 2. تشغيل النظام
         setTimeout(() => {
             const startPage = localStorage.getItem("sys_file_home.html");
 
             if (startPage) {
-                // ضبط الحالة الأولية
                 localStorage.setItem("sys_current_page", "home.html");
-                history.replaceState(null, null, " "); // تنظيف التاريخ عند البدء
-
+                history.replaceState(null, null, " ");
                 document.open();
                 document.write(startPage);
                 document.close();
@@ -237,7 +223,7 @@
                 uiError.innerHTML = `
                     ⚠️ <b>تنبيه هام</b><br><br>
                     لم يتم العثور على ملفات النظام.<br>
-                    يرجى <b>توصيل الإنترنت</b> ثم إعادة فتح التطبيق لتنزيل الملفات لأول مرة.
+                    يرجى <b>توصيل الإنترنت</b> ثم إعادة فتح التطبيق لتنزيل الملفات.
                 `;
             }
         }, 1000);
