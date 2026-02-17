@@ -81,13 +81,15 @@
 
 <script>
     // ============================================================
-    // الرابط والملفات
+    // إعدادات النظام
     // ============================================================
     const REPO_URL = "https://raw.githubusercontent.com/minaibrahimfawzy-droid/Manzoma-pro/main/";
+    
+    // قائمة الملفات
     const APP_FILES = ["home.html", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html"];
     
     // ============================================================
-    // كود الحقن (المسؤول عن الزر والتنقل)
+    // كود الحقن القوي (تم تعديله ليضمن ظهور الزر)
     // ============================================================
     const INJECTED_SCRIPT = `
     <script>
@@ -112,39 +114,43 @@
             }
         };
 
+        // معالجة زر الرجوع في الموبايل
         window.onpopstate = function(event) {
             window.go("home.html");
         };
 
-        // دالة إظهار الزر العائم
-        function showHomeBtn() {
-            const currentPage = localStorage.getItem("sys_current_page");
-            // نظهر الزر فقط لو الصفحة مش home.html
-            if(currentPage && currentPage !== "home.html") {
-                // التأكد من عدم وجود الزر مسبقاً لتجنب التكرار
-                if(document.getElementById('sys-home-btn')) return;
+        // دالة رسم الزر (تعمل بمؤقت لضمان التنفيذ)
+        function injectHomeButton() {
+            // لو الصفحة هي الرئيسية، لا تفعل شيء
+            const cp = localStorage.getItem("sys_current_page");
+            if (!cp || cp === "home.html") return;
 
-                const btn = document.createElement("div");
-                btn.id = 'sys-home-btn';
-                btn.innerHTML = "🏠";
-                // جعلنا الـ z-index عالي جداً (999999) ليظهر فوق كل شيء
-                btn.style.cssText = "position:fixed; bottom:20px; left:20px; width:50px; height:50px; background:#238636; color:white; border-radius:50%; text-align:center; line-height:50px; font-size:24px; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.6); z-index:999999; border: 2px solid #fff; transition: transform 0.2s;";
-                
-                btn.onmousedown = function(){ btn.style.transform = "scale(0.9)"; };
-                btn.onmouseup = function(){ btn.style.transform = "scale(1)"; };
-                btn.onclick = function() { window.go('home.html'); };
-                
-                document.body.appendChild(btn);
+            // لو الزر موجود بالفعل، لا تفعل شيء
+            if (document.getElementById('sys-home-floater')) return;
+
+            // لو الجسم (body) غير جاهز، حاول كمان شوية
+            if (!document.body) {
+                setTimeout(injectHomeButton, 100);
+                return;
             }
+
+            // رسم الزر
+            const btn = document.createElement("div");
+            btn.id = 'sys-home-floater';
+            btn.innerHTML = "🏠";
+            // ستايل الزر (تم رفع z-index لأقصى درجة)
+            btn.style.cssText = "position:fixed; bottom:20px; left:20px; width:55px; height:55px; background:#238636; color:white; border-radius:50%; text-align:center; line-height:55px; font-size:26px; cursor:pointer; box-shadow:0 4px 15px rgba(0,0,0,0.8); z-index:2147483647; border: 2px solid #fff;";
+            
+            btn.onclick = function() { window.go('home.html'); };
+            
+            document.body.appendChild(btn);
         }
 
-        // تشغيل الدالة فور تحميل الصفحة
-        if(document.body) {
-            showHomeBtn();
-        } else {
-            window.addEventListener('DOMContentLoaded', showHomeBtn);
-            window.addEventListener('load', showHomeBtn);
-        }
+        // تشغيل محاولة رسم الزر فوراً وبعد تحميل الصفحة
+        injectHomeButton();
+        window.addEventListener('load', injectHomeButton);
+        // محاولة إضافية كل ثانية للتأكيد (في حالة الصفحات الثقيلة)
+        setInterval(injectHomeButton, 1000);
 
         document.oncontextmenu = function(){return false;};
     <\/script>
@@ -157,9 +163,8 @@
     const uiSpinner = document.getElementById("spinner");
 
     async function bootSystem() {
-        // !!! هام جداً: هذا السطر يمسح الإصدار القديم لإجبار التحميل الجديد !!!
-        // بعد أن يعمل الكود وتتأكد أن الزر ظهر، يمكنك حذف هذا السطر مستقبلاً لتسريع الفتح
-        localStorage.removeItem("sys_version"); 
+        // !!! سطر المسح الإجباري (مهم جداً الآن لتحديث الملفات القديمة) !!!
+        localStorage.removeItem("sys_version");
 
         let localVer = parseFloat(localStorage.getItem("sys_version")) || 0;
 
@@ -171,9 +176,9 @@
                     const vData = await vResponse.json();
                     const remoteVer = parseFloat(vData.version);
 
-                    // بما أننا مسحنا الإصدار المحلي، الشرط ده هيتحقق دائماً الآن
+                    // التحديث سيعمل دائماً بسبب سطر المسح الإجباري
                     if (remoteVer > localVer || localVer === 0) {
-                        uiStatus.innerText = `تحديث ملفات النظام...`;
+                        uiStatus.innerText = `تحديث الملفات (إضافة الأزرار)...`;
                         uiPBar.style.display = "block";
                         
                         let count = 0;
@@ -187,6 +192,7 @@
                             
                             let content = await fResponse.text();
 
+                            // نضع الكود في نهاية الملف لضمان عمله
                             if(content.includes("</body>")) {
                                 content = content.replace("</body>", INJECTED_SCRIPT + "</body>");
                             } else {
@@ -223,7 +229,7 @@
                 uiError.innerHTML = `
                     ⚠️ <b>تنبيه هام</b><br><br>
                     لم يتم العثور على ملفات النظام.<br>
-                    يرجى <b>توصيل الإنترنت</b> ثم إعادة فتح التطبيق لتنزيل الملفات.
+                    يرجى توصيل الإنترنت لتحميل النسخة الجديدة.
                 `;
             }
         }, 1000);
