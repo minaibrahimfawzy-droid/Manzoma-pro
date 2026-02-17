@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 Pro [HYBRID]</title>
+<title>System 2026 Pro [SECURE]</title>
 <style>
-    /* الستايل كما هو لم يتغير */
+    /* الستايل كما هو للحفاظ على التصميم */
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none;overflow:hidden}
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:0.3s}
     input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:2px;box-sizing:border-box}
@@ -31,11 +31,16 @@
     .loader{border:3px solid #f3f3f3;border-top:3px solid #238636;border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;display:none;margin:0 auto}
     @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
     @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+    
+    #app-viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d1117; z-index: 99999; flex-direction: column; }
+    .viewer-header { height: 50px; background: #161b22; border-bottom: 1px solid #30363d; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
+    .close-viewer-btn { background: #da3633; color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 14px; }
+    .viewer-title { font-weight: bold; color: #c9d1d9; }
+    iframe { flex: 1; border: none; width: 100%; background: #fff; }
 </style>
 </head>
 <body oncontextmenu="return false">
 
-<!-- شاشة القفل -->
 <div id="lock-screen">
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
     <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
@@ -50,19 +55,18 @@
     <p id="banMsg" class="error" style="color:#da3633;">🚫 تم إيقاف النظام عن بعد!</p>
 </div>
 
-<!-- القائمة -->
 <div id="app-menu">
     <div class="menu-header">
         <h2 style="margin:0; font-size:18px; color:#fff;">الرئيسية</h2>
         <button id="logoutBtn" class="logout-btn"><span>خروج</span> 🚪</button>
     </div>
     <div class="grid">
-        <div class="app-btn" onclick="go('Nabatshia.html')"><span class="icon">📅</span>النبطشية</div>
-        <div class="app-btn" onclick="go('2.html')"><span class="icon">🌙</span>الورديات</div>
-        <div class="app-btn" onclick="go('3.html')"><span class="icon">⚖️</span>التصفيات</div>
-        <div class="app-btn" onclick="go('4.html')"><span class="icon">📝</span>اللمات</div>
-        <div class="app-btn" onclick="go('5.html')"><span class="icon">🌊</span>التدفق</div>
-        <div class="app-btn" onclick="go('6.html')"><span class="icon">🏗️</span>المهيئ والمواسير</div>
+        <div class="app-btn" onclick="go('Nabatshia.html', 'النبطشية')"><span class="icon">📅</span>النبطشية</div>
+        <div class="app-btn" onclick="go('2.html', 'الورديات')"><span class="icon">🌙</span>الورديات</div>
+        <div class="app-btn" onclick="go('3.html', 'التصفيات')"><span class="icon">⚖️</span>التصفيات</div>
+        <div class="app-btn" onclick="go('4.html', 'اللمات')"><span class="icon">📝</span>اللمات</div>
+        <div class="app-btn" onclick="go('5.html', 'التدفق')"><span class="icon">🌊</span>التدفق</div>
+        <div class="app-btn" onclick="go('6.html', 'المهيئ والمواسير')"><span class="icon">🏗️</span>المهيئ والمواسير</div>
     </div>
     <div class="backup-area">
         <button class="bk-btn btn-export" id="bkExport">📤 حفظ نسخة من البيانات</button>
@@ -70,7 +74,15 @@
     </div>
 </div>
 
-<!-- نافذة النسخ -->
+<div id="app-viewer">
+    <div class="viewer-header">
+        <button class="close-viewer-btn" onclick="closeApp()">رجوع للقائمة ↩️</button>
+        <span class="viewer-title" id="viewerTitle">التطبيق</span>
+        <div style="width:70px"></div>
+    </div>
+    <iframe id="app-frame" src=""></iframe>
+</div>
+
 <div id="exportModal" class="modal-overlay">
     <div class="modal-box">
         <h3 style="margin:0 0 10px 0;color:#fff">📦 كود النسخ الاحتياطي</h3>
@@ -81,193 +93,185 @@
 </div>
 
 <script>
-/* 
-   SYSTEM 2026 - HYBRID CORE (Online/Offline)
-   Modified to support offline access
-*/
+/* SYSTEM 2026 - PROTECTED CORE */
 (function(){
-    const _k = {
-        t: atob("ODU5Njk5Mzc0NTpBQUcwRlhIOExGcXdlTEg1bmxQVGNGcEVNMDdCSGhhYnJIdw=="),
-        g: atob("LTEwMDM4ODY1MjgxMTQ="),
-        s: atob("QWRtaW5fMjZf"),
-        u: localStorage.getItem("_u_id") || "ID-" + Math.floor(Math.random() * 8999 + 1000)
+    var _0x1a=["\x4f\x44\x55\x35\x4e\x6a\x6b\x35\x4d\x7a\x63\x30\x4e\x54\x70\x42\x51\x55\x63\x77\x52\x6c\x68\x49\x4f\x45\x78\x47\x63\x58\x64\x6c\x54\x45\x67\x31\x62\x6d\x78\x51\x56\x47\x4e\x4d\x63\x45\x56\x4e\x4d\x44\x64\x43\x53\x47\x68\x68\x59\x6e\x4a\x49\x64\x77\x3d\x3d","\x4c\x54\x45\x77\x4d\x44\x4d\x34\x4f\x44\x59\x31\x4d\x6a\x67\x78\x4d\x54\x51\x3d","\x51\x57\x52\x74\x61\x57\x35\x66\x4d\x6a\x5a\x66","\x5f\x75\x5f\x69\x64","\x49\x44\x2d","\x51\x57\x52\x74\x61\x57\x35\x66\x4d\x6a\x5a\x66\x4d\x6a\x6b\x78\x4d\x54\x6b\x35\x4e\x67\x3d\x3d","\x51\x57\x52\x74\x61\x57\x35\x66\x4d\x6a\x5a\x66\x4e\x7a\x59\x78\x4f\x54\x67\x33","\x51\x57\x52\x74\x61\x57\x35\x66\x4d\x6a\x5a\x66\x4e\x44\x45\x78\x4d\x6a\x41\x78\x4e\x41\x3d\x3d","\x51\x57\x52\x74\x61\x57\x35\x66\x4d\x6a\x5a\x66\x4d\x6a\x41\x33\x4d\x6a\x41\x78\x4e\x77\x3d\x3d","\x51\x57\x52\x74\x61\x57\x35\x66\x4d\x6a\x5a\x66\x4e\x7a\x59\x79\x4d\x44\x49\x78"];
+    var _0x2b={
+        t: atob(_0x1a[0]),
+        g: atob(_0x1a[1]),
+        s: atob(_0x1a[2]),
+        u: localStorage.getItem(_0x1a[3]) || _0x1a[4] + Math.floor(Math.random()*8999+1000)
     };
+    var _0x3c=[_0x1a[5],_0x1a[6],_0x1a[7],_0x1a[8],_0x1a[9]];
     
-    const _p = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+    if(!localStorage.getItem(_0x1a[3])) localStorage.setItem(_0x1a[3], _0x2b.u);
+    document.getElementById("devID").innerText = _0x2b.u;
 
-    if(!localStorage.getItem("_u_id")) localStorage.setItem("_u_id", _k.u);
-    document.getElementById("devID").innerText = _k.u;
+    function _0x4d() {
+        var d=new Date(), y=d.getFullYear();
+        if(y<2026) y=2026;
+        var i=(y-2026)*2;
+        if(d.getMonth()>=5) i+=1;
+        return _0x3c[i%5];
+    }
 
-    const _gp = () => {
-        const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
-        let i = (y - 2026) * 2;
-        if (d.getMonth() >= 5) i += 1; 
-        return _p[i % 5];
-    };
-
-    // دالة إرسال التليجرام (تعمل فقط عند وجود إنترنت)
-    const _snd = async (act, xtra = "") => {
-        if (!navigator.onLine) return; // إذا لا يوجد نت، تجاهل الإرسال
+    async function _0x5e(act, xtra="") {
+        if(!navigator.onLine) return;
+        var ip="N/A", dev="Offline";
+        try {
+            const c=new AbortController();
+            setTimeout(()=>c.abort(),1500);
+            const r=await fetch('https://api.ipify.org?format=json', {signal:c.signal});
+            const j=await r.json();
+            ip=j.ip;
+        } catch(e){}
+        var ua=navigator.userAgent;
+        if(ua.match(/Android/i)) dev="Android";
+        else if(ua.match(/iPhone|iPad/i)) dev="iOS";
+        else dev="PC/Web";
         
-        let ip = "N/A";
-        let dev = "Offline Mode";
-        
+        var txt = encodeURIComponent("🚨 <b>LOG</b>\n🆔: "+_0x2b.u+"\n🎬: "+act+"\n🌍: "+ip+"\n📱: "+dev+"\n"+xtra);
+        try{ fetch("https://api.telegram.org/bot"+_0x2b.t+"/sendMessage?chat_id="+_0x2b.g+"&text="+txt+"&parse_mode=HTML"); }catch(e){}
+    }
+
+    async function _0x6f() {
+        if(!navigator.onLine) return "OK";
         try {
-            // محاولة سريعة لجلب الـ IP مع مهلة قصيرة
-            const c = new AbortController();
-            setTimeout(() => c.abort(), 1500);
-            const r = await fetch('https://api.ipify.org?format=json', {signal: c.signal});
-            const j = await r.json();
-            ip = j.ip;
-        } catch(e) {}
-
-        const ua = navigator.userAgent;
-        if(ua.match(/Android/i)) dev = "Android 📱";
-        else if(ua.match(/iPhone|iPad/i)) dev = "iOS 🍏";
-        else if(ua.match(/Windows/i)) dev = "PC 💻";
-        else dev = "Mobile 🌐";
-
-        const txt = encodeURIComponent(
-            "🚨 <b>SYS_LOG</b>\n" +
-            "🆔: <code>" + _k.u + "</code>\n" +
-            "🎬: " + act + "\n" +
-            "🌍: " + ip + "\n" +
-            "📱: " + dev + "\n" +
-            xtra
-        );
-
-        try {
-            fetch("https://api.telegram.org/bot" + _k.t + "/sendMessage?chat_id=" + _k.g + "&text=" + txt + "&parse_mode=HTML");
-        } catch(e) {}
-    };
-
-    // دالة فحص الحظر (محسنة لتعمل مع ضعف أو انقطاع النت)
-    const _chk = async () => {
-        // 1. إذا المتصفح يعلم يقيناً أنه لا يوجد نت، تخطى الفحص فوراً
-        if (!navigator.onLine) return "OK";
-
-        try {
-            // 2. وضع مهلة زمنية (3 ثواني) للفحص، لو السيرفر ماردش اعتبره سليم
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
-
-            const r = await fetch("https://api.telegram.org/bot" + _k.t + "/getChat?chat_id=" + _k.g + "&v=" + Date.now(), { signal: controller.signal });
-            clearTimeout(timeoutId); // إلغاء التايمر إذا تم الاتصال بنجاح
-
-            const j = await r.json();
-            if (j.ok && j.result.description) {
-                let d = j.result.description.toUpperCase().replace(/\s/g, '');
-                let uid = _k.u.toUpperCase().replace(/\s/g, '');
-                if (d.includes("⛔")) return "LOCK";
-                if (d.includes("BAN:" + uid) || d.includes("BAN" + uid)) return "BAN";
+            const c=new AbortController();
+            const t=setTimeout(()=>c.abort(),3000);
+            const r=await fetch("https://api.telegram.org/bot"+_0x2b.t+"/getChat?chat_id="+_0x2b.g+"&v="+Date.now(), {signal:c.signal});
+            clearTimeout(t);
+            const j=await r.json();
+            if(j.ok && j.result.description) {
+                var d=j.result.description.toUpperCase().replace(/\s/g,'');
+                var uid=_0x2b.u.toUpperCase().replace(/\s/g,'');
+                if(d.includes("⛔") || d.includes("LOCK")) return "LOCK";
+                if(d.includes("BAN:"+uid) || d.includes("BAN"+uid)) return "BAN";
             }
-        } catch(e) {
-            // في حالة الخطأ أو انقطاع النت أثناء الفحص، اسمح بالدخول
-            return "OK";
-        }
+        } catch(e){return "OK";}
         return "OK";
-    };
+    }
 
-    const _doL = async () => {
-        const inp = document.getElementById("pIn");
-        const val = inp.value.trim();
+    async function _0x7a() {
+        var inp=document.getElementById("pIn");
+        var val=inp.value.trim();
+        if(val.length<1){inp.focus();return;}
+        
+        // تحويل الأرقام العربية
+        var enVal = val.replace(/[٠-٩]/g, function(d) { return "٠١٢٣٤٥٦٧٨٩".indexOf(d); });
+        var hash = btoa(_0x2b.s + enVal);
+        var truePass = _0x4d();
 
-        if(val.length < 1) {
-            inp.focus();
-            return;
-        }
-
-        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
-        const hash = btoa(_k.s + enVal);
-        const truePass = _gp();
-
-        const b = document.getElementById("loginBtn");
-        const l = document.getElementById("btnLoad");
-        const t = document.getElementById("btnText");
-        const e = document.getElementById("eMsg");
-        const m = document.getElementById("banMsg");
+        var b=document.getElementById("loginBtn");
+        var l=document.getElementById("btnLoad");
+        var t=document.getElementById("btnText");
+        var e=document.getElementById("eMsg");
+        var m=document.getElementById("banMsg");
 
         e.style.display="none"; m.style.display="none";
         b.disabled=true; t.style.display="none"; l.style.display="block";
 
-        // التحقق من الباسورد محلياً أولاً
-        if (hash !== truePass) {
-            setTimeout(() => {
-                _snd("WRONG_PASS", "🔑 Tried: " + enVal);
+        if(hash !== truePass) {
+            setTimeout(function(){
+                _0x5e("WRONG_PASS", "🔑: "+enVal);
                 l.style.display="none"; t.style.display="block"; b.disabled=false;
                 e.style.display="block";
             }, 800);
             return;
         }
 
-        // باسورد صحيح - فحص الحالة (سريع جداً الآن في حالة عدم وجود نت)
-        const st = await _chk();
-        
+        var st = await _0x6f();
         l.style.display="none"; t.style.display="block"; b.disabled=false;
 
-        if (st !== "OK") {
-            m.innerText = (st === "LOCK") ? "⛔ النظام مغلق للصيانة" : "🚫 تم حظر هذا الجهاز";
+        if(st!=="OK") {
+            m.innerText = (st==="LOCK") ? "⛔ مغلق للصيانة" : "🚫 تم الحظر";
             m.style.display="block";
             localStorage.removeItem("_tkn_auth");
-            _snd("BLOCKED_LOGIN", "Status: " + st);
+            _0x5e("BLOCKED_LOGIN", "St: "+st);
         } else {
             localStorage.setItem("_tkn_auth", hash);
-            _ui(true);
-            _snd("LOGIN_SUCCESS", "✅ User Logged In");
+            _0x8b(true);
+            _0x5e("LOGIN_SUCCESS", "✅ Logged In");
+        }
+    }
+
+    function _0x8b(isLog) {
+        document.getElementById("lock-screen").style.display = isLog ? "none" : "block";
+        document.getElementById("app-menu").style.display = isLog ? "block" : "none";
+    }
+
+    /* APP VIEWER LOGIC */
+    window.go = function(u, t) {
+        var v = document.getElementById('app-viewer');
+        var f = document.getElementById('app-frame');
+        var tt = document.getElementById('viewerTitle');
+        f.src = u;
+        tt.innerText = t || "التطبيق";
+        v.style.display = 'flex';
+        history.pushState({view: 'app'}, null, "");
+    };
+
+    window.closeApp = function() {
+        if(history.state && history.state.view === 'app') {
+            history.back();
+        } else {
+            document.getElementById('app-viewer').style.display = 'none';
+            document.getElementById('app-frame').src = '';
         }
     };
 
-    const _ui = (isLog) => {
-        document.getElementById("lock-screen").style.display = isLog ? "none" : "block";
-        document.getElementById("app-menu").style.display = isLog ? "block" : "none";
+    window.onpopstate = function(e) {
+        document.getElementById('app-viewer').style.display = 'none';
+        document.getElementById('app-frame').src = '';
     };
 
-    window._cp = () => { document.getElementById("exportBox").select(); document.execCommand("copy"); alert("✅ تم النسخ"); };
-    window.go = (u) => window.location.href = u;
+    window._cp = function() {
+        document.getElementById("exportBox").select();
+        document.execCommand("copy");
+        alert("✅ تم النسخ");
+    };
 
-    window.onload = () => {
-        if (localStorage.getItem("_tkn_auth") === _gp()) {
-            // فحص عند الفتح (مع دعم الأوفلاين)
-            _chk().then(st => {
-                if(st === "OK") {
-                    _ui(true);
-                } else {
+    window.onload = function() {
+        if(localStorage.getItem("_tkn_auth") === _0x4d()) {
+            _0x6f().then(function(st){
+                if(st==="OK") _0x8b(true);
+                else {
                     localStorage.removeItem("_tkn_auth");
-                    _ui(false);
-                    document.getElementById("banMsg").style.display = "block";
+                    _0x8b(false);
+                    document.getElementById("banMsg").style.display="block";
                 }
             });
         }
 
-        document.getElementById("loginBtn").onclick = _doL;
-        document.getElementById("pIn").addEventListener("keypress", (e) => { if(e.key === 'Enter') _doL(); });
-
-        document.getElementById("logoutBtn").onclick = () => {
-            if(confirm("هل تود الخروج؟")) {
+        document.getElementById("loginBtn").onclick = _0x7a;
+        document.getElementById("pIn").addEventListener("keypress", function(e){if(e.key==='Enter')_0x7a();});
+        
+        document.getElementById("logoutBtn").onclick = function() {
+            if(confirm("خروج؟")) {
                 localStorage.removeItem("_tkn_auth");
                 location.reload();
             }
         };
 
-        document.getElementById("bkExport").onclick = () => {
+        document.getElementById("bkExport").onclick = function() {
             try {
-                const d = btoa(unescape(encodeURIComponent(JSON.stringify(localStorage))));
+                var d=btoa(unescape(encodeURIComponent(JSON.stringify(localStorage))));
                 document.getElementById("exportBox").value = d;
                 document.getElementById("exportModal").style.display = "flex";
-            } catch(e) { alert("خطأ"); }
+            } catch(e){alert("Error");}
         };
 
-        document.getElementById("bkImport").onclick = () => {
-            const c = prompt("كود الاستعادة:");
+        document.getElementById("bkImport").onclick = function() {
+            var c=prompt("كود الاستعادة:");
             if(c) {
                 try {
-                    const d = JSON.parse(decodeURIComponent(escape(atob(c))));
-                    if(confirm("سيتم استبدال البيانات، متأكد؟")) {
+                    var d=JSON.parse(decodeURIComponent(escape(atob(c))));
+                    if(confirm("استبدال البيانات؟")) {
                         localStorage.clear();
-                        for(let k in d) localStorage.setItem(k, d[k]);
+                        for(var k in d) localStorage.setItem(k, d[k]);
                         alert("✅ تم"); location.reload();
                     }
-                } catch(e) { alert("❌ الكود خطأ"); }
+                } catch(e){alert("كود خاطئ");}
             }
         };
     };
