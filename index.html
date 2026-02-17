@@ -81,13 +81,12 @@
 
 <script>
     // ============================================================
-    // الرابط الخاص بك
+    // إعدادات الرابط والملفات
     // ============================================================
     const REPO_URL = "https://raw.githubusercontent.com/minaibrahimfawzy-droid/Manzoma-pro/main/";
 
-    // لاحظ: تم تغيير index.html إلى home.html في القائمة
     const APP_FILES = [
-        "home.html",      // <-- دي شاشة القفل بتاعتك (غيرت اسمها هنا)
+        "home.html",      // الشاشة الرئيسية
         "Nabatshia.html", 
         "2.html",         
         "3.html",         
@@ -103,13 +102,28 @@
     const uiPFill = document.getElementById("pFill");
     const uiSpinner = document.getElementById("spinner");
 
-    // كود الحقن (لتشغيل التنقل من الذاكرة)
+    // ============================================================
+    // كود الحقن المطور (يتحكم في التنقل + زر الرجوع + الزر العائم)
+    // ============================================================
     const INJECTED_SCRIPT = `
     <script>
+        // دالة التنقل بين الصفحات
         window.go = function(pageName) {
-            // لو الزرار بيحاول يروح لـ index.html هنحوله لـ home.html
             if(pageName === "index.html") pageName = "home.html";
             
+            // تسجيل الصفحة الحالية للتحكم في ظهور الزر العائم
+            localStorage.setItem("sys_current_page", pageName);
+
+            // إضافة سجل للتاريخ عشان زر الموبايل يشتغل
+            if(pageName !== "home.html") {
+                // لو رايحين لصفحة فرعية بنضيفها للتاريخ
+                history.pushState({page: pageName}, null, "#" + pageName);
+            } else {
+                // لو راجعين للرئيسية، بننظف الرابط شكلياً
+                history.replaceState(null, null, " ");
+            }
+
+            // تحميل المحتوى من الذاكرة
             const storedPage = localStorage.getItem("sys_file_" + pageName);
             if(storedPage) {
                 document.open();
@@ -117,9 +131,41 @@
                 document.close();
             } else {
                 alert("⛔ الملف غير موجود: " + pageName);
-                location.reload(); 
+                // لو الملف مش موجود ارجع للرئيسية
+                window.go("home.html");
             }
         };
+
+        // تفعيل زر الرجوع في الموبايل (Hardware Back Button)
+        window.onpopstate = function(event) {
+            // مهما كنت فين، زر الرجوع في الموبايل هيرجعك للرئيسية
+            // إلا لو كنت أصلاً في الرئيسية مش هيعمل حاجة (أو هيخرج حسب المتصفح)
+            window.go("home.html");
+        };
+
+        // كود الزر العائم (زر الهوم 🏠)
+        (function() {
+            const currentPage = localStorage.getItem("sys_current_page");
+            
+            // الشرط: اظهر الزر فقط لو الصفحة مش home.html
+            if(currentPage && currentPage !== "home.html") {
+                const btn = document.createElement("div");
+                btn.innerHTML = "🏠";
+                // تنسيق الزر (أسفل اليسار - لون أخضر - ظل)
+                btn.style.cssText = "position:fixed; bottom:20px; left:20px; width:50px; height:50px; background:#238636; color:white; border-radius:50%; text-align:center; line-height:50px; font-size:24px; cursor:pointer; box-shadow:0 5px 15px rgba(0,0,0,0.5); z-index:9999; border: 2px solid #fff; transition: transform 0.2s;";
+                
+                // تأثير بسيط عند الضغط
+                btn.onmousedown = function(){ btn.style.transform = "scale(0.9)"; };
+                btn.onmouseup = function(){ btn.style.transform = "scale(1)"; };
+                
+                // عند النقر يروح للرئيسية
+                btn.onclick = function() { window.go('home.html'); };
+                
+                document.body.appendChild(btn);
+            }
+        })();
+
+        // منع القائمة المنسدلة (كليك يمين)
         document.oncontextmenu = function(){return false;};
     <\/script>
     `;
@@ -127,7 +173,7 @@
     async function bootSystem() {
         let localVer = parseFloat(localStorage.getItem("sys_version")) || 0;
 
-        // 1. التحديث عبر الإنترنت
+        // 1. الاتصال والتحديث
         if (navigator.onLine) {
             uiStatus.innerText = "فحص التحديثات...";
             try {
@@ -151,6 +197,7 @@
                             
                             let content = await fResponse.text();
 
+                            // حقن السكربت داخل كل ملف يتم تحميله
                             if(content.includes("</body>")) {
                                 content = content.replace("</body>", INJECTED_SCRIPT + "</body>");
                             } else {
@@ -170,12 +217,15 @@
             }
         }
 
-        // 2. التشغيل (يفتح home.html بدل index.html)
+        // 2. تشغيل النظام
         setTimeout(() => {
-            // هنا التغيير المهم: بنجيب home.html
             const startPage = localStorage.getItem("sys_file_home.html");
 
             if (startPage) {
+                // ضبط الحالة الأولية
+                localStorage.setItem("sys_current_page", "home.html");
+                history.replaceState(null, null, " "); // تنظيف التاريخ عند البدء
+
                 document.open();
                 document.write(startPage);
                 document.close();
