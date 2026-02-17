@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اللمات - الإصدار المطور (تعديل التنسيق)</title>
+    <title>اللمات - الإصدار المطور (فيزا اليوم الكامل)</title>
     <style>
         /* --- 1. أساسيات التصميم --- */
         :root {
@@ -92,16 +92,15 @@
             background-color: var(--dark); 
             color: white; 
             height: 35px;
-            /* التعديل: تصغير الخط ومنع التفاف النص ليظهر كاملاً */
             font-size: 0.85rem; 
             white-space: nowrap; 
             overflow: hidden;
-            padding: 0 2px; /* تقليل الهوامش الداخلية */
+            padding: 0 2px;
         }
         .grand-total-cell { 
             background-color: var(--warning) !important; 
             color: #000 !important; 
-            font-size: 1rem !important; /* الخط هنا يمكن أن يكون أكبر قليلاً لأنه خانة واحدة */
+            font-size: 1rem !important;
             font-weight: bold; 
         }
 
@@ -311,23 +310,28 @@
                     </div>
 
                     <div class="row text-center mb-2">
-                         <div class="col-6 p-1">
+                         <div class="col-4 p-1">
                             <div class="summary-box" style="background:#fff5f5; border-color:#f5c6cb;">
                                 <span class="summary-label text-danger">إجمالي التوريدات (ص+م)</span>
                                 <span id="totalTawreedAllShifts" class="summary-value text-danger">0</span>
                             </div>
                          </div>
-                         <div class="col-6 p-1">
+                         <!-- خانة إجمالي فيزا اليوم الكامل -->
+                         <div class="col-4 p-1">
+                            <div class="summary-box" style="background:#e3f2fd; border-color:#90caf9;">
+                                <span class="summary-label" style="color:#0d6efd">إجمالي فيزا (ص+م)</span>
+                                <span id="totalVisaDayDisplay" class="summary-value" style="color:#0d6efd">0</span>
+                            </div>
+                         </div>
+                         <div class="col-4 p-1">
                             <div class="summary-box bg-success text-white">
-                                <span class="summary-label" style="color:rgba(255,255,255,0.8)">الصافي النهائي</span>
+                                <span class="summary-label" style="color:rgba(255,255,255,0.8)">الصافي النهائي (خزينة+فيزا)</span>
                                 <span id="netFinalTotal" class="summary-value">0</span>
                             </div>
                          </div>
                     </div>
                     
-                    <!-- --- تعديل توزيع عناصر الخزينة والفيزا في 3 صفوف --- -->
-                    
-                    <!-- الصف الأول: إيراد نقدي - إلكتروني - رقابة -->
+                    <!-- --- الصف الأول: إيراد نقدي - إلكتروني - رقابة --- -->
                     <div class="row mb-1">
                         <div class="col-4 px-1">
                             <div class="info-box">
@@ -357,7 +361,6 @@
                                 <div class="val text-muted" id="morningTawreedDisplay">0</div>
                             </div>
                         </div>
-                        <!-- في حالة الصباحي، هذه الخانات ستختفي تلقائياً عبر الجافاسكربت وتترك مكانها فارغاً أو تعيد التوزيع -->
                         <div class="col-4 px-1" id="carryOverContainer">
                             <div class="info-box">
                                 <small class="text-secondary">مرحل صباحي</small>
@@ -372,12 +375,18 @@
                         </div>
                     </div>
 
-                    <!-- الصف الثالث: الخزينة كاش -->
+                    <!-- الصف الثالث: الخزينة كاش + الإجمالي الكلي (التعديل الجديد) -->
                     <div class="row mt-2">
-                        <div class="col-12 px-1">
-                            <div class="bg-dark text-white rounded p-2 text-center border border-warning">
+                        <div class="col-6 px-1">
+                            <div class="bg-dark text-white rounded p-2 text-center border border-warning" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
                                 <small style="color:#bbb;">خزينة حالية (كاش)</small>
-                                <div class="fw-bold text-warning" style="font-size:1.5rem;" id="safeBalance">0</div>
+                                <div class="fw-bold text-warning" style="font-size:1.4rem;" id="safeBalance">0</div>
+                            </div>
+                        </div>
+                        <div class="col-6 px-1">
+                            <div class="bg-dark text-white rounded p-2 text-center border border-info" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                <small style="color:#bbb;">إجمالي (خزينة + فيزا)</small>
+                                <div class="fw-bold text-info" style="font-size:1.4rem;" id="totalSafeVisaDisplay">0</div>
                             </div>
                         </div>
                     </div>
@@ -671,6 +680,13 @@
                 const req = (d.fin?.reqaba||[]).reduce((a,b)=>a+b.value,0);
                 return c + req;
             };
+            // دالة لحساب الفيزا فقط لوردية محفوظة
+            const getVisaOnly = (d) => {
+                if(!d) return 0;
+                let v = 0;
+                (d.trans||[]).forEach(x => { v += (x.visa||0); });
+                return v;
+            };
             
             const getTaw = (d) => !d ? 0 : (d.fin?.tawreed||[]).reduce((a,b)=>a+b.value,0);
 
@@ -685,13 +701,17 @@
             document.getElementById('totalTawreedAllShifts').innerText = (mTaw + eTaw).toLocaleString();
             document.getElementById('netFinalTotal').innerText = ((mRev + eRev) - (mTaw + eTaw)).toLocaleString();
 
+            // --- حساب إجمالي فيزا اليوم الكامل (ص+م) ---
+            const mVisa = shift === 'صباحية' ? visaTotal : getVisaOnly(mData);
+            const eVisa = shift === 'مسائية' ? visaTotal : getVisaOnly(eData);
+            const totalDayVisa = mVisa + eVisa;
+            document.getElementById('totalVisaDayDisplay').innerText = totalDayVisa.toLocaleString();
+
             let carry = 0;
-            // التحكم في ظهور عناصر الوردية الصباحية (التوريد والمرحل) عند اختيار المسائية
             const mornTawContainer = document.getElementById('morningTawreedContainer');
             const carryContainer = document.getElementById('carryOverContainer');
 
             if (shift === 'مسائية') {
-                // المرحل يحسب من (الكاش الصباحي - التوريد الصباحي)
                 const mCash = getCashRev(mData);
                 carry = mCash - mTaw;
                 
@@ -701,20 +721,22 @@
                 document.getElementById('carryOverDisplay').innerText = carry.toLocaleString();
                 document.getElementById('morningTawreedDisplay').innerText = mTaw.toLocaleString();
             } else {
-                // في الصباحي، نخفي المحتوى وليس العنصر نفسه للحفاظ على التنسيق
                 mornTawContainer.style.visibility = 'hidden';
                 carryContainer.style.visibility = 'hidden';
             }
 
             document.getElementById('totalLanes').innerText = cashTotal.toLocaleString();
-            document.getElementById('totalVisa').innerText = visaTotal.toLocaleString(); // عرض الفيزا
+            document.getElementById('totalVisa').innerText = visaTotal.toLocaleString();
             document.getElementById('totalReqaba').innerText = r.toLocaleString();
             document.getElementById('totalTawreed').innerText = t.toLocaleString();
             
-            // معادلة الخزينة: كاش حالي + مرحل (كاش) + رقابة - توريد حالي
-            // ملاحظة: cashTotal هو المبالغ النقدية فقط بدون فيزا
+            // الخزينة الكاش فقط
             const safe = (cashTotal + r + carry) - t;
             document.getElementById('safeBalance').innerText = safe.toLocaleString();
+
+            // إجمالي الخزينة والفيزا
+            const totalSafeAndVisa = safe + visaTotal;
+            document.getElementById('totalSafeVisaDisplay').innerText = totalSafeAndVisa.toLocaleString();
         }
 
         // 10. إعدادات الحارات
