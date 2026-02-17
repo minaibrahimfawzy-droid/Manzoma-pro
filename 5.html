@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>التدفق العام</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: linear-gradient(to right, #f1f2f6, #dfe4ea);
+      font-family: 'Cairo', Tahoma, Arial, sans-serif;
+      text-align: center;
+      padding: 40px 10px;
+      font-size: 22px; color: #2c3e50;
+      direction: rtl;
+    }
+    input, button {
+      background: white;
+      border: 1px solid #ddd;
+      padding: 15px;
+      font-size: 22px; color: #2c3e50;
+      width: 90%;
+      max-width: 300px;
+      border-radius: 8px;
+      margin: 10px auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: 0.3s;
+    }
+    input[type="number"] {
+      min: 0;
+      text-align: center;
+    }
+    button {
+      background: linear-gradient(to right, #2ed573, #1e90ff);
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: linear-gradient(to right, #218838, #0056b3);
+      transform: translateY(-2px);
+    }
+    .result {
+      margin-top: 30px;
+      background-color: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      font-size: 22px; color: #2c3e50;
+      text-align: right;
+      border: 1px solid #ced6e0;
+    }
+    .count {
+      color: #3742fa;
+      font-weight: bold; font-size: 26px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #a4b0be; background-color: #f1f2f6;
+    }
+    input[type="checkbox"] {
+      width: 25px; height: 25px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="topBanner" style="margin-bottom: 20px;">
+  <p id="datetime" style="font-weight: bold; color: #2f3542; font-size: 22px;"></p>
+</div>
+
+<div id="main">
+  <!-- تم تغيير الاسم هنا -->
+  <h1>🌊 التدفق العام 🌊</h1>
+  <input type="number" id="amount" placeholder="ادخل المبلغ بالجنيه" min="0">
+
+  <div id="factions" style="margin-top:15px; text-align:right; font-size: 20px;">
+    <table>
+      <thead>
+        <tr style="background:#dfe6e9;">
+          <th>اختيار</th>
+          <th>الفئة</th>
+          <th>النسبة % (اختياري)</th>
+        </tr>
+        <tr style="background:#f9f9f9;">
+          <td><input type="checkbox" onclick="toggleAll(this)" checked></td>
+          <td colspan="2"><b>تحديد/إلغاء الكل</b></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><input type="checkbox" class="faction" value="10" checked></td><td>فئة 10</td><td><input type="number" id="percent_10" min="0" max="100" placeholder="%"></td></tr>
+        <tr><td><input type="checkbox" class="faction" value="15" checked></td><td>فئة 15</td><td><input type="number" id="percent_15" min="0" max="100" placeholder="%"></td></tr>
+        <tr><td><input type="checkbox" class="faction" value="20" checked></td><td>فئة 20</td><td><input type="number" id="percent_20" min="0" max="100" placeholder="%"></td></tr>
+        <tr><td><input type="checkbox" class="faction" value="25" checked></td><td>فئة 25</td><td><input type="number" id="percent_25" min="0" max="100" placeholder="%"></td></tr>
+        <tr><td><input type="checkbox" class="faction" value="30" checked></td><td>فئة 30</td><td><input type="number" id="percent_30" min="0" max="100" placeholder="%"></td></tr>
+        <tr><td><input type="checkbox" class="faction" value="35" checked></td><td>فئة 35</td><td><input type="number" id="percent_35" min="0" max="100" placeholder="%"></td></tr>
+        <tr style="background-color: #e3f2fd;"><td><input type="checkbox" class="faction" value="50" checked></td><td><b>فئة 50</b></td><td><input type="number" id="percent_50" min="0" max="100" placeholder="%"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button onclick="احسب()">احسب التوزيع</button>
+  <button onclick="location.reload()" style="background: linear-gradient(to right, #ff6b6b, #ee5253);">🔄 مسح وإعادة</button>
+  <div class="result" id="result"></div>
+
+  <div id="footer" style="margin-top: 40px;">
+    <p id="quran" style="font-weight:bold; font-size: 20px; color: #006400;"></p>
+    <p id="bible" style="font-weight:bold; font-size: 20px; color: #003366;"></p>
+    <p id="wisdom" style="font-style: italic; font-size: 18px; margin-top:10px;"></p>
+  </div>
+</div>
+
+<script>
+function toggleAll(source) {
+  let checkboxes = document.querySelectorAll(".faction");
+  checkboxes.forEach(cb => cb.checked = source.checked);
+}
+
+function احسب() {
+  let المبلغ = parseInt(document.getElementById("amount").value);
+  let selectedFactions = Array.from(document.querySelectorAll(".faction:checked"))
+                              .map(cb => parseInt(cb.value))
+                              .sort((a, b) => b - a);
+
+  if (isNaN(المبلغ) || المبلغ <= 0) {
+    document.getElementById("result").innerHTML = "<p style='color:red;'>من فضلك أدخل مبلغ صحيح.</p>";
+    return;
+  }
+
+  let النسب = {}, مجموع_مخصص = 0, فئات_مخصصة = [], فئات_افتراضية = [], توزيع = {}, باقي = المبلغ;
+
+  for (let فئة of selectedFactions) {
+    let input = document.getElementById("percent_" + فئة);
+    let نسبة = input && input.value ? parseFloat(input.value) : null;
+    if (!isNaN(نسبة) && نسبة >= 0 && نسبة <= 100) {
+      النسب[فئة] = نسبة / 100;
+      مجموع_مخصص += نسبة / 100;
+      فئات_مخصصة.push(فئة);
+    } else if (input.value.trim() === "") {
+      فئات_افتراضية.push(فئة);
+    } else {
+      document.getElementById("result").innerHTML = "<p style='color:red;'>من فضلك أدخل نسبة صحيحة بين 0 و 100.</p>";
+      return;
+    }
+  }
+
+  if (مجموع_مخصص > 1) {
+    document.getElementById("result").innerHTML = "<p style='color:red;'>مجموع النسب أكبر من 100%</p>";
+    return;
+  }
+
+  if (selectedFactions.length === 0) {
+    document.getElementById("result").innerHTML = "<p style='color:red;'>لم يتم اختيار أي فئة</p>";
+    return;
+  }
+
+  if (مجموع_مخصص === 0) {
+    let نسب_افتراضية = {
+      10: 0.20, 
+      15: 0.15, 
+      20: 0.12, 
+      25: 0.10, 
+      30: 0.13, 
+      35: 0.15,
+      50: 0.15 
+    };
+    
+    for (let فئة of selectedFactions) {
+      let نسبة = نسب_افتراضية[فئة] || 0.10;
+      let عدد = Math.floor((المبلغ * نسبة) / فئة);
+      توزيع[فئة] = عدد;
+      باقي -= عدد * فئة;
+    }
+  } else {
+    for (let فئة of فئات_مخصصة) {
+      let عدد = Math.floor((المبلغ * النسب[فئة]) / فئة);
+      توزيع[فئة] = عدد;
+      باقي -= عدد * فئة;
+    }
+
+    let نسبة_متبقية = 1 - مجموع_مخصص;
+    let عدد_غير_محددة = فئات_افتراضية.length;
+    let نسبة_لكل_واحدة = عدد_غير_محددة > 0 ? نسبة_متبقية / عدد_غير_محددة : 0;
+
+    for (let فئة of فئات_افتراضية) {
+      let عدد = Math.floor((المبلغ * نسبة_لكل_واحدة) / فئة);
+      توزيع[فئة] = عدد;
+      باقي -= عدد * فئة;
+    }
+  }
+
+  function backtrack(index, remaining, current) {
+    if (remaining === 0) return current;
+    if (index >= selectedFactions.length || remaining < 0) return null;
+    let coin = selectedFactions[index];
+    let maxCount = Math.floor(remaining / coin);
+    for (let count = maxCount; count >= 0; count--) {
+      let newCurrent = {...current};
+      if (count > 0) newCurrent[coin] = (newCurrent[coin] || 0) + count;
+      let result = backtrack(index + 1, remaining - coin * count, newCurrent);
+      if (result) return result;
+    }
+    return null;
+  }
+
+  let extra = backtrack(0, باقي, {});
+  if (!extra) {
+    document.getElementById("result").innerHTML = "<p style='color:red;'>لا يمكن توزيع المبلغ بالكامل بهذه الفئات (يوجد كسور لا تقبل القسمة).</p>";
+    return;
+  }
+
+  for (let فئة in extra) {
+    توزيع[فئة] = (توزيع[فئة] || 0) + extra[فئة];
+  }
+
+  let html = "", الإجمالي = 0;
+  
+  for (let فئة of selectedFactions) {
+    if (توزيع[فئة] > 0) {
+      let عدد = توزيع[فئة];
+      html += `<div style="border-bottom:1px solid #eee; padding:10px 0;"><p style="margin:5px 0;"><span class="count">${عدد}</span> × فئة ${فئة} = <b>${عدد * فئة}</b> جنيه</p>`;
+
+      if (فئة == 10) {
+        let فئة10 = عدد;
+        let ملاكي = Math.floor(فئة10 * 0.5);
+        let نقل = Math.floor(فئة10 * 0.2);
+        let ميكروباص = فئة10 - ملاكي - نقل;
+        html += `<ul style='margin-right:20px; font-size:18px; color:#555; list-style-type:none;'>
+                  <li>🚗 ملاكي: ${ملاكي}</li>
+                  <li>🚚 نقل ربع: ${نقل}</li>
+                  <li>🚐 ميكروباص: ${ميكروباص}</li>
+                </ul>`;
+      }
+      else if (فئة == 15) {
+        let شفر = Math.floor(عدد * 0.15);
+        let ربع = Math.floor(عدد * 0.30);
+        let ميني = Math.floor(عدد * 0.05);
+        let ميكروباص = عدد - شفر - ربع - ميني;
+        html += `<ul style='margin-right:20px; font-size:18px; color:#555; list-style-type:none;'>
+                  <li>🚙 شفر: ${شفر}</li>
+                  <li>🚚 ربع نقل: ${ربع}</li>
+                  <li>🚌 ميني باص: ${ميني}</li>
+                  <li>🚐 ميكروباص: ${ميكروباص}</li>
+                </ul>`;
+      }
+      else if (فئة == 20) {
+        let شفر = Math.floor(عدد * 0.95);
+        let ميني = عدد - شفر;
+        html += `<ul style='margin-right:20px; font-size:18px; color:#555; list-style-type:none;'>
+                  <li>🚙 شفر: ${شفر}</li>
+                  <li>🚌 ميني باص: ${ميني}</li>
+                </ul>`;
+      }
+      else if (فئة == 25) {
+        html += `<span style="color:#777; font-size:18px;"> 🚌 أتوبيس / رحلات</span>`;
+      }
+      else if (فئة == 30) {
+        html += `<span style="color:#777; font-size:18px;"> 🚐 نقل فردي</span>`;
+      }
+      else if (فئة == 35) {
+        html += `<span style="color:#777; font-size:18px;"> 🚛 نقل ثقيل</span>`;
+      }
+      else if (فئة == 50) {
+        html += `<span style="color:#777; font-size:18px;"> 🚛 تريلا / مقطورة</span>`;
+      }
+
+      html += `</div>`;
+      الإجمالي += عدد * فئة;
+    }
+  }
+
+  html += `<div style="margin-top:20px; padding:10px; background:#f1f2f6; border-radius:10px;">
+            <p><strong>الإجمالي الموزع: ${الإجمالي} جنيه</strong></p>
+            <p><strong>إجمالي عدد التذاكر: ${Object.values(توزيع).reduce((a,b)=>a+b,0)}</strong></p>
+           </div>`;
+           
+  if (الإجمالي < المبلغ) {
+    html += `<p style="color:red; font-weight:bold;">المتبقي بدون توزيع: ${المبلغ - الإجمالي} جنيه</p>`;
+  }
+
+  document.getElementById("result").innerHTML = html;
+}
+
+function updateDateTimeAndWisdom() {
+  const now = new Date();
+  const days = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const index = now.getDay();
+  document.getElementById("datetime").innerText = `${days[index]} - ${now.toLocaleDateString()} - ${now.toLocaleTimeString()}`;
+
+  const quran = ['﴿ إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ ﴾', '﴿ وَالَّذِينَ هُمْ لِفُرُوجِهِمْ حَافِظُونَ ﴾', '﴿ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا ﴾', '﴿ وَأَطِيعُوا اللَّهَ وَرَسُولَهُ ﴾', '﴿ وَلَا تَبْخَسُوا النَّاسَ أَشْيَاءَهُمْ ﴾', '﴿ وَاخْفِضْ جَنَاحَكَ لِلْمُؤْمِنِينَ ﴾', '﴿ إِنَّهُ لَا يُحِبُّ الْمُسْتَكْبِرِينَ ﴾'];
+  const bible = ['الله محبة...', 'اهربوا من الزنا', 'اغفروا يغفر لكم', 'أطيعوا مرشديكم', 'لا تسرق', 'تعلموا مني...', 'كل من يرفع نفسه يتضع'];
+  const wisdom = ['المحبة تغلب كل شيء', 'الزنا مفتاح الخراب', 'من سامح ارتاح', 'الطاعة شيمة العقلاء', 'السارق نهايته ندم', 'الوداعة قوة داخلية', 'التواضع يرفعك'];
+
+  document.getElementById("quran").innerText = quran[index];
+  document.getElementById("bible").innerText = bible[index];
+  document.getElementById("wisdom").innerText = wisdom[index];
+}
+
+window.onload = () => {
+  updateDateTimeAndWisdom();
+  setInterval(updateDateTimeAndWisdom, 60000);
+};
+</script>
+
+</body>
+</html>

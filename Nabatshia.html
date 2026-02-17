@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>برنامج النبطشية - v38 (Large Port Civilian Rule)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--olive:#6b705c;--olive-deep:#556b2f;--beige:#f5f0e6;--text:#222;--muted:#7b7b6b;--accent:#8a9a5b; --danger:#c62828;}
+*{box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;background:linear-gradient(180deg,#f7f6f0 0%, #fbfaf6 100%);margin:0;color:var(--text);padding:16px}
+.container{max-width:1280px;margin:0 auto}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.title{font-size:1.4rem;font-weight:700;color:var(--olive-deep)}
+.controls{display:flex;gap:8px;align-items:center; flex-wrap: wrap;}
+button{background:var(--olive-deep);color:#fff;border:none;padding:8px 10px;border-radius:8px;cursor:pointer}
+button:disabled { background: #ccc; cursor: not-allowed; }
+.btn-ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--olive-deep)}
+.tabs{display:flex;gap:8px;margin-bottom:12px; flex-wrap: wrap;}
+.tab{padding:10px 12px;border-radius:10px;background:var(--beige);cursor:pointer;border:1px solid rgba(0,0,0,0.04)}
+.tab.active{box-shadow:0 6px 18px rgba(85,107,47,0.06);border-color:var(--olive-deep);background:#fff; font-weight:bold;}
+.grid{display:grid;grid-template-columns:1fr 3fr;gap:12px}
+.card{background:var(--beige);padding:12px;border-radius:12px;box-shadow:0 6px 18px rgba(75,83,32,0.03)}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px; flex-wrap: wrap;}
+.input,select{padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);min-width:0; flex: 1;}
+.small{padding:4px 8px;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.1);cursor:pointer;color:var(--olive-deep);font-weight:600; font-size:0.85rem;}
+.small:hover{background:var(--olive-deep);color:#fff}
+.x-small { font-size: 0.75rem; padding: 2px 5px; margin-left: 2px; }
+.list{max-height:260px;overflow:auto;padding-right:6px}
+.table{overflow:auto;background:linear-gradient(180deg,#fff,#fbf9f2);padding:10px;border-radius:10px}
+table{width:100%;border-collapse:collapse;text-align:right}
+th,td{padding:10px;border-bottom:1px solid rgba(0,0,0,0.06)}
+thead th{background:transparent;position:sticky;top:0;color:var(--olive-deep);font-weight:600}
+tbody tr { border-bottom: 2px solid rgba(0,0,0,0.15); } 
+.badge{display:inline-block;padding:4px 8px;border-radius:8px;background:rgba(0,0,0,0.04);font-size:0.85rem;margin-left:6px}
+.badge-blue{background: rgba(62, 168, 255, 0.1); color: #3ea8ff;}
+.badge-score{background: #fff3e0; color: #e65100; border: 1px solid #ffe0b2; font-weight:bold;}
+.modal-back{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:60}
+.modal{background:#fff;padding:14px;border-radius:10px;max-width:900px;width:95%;box-shadow:0 6px 30px rgba(0,0,0,0.2);direction:rtl}
+.stats-row{display:flex;gap:12px;align-items:center}
+.supervisor-info { padding: 10px; background: #e8f5e9; border-radius: 8px; margin-top: 10px; border: 1px solid #c8e6c9; color: #1b5e20; }
+.person-assignment-actions { display: inline-flex; gap: 2px; margin-right: 8px; vertical-align: middle; }
+.vertical-port-name { writing-mode: vertical-rl; text-orientation: mixed; transform: rotate(180deg); white-space: nowrap; text-align: center; font-weight: bold; font-size: 1.1rem; max-height: 150px; padding: 10px 0; margin: 0 auto; width: 30px; display: block; }
+.consolidated-report-item { display: inline-block; vertical-align: top; width: 48%; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 6px; padding: 6px; background: #fafafa; }
+.cri-header { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px; font-weight: bold; color: var(--olive-deep); }
+.cri-count { background: var(--accent); color: white; padding: 0 6px; border-radius: 10px; font-size: 0.8rem; }
+.cri-dates { font-size: 0.75rem; color: #666; line-height: 1.4; }
+.strength-wrapper { overflow-x: auto; margin-bottom: 15px; background: #fff; padding: 5px; border-radius: 8px; border: 1px solid #ddd; }
+.strength-table { width:100%; border-collapse: collapse; font-size: 0.8rem; text-align: center; white-space: nowrap; }
+.strength-table th, .strength-table td { border: 1px solid #ccc; padding: 6px 4px; }
+.strength-table th { background: #f1f8e9; color: var(--olive-deep); font-weight: bold; font-size: 0.75rem; }
+.strength-table tr:nth-child(even) { background: #fafafa; }
+.strength-table .label-col { text-align: right; font-weight: bold; background: #f9f9f9; min-width: 100px; }
+.strength-table .total-col { background: #e0f2f1; font-weight: bold; }
+.strength-header { font-weight: bold; margin-bottom: 8px; color: var(--olive-deep); border-bottom: 2px solid var(--accent); display:inline-block; font-size: 1.1rem; }
+@media (max-width:980px){.grid{grid-template-columns:1fr} .list{max-height:160px}}
+@media print {
+    @page { size: A4; margin: 3mm; } 
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+    body { background: #fff !important; padding: 0; margin: 0; width: 100%; zoom: 65%; } 
+    .no-print { display:none!important } 
+    .card { box-shadow:none!important; border:none!important; margin:0; padding: 0; }
+    .container { max-width: 100%; width: 100%; margin: 0; }
+    .print-page-wrapper { display: block; width: 100%; }
+    .print-top-section { margin-bottom: 5px; }
+    .print-bottom-section { margin-top: 10px; border-top: 2px solid #000; padding-top: 5px; page-break-inside: avoid; }
+    .table { padding: 0; overflow: visible; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th:nth-child(4), td:nth-child(4) { display: none; }
+    th, td { padding: 1px 2px; border: 1px solid #666; }
+    thead th { background-color: #f0f0f0 !important; color: #000; padding: 2px; }
+    tbody tr { border-bottom: 1px solid #999; page-break-inside: avoid; break-inside: avoid; }
+    .strength-table th, .strength-table td { font-size: 0.7rem; padding: 1px; border: 1px solid #000; }
+    h1, h2, h3 { color: #000; margin: 2px 0; font-size: 1.1rem; }
+    .supervisor-info { border: 1px solid #000; padding: 2px; margin-bottom: 4px; font-size: 0.9rem; }
+    .vertical-port-name { font-size: 0.8rem; max-height: 60px; width: 15px; }
+    .badge { border: 1px solid #000; color: #000; padding: 0 2px; font-size: 0.7rem; }
+    ::-webkit-scrollbar { display: none; }
+    .consolidated-report-item { width: 32%; margin-right: 1%; border: 1px solid #000; font-size: 0.75rem; }
+    .print-section { page-break-after: avoid; margin-bottom: 5px; }
+}
+#circleLeadersBtn { position: fixed; bottom: 20px; right: 20px; background-color: var(--accent); color: white; padding: 10px 15px; border-radius: 50%; font-size: 1.2rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 50; cursor: pointer; border: none; }
+.report-person-entry { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; margin-bottom: 10px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); page-break-inside: avoid; }
+.print-section { page-break-after: always; margin-bottom: 20px; }
+.print-section:last-child { page-break-after: avoid; }
+</style>
+</head>
+<body>
+<div id="saveNotice" style="display:none;position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#3ea8ff;color:#fff;padding:8px 16px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,0.2);z-index:9999;font-weight:600;">✅ تم الحفظ بنجاح</div>
+<input type="file" id="hiddenImportInput" accept=".json" style="display:none" />
+<div class="container">
+  <div class="header">
+    <div class="title">توزيع النبطشية — v38 <span id="todayTitle"></span></div>
+    <div class="controls no-print">
+      <button class="btn-ghost" id="setSupervisorBtn" disabled>👤 تعديل القادة</button>
+      <button class="btn-ghost" id="saveBtn">💾 حفظ</button>
+      <button class="btn-ghost" id="exportBtn">📤 تصدير</button>
+      <button class="btn-ghost" id="loadBtn">📂 استيراد</button>
+      <button class="btn-ghost" id="resetBtn">♻️ تهيئة</button>
+      <button id="printChooserBtn">🖨️ طباعة</button>
+    </div>
+  </div>
+  <div class="tabs no-print" id="tabs">
+    <div class="tab active" data-tab="people">الأفراد 👤</div>
+    <div class="tab" data-tab="ports">المنافذ 🚪</div>
+    <div class="tab" data-tab="leaves">الإجازات 🌴</div>
+    <div class="tab" data-tab="holidays">الأعياد الرسمية 🎊</div>
+    <div class="tab" data-tab="shifts">النبطشيات 📋</div>
+    <div class="tab" data-tab="reports">التقارير 📊</div>
+  </div>
+  <div class="grid">
+    <div>
+      <!-- Left column -->
+      <div class="card" id="panelPeople">
+        <h2>إدارة الأفراد</h2>
+        <div class="row">
+          <input class="input" id="personName" placeholder="اكتب الاسم هنا" />
+          <select class="input" id="personRank" style="flex: 0 0 120px;">
+            <option value="0">لواء</option><option value="1">عميد</option><option value="2">عقيد</option>
+            <option value="3">مقدم</option><option value="4">رائد</option><option value="5">نقيب</option>
+            <option value="6">ملازم أول</option><option value="7">ملازم</option><option value="8">مساعد أول</option>
+            <option value="9">مساعد</option><option value="10">رقيب أول</option><option value="11">رقيب</option>
+            <option value="12">عريف</option><option value="13">جندي</option><option value="99">مدني</option>
+          </select>
+        </div>
+        <div class="row">
+            <select class="input" id="personWorkSystem" style="flex: 1;">
+                <option value="24/48">نظام 24 / 48</option>
+                <option value="daily">عمل يومي (راحة الجمعة + العطلات)</option>
+            </select>
+            <input class="input" id="personStartBalance" type="number" placeholder="رصيد سابق" style="flex: 0 0 100px;" />
+            <button class="small" id="addPersonBtn" style="flex: 0 0 80px;">إضافة</button>
+        </div>
+        <div class="row">
+          <button class="small btn-ghost" id="savePeopleBtn">💾 حفظ الأشخاص</button>
+          <button class="small btn-ghost" id="reportPeopleBtn" style="color:white; background:var(--accent);">📋 تقرير الأفراد</button>
+        </div>
+        <div class="list" id="peopleList"></div>
+      </div>
+      <div class="card" id="panelPorts" style="display:none">
+        <h2>المنافذ</h2>
+        <div class="row">
+          <input class="input" id="portName" placeholder="اسم المنفذ" />
+          <input class="input" id="portCount" min="1" placeholder="سعة" style="width:90px" type="number" />
+        </div>
+        <div class="row">
+          <input class="input" id="portDifficulty" min="1" placeholder="الوزن/الصعوبة" style="flex:1" type="number" value="1" />
+          <label style="display:flex;align-items:center;gap:6px"><input checked id="portAllowCivilian" type="checkbox"/> يسمح بمدني</label>
+          <button class="small" id="addPortBtn">إضافة</button>
+        </div>
+        <div class="list" id="portsList"></div>
+      </div>
+      <div class="card" id="panelLeaves" style="display:none">
+        <h2>الإجازات</h2>
+        <div class="row">
+          <select class="input" id="leavePerson"></select>
+          <select class="input" id="leaveType" style="width:140px">
+            <option>سنوية</option><option>عارضة</option><option>طارئة</option><option>مرضية</option><option>إجازة رسمية</option>
+          </select>
+        </div>
+        <div class="row">
+          <input class="input" id="leaveFrom" type="date"/>
+          <input class="input" id="leaveShifts" min="1" placeholder="عدد النبطشيات" style="width:140px" type="number"/>
+          <button class="small" id="addLeaveBtn">أضف إجازة</button>
+        </div>
+        <div class="list" id="leaveList"></div>
+        <div style="margin-top:8px"><button class="small btn-ghost" id="toggleHiddenLeaves">عرض المخفي</button></div>
+        <hr style="margin: 15px 0; border: 0; border-top: 1px solid #ddd;">
+        <h3>سجل إجازات فرد</h3>
+        <div class="row">
+            <select class="input" id="leaveReportPersonSelect">
+                <option value="">-- اختر الفرد --</option>
+            </select>
+            <button class="small" id="btnShowLeaveReport">عرض السجل</button>
+        </div>
+        <div id="leaveReportResult" class="list" style="background:#fff; padding:10px; border:1px solid #eee; margin-top:10px; min-height:50px;">
+            <div style="text-align:center; color:#999">اختر اسماً للعرض</div>
+        </div>
+      </div>
+      <div class="card" id="panelHolidays" style="display:none">
+        <h2>الأعياد الرسمية</h2>
+        <div class="row">
+            <input class="input" id="holidayName" placeholder="اسم العيد"/>
+            <input class="input" id="holidayDate" type="date" style="flex: 0 0 180px;"/>
+        </div>
+        <div class="row">
+            <button class="small" id="addHolidayBtn">إضافة إجازة رسمية</button>
+        </div>
+        <div class="list" id="holidaysList"></div>
+      </div>
+      <div class="card" id="panelShifts" style="display:none">
+        <h2>توزيع النبطشية</h2>
+        <div class="row">
+          <input class="input" id="shiftDate" style="width:180px" type="date" />
+          <input class="input" id="shiftName" placeholder="اسم النبطشية (اختياري)" style="flex:1" />
+        </div>
+        <div style="background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 10px;">
+            <h3 style="margin: 0 0 5px 0; font-size: 1rem; color: var(--olive-deep);">تعيين القيادة (إلزامي قبل التوزيع):</h3>
+            <div class="row">
+                <label style="width:80px">المنوب:</label>
+                <select id="preSelectSupervisor" class="input"><option value="">-- اختر --</option></select>
+            </div>
+            <div class="row">
+                <label style="width:80px">الضابط:</label>
+                <select id="preSelectOfficer" class="input"><option value="">-- اختر --</option></select>
+            </div>
+        </div>
+        <div class="row">
+          <button class="small" id="autoDistributeBtn" style="width:100%; padding: 10px; font-size:1rem">⚖️ توزيع آلي (نقاط + تدوير إجباري)</button>
+        </div>
+        <div class="row">
+           <button class="small btn-ghost" id="manualDistributeBtn" style="width:100%">✍️ توزيع يدوي</button>
+        </div>
+      </div>
+      <div class="card" id="panelReports" style="display:none">
+        <h2>التقارير</h2>
+        <div class="row">
+          <select class="input" id="reportPersonSelect"><option value="_all_">الكل</option></select>
+          <button class="small" id="generatePersonReport">عرض</button>
+        </div>
+        <div class="list" id="reportArea"></div>
+      </div>
+    </div>
+    <div>
+      <!-- Right column -->
+      <div class="card" id="shiftArea">
+        <div id="shiftTitle"></div>
+        <div id="strengthReportArea"></div>
+        <div id="supervisorInfoArea"></div>
+        <div class="table" id="shiftTableWrap">
+          <table id="shiftTable">
+            <thead><tr><th style="width:50px">المنفذ</th><th>الأفراد</th><th>قائد المنفذ</th><th>الإجراءات</th></tr></thead>
+            <tbody id="shiftTbody"><tr><td colspan="4" style="text-align:center;color:var(--muted)">لم يتم التوزيع بعد</td></tr></tbody>
+          </table>
+        </div>
+        <div id="statsArea" style="margin-top:12px"></div>
+        <div id="reserveArea" style="margin-top:12px"></div>
+      </div>
+      <div class="history card">
+        <h2>سجل النبطشيات السابقة</h2>
+        <div class="row">
+          <input class="input" id="historySearch" placeholder="بحث بالاسم أو التاريخ" style="flex:1" />
+          <button class="small" id="searchHistoryBtn">بحث</button>
+          <button class="small btn-ghost" id="clearSearchBtn">مسح</button>
+        </div>
+        <div id="historyList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modals -->
+<div class="modal-back" id="modalBack"><div class="modal" id="modalContent"></div></div>
+<button id="circleLeadersBtn" class="no-print">قادة البوابة</button>
+
+<script>
+const STORAGE_KEY = 'nb_v35_data'; 
+const state = { people: [], ports: [], leaves: [], holidays: [], shifts: [], personHistory: {}, hiddenLeaves: [], leaveHiddenMode: false, currentShift: null, portLeaders: {}, lastLeaderIndex: {} };
+const rankNames = ["لواء","عميد","عقيد","مقدم","رائد","نقيب","ملازم أول","ملازم","مساعد أول","مساعد","رقيب أول","رقيب","عريف","جندي","مدني"];
+
+function uid(){ return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function dateAddISO(iso, days){ const d=new Date(iso); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); }
+function formatDateLocalized(iso){ if(!iso) return ''; const d=new Date(iso); const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }; return d.toLocaleDateString('ar-EG', options); }
+function formatShortDate(iso) { if (!iso) return ''; const d = new Date(iso); return d.toLocaleDateString('ar-EG', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+function isPriorityPort(port) { return port && (parseInt(port.difficulty) >= 100 || port.name.includes('(100)')); } 
+
+function saveLocal(){ 
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); 
+        localStorage.setItem('nb_v22_state', JSON.stringify(state));
+    } catch(e) {
+        alert('تحذير: فشل الحفظ! المتصفح يمنع تخزين البيانات. تأكد أنك لست في وضع التصفح الخفي (Incognito) وأن المساحة غير ممتلئة.');
+        console.error("Save failed:", e);
+    }
+}
+function showSaveNotice(){ 
+    const n=document.getElementById('saveNotice'); if(!n) return; n.style.display='block'; 
+    clearTimeout(window._saveNoticeTimer); 
+    window._saveNoticeTimer=setTimeout(()=>{ n.style.display='none'; },2000); 
+}
+
+function getPersonLoad(personId) {
+    const person = state.people.find(p => p.id === personId);
+    if (!person) return 0;
+    let load = parseInt(person.startBalance || 0);
+    const history = state.personHistory[personId] || [];
+    history.forEach(h => {
+        const port = state.ports.find(p => p.name === h.portName);
+        load += (port ? (parseInt(port.difficulty) || 1) : 1);
+    });
+    return load;
+}
+
+function loadLocal(){
+    let s = localStorage.getItem(STORAGE_KEY);
+    if (!s) s = localStorage.getItem('nb_v22_state'); 
+    if (!s) s = localStorage.getItem('nb_v21_state'); 
+    if(s){
+        try{
+            const loadedState = JSON.parse(s);
+            Object.assign(state, loadedState);
+            state.people.forEach(p => { if (!p.workSystem) p.workSystem = '24/48'; });
+            state.ports.forEach(p => { if (!p.difficulty) p.difficulty = 1; }); 
+            if (!state.holidays) state.holidays = [];
+            return true; 
+        }catch(e){ console.warn("Error loading data:", e); return false; }
+    }
+    return false; 
+}
+
+document.getElementById('todayTitle').textContent = formatDateLocalized(todayISO());
+
+/* UI functions */
+function showModal(html){ document.getElementById('modalContent').innerHTML = html; document.getElementById('modalBack').style.display='flex'; }
+function closeModal(){ document.getElementById('modalBack').style.display='none'; document.getElementById('modalContent').innerHTML=''; }
+document.querySelectorAll('.tab').forEach(t=> t.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); const tab=t.getAttribute('data-tab'); ['panelPeople','panelPorts','panelLeaves','panelHolidays','panelShifts','panelReports'].forEach(id=> { document.getElementById(id).style.display='none'; }); document.getElementById('panel'+tab.charAt(0).toUpperCase()+tab.slice(1)).style.display='block'; }));
+
+function populateSelects(){ 
+    const leaveSel=document.getElementById('leavePerson'); const reportSel=document.getElementById('reportPersonSelect'); 
+    const supSel=document.getElementById('preSelectSupervisor'); const offSel=document.getElementById('preSelectOfficer');
+    const leaveReportSel = document.getElementById('leaveReportPersonSelect');
+    leaveSel.innerHTML=''; reportSel.innerHTML='<option value="_all_">الكل</option>'; 
+    supSel.innerHTML='<option value="">-- اختر --</option>'; offSel.innerHTML='<option value="">-- اختر --</option>';
+    const activePeople = state.people.filter(p => p.id); 
+    const military = activePeople.filter(p=>p.rank!==99).sort((a,b)=>a.rank-b.rank);
+    military.forEach(p=>{ const opt = `<option value="${p.id}">${p.rankName} ${p.name}</option>`; supSel.innerHTML+=opt; offSel.innerHTML+=opt; });
+    activePeople.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent = `${p.rankName} ${p.name}`; leaveSel.appendChild(o.cloneNode(true)); reportSel.appendChild(o.cloneNode(true)); leaveReportSel.appendChild(o.cloneNode(true)); }); 
+}
+
+/* Render lists */
+function renderPeople(){ 
+    const wrap=document.getElementById('peopleList'); wrap.innerHTML=''; 
+    state.people.sort((a,b)=>a.rank-b.rank).forEach(p=>{ 
+        const el=document.createElement('div'); el.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:6px;margin-bottom:6px;border-radius:8px;background:rgba(85,107,47,0.03)'; 
+        const workSystemBadge = p.workSystem === 'daily' ? '<span class="badge badge-blue">عمل يومي</span>' : ''; 
+        const score = getPersonLoad(p.id);
+        el.innerHTML=`<div><strong>${p.rankName}</strong> ${p.name} <span class="badge badge-score">رصيد: ${score}</span> ${workSystemBadge} ${p.fixedPortName?'<span class="badge">مثبت: '+p.fixedPortName+'</span>':''}</div>`; 
+        const controls=document.createElement('div'); 
+        const fixBtn=document.createElement('button'); fixBtn.className='small'; fixBtn.textContent='📍 تثبيت'; fixBtn.onclick=()=>toggleFixedPortUI(p.id); 
+        const edit=document.createElement('button'); edit.className='small'; edit.textContent='تعديل'; edit.onclick=()=>editPerson(p.id); 
+        const del=document.createElement('button'); del.className='small'; del.textContent='حذف'; del.onclick=()=>{ if(confirm('حذف؟')){ state.people=state.people.filter(x=>x.id!==p.id); state.leaves = state.leaves.filter(l=>l.personId!==p.id); saveLocal(); renderAll(); } }; 
+        controls.append(fixBtn, edit, del); el.appendChild(controls); wrap.appendChild(el); 
+    }); populateSelects(); 
+}
+function toggleFixedPortUI(personId){ const opts = state.ports.map(p=>`<option value="${p.id}">${p.name}</option>`).join(''); const p = state.people.find(x=>x.id===personId); showModal(`<h3>تثبيت ${p.name}</h3><div style="margin-top:8px"><select id="fixedPortSelect" class="input"><option value="">اختيار منفذ</option>${opts}</select><div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"><button class="small" id="setFixedBtn">ثبت</button><button class="small btn-ghost" id="clearFixedBtn">مسح</button><button class="small btn-ghost" id="closeModalBtn">إلغاء</button></div></div>`); document.getElementById('closeModalBtn').onclick=closeModal; document.getElementById('setFixedBtn').onclick=()=>{ const portId=document.getElementById('fixedPortSelect').value; if(!portId) return alert('اختر منفذا'); p.fixedPort = portId; const port=state.ports.find(x=>x.id===portId); p.fixedPortName = port?port.name:null; saveLocal(); closeModal(); renderAll(); }; document.getElementById('clearFixedBtn').onclick=()=>{ delete p.fixedPort; delete p.fixedPortName; saveLocal(); closeModal(); renderAll(); }; }
+function editPerson(id){ const p=state.people.find(x=>x.id===id); if(!p) return; const rankOptions = rankNames.map((name,idx)=>`<option value="${idx}" ${p.rank===idx ? 'selected':''}>${name}</option>`).join(''); const workSystemOptions = `<option value="24/48" ${p.workSystem === '24/48' ? 'selected':''}>نظام 24 / 48</option><option value="daily" ${p.workSystem === 'daily' ? 'selected':''}>عمل يومي</option>`; const modalHtml = `<h3>تعديل ${p.name}</h3> <div class="row"><label>الاسم:</label><input id="editName" class="input" value="${p.name}"></div> <div class="row"><label>الرتبة:</label><select id="editRank" class="input">${rankOptions}</select></div> <div class="row"><label>نظام العمل:</label><select id="editWorkSystem" class="input">${workSystemOptions}</select></div> <div class="row"><label>رصيد سابق:</label><input id="editStartBalance" class="input" type="number" value="${p.startBalance||0}"></div> <div style="margin-top:15px; display:flex; justify-content:flex-end; gap:8px;"> <button class="small" id="saveEditBtn">حفظ</button> <button class="small btn-ghost" id="closeModalBtn">إلغاء</button> </div>`; showModal(modalHtml); document.getElementById('closeModalBtn').onclick=closeModal; document.getElementById('saveEditBtn').onclick=()=>{ const newName=document.getElementById('editName').value.trim(); const newRank=parseInt(document.getElementById('editRank').value); const newWorkSystem=document.getElementById('editWorkSystem').value; const newBal = parseInt(document.getElementById('editStartBalance').value)||0; if(!newName || isNaN(newRank)){return alert('الاسم والرتبة مطلوبان');} p.name=newName; p.rank=newRank; p.rankName=rankNames[newRank]||'—'; p.workSystem=newWorkSystem; p.startBalance=newBal; saveLocal(); closeModal(); renderAll(); }; }
+
+function editPort(portId) {
+    const port = state.ports.find(p => p.id === portId); if (!port) return;
+    const civilianChecked = port.allowCivilian ? 'checked' : '';
+    const modalHtml = `<h3>تعديل منفذ ${port.name}</h3><div class="row"><label>اسم المنفذ:</label><input id="editPortName" class="input" value="${port.name}"></div><div class="row"><label>السعة:</label><input id="editPortCount" class="input" type="number" min="1" value="${port.count}"></div><div class="row"><label>الوزن/الصعوبة:</label><input id="editPortDifficulty" class="input" type="number" min="1" value="${port.difficulty||1}"></div><div class="row" style="justify-content:flex-end"><label style="display:flex;align-items:center;gap:6px"><input id="editPortAllowCivilian" type="checkbox" ${civilianChecked}/> يسمح بمدني</label></div><div style="margin-top:15px; display:flex; justify-content:flex-end; gap:8px;"> <button class="small" id="savePortEditBtn">حفظ</button> <button class="small btn-ghost" id="closeModalBtn">إلغاء</button> </div>`;
+    showModal(modalHtml); 
+    document.getElementById('closeModalBtn').onclick=closeModal;
+    document.getElementById('savePortEditBtn').onclick = () => {
+        const newName = document.getElementById('editPortName').value.trim();
+        const newCount = parseInt(document.getElementById('editPortCount').value) || 1;
+        const newDiff = parseInt(document.getElementById('editPortDifficulty').value) || 1;
+        const newAllowCivilian = document.getElementById('editPortAllowCivilian').checked;
+        if (!newName || newCount < 1 || newDiff < 1) { return alert('جميع الحقول مطلوبة ويجب أن تكون الأرقام أكبر من 0'); }
+        const oldName = port.name;
+        if (oldName !== newName) {
+            state.shifts.forEach(shift => { if (shift.assignments[oldName]) { shift.assignments[newName] = shift.assignments[oldName]; delete shift.assignments[oldName]; } });
+            for (const personId in state.personHistory) { state.personHistory[personId].forEach(historyEntry => { if (historyEntry.portName === oldName) { historyEntry.portName = newName; } }); }
+            state.people.forEach(p => { if (p.fixedPortName === oldName) { p.fixedPortName = newName; } });
+        }
+        port.name = newName; port.count = newCount; port.difficulty = newDiff; port.allowCivilian = newAllowCivilian;
+        saveLocal(); closeModal(); renderAll(); showSaveNotice();
+    };
+}
+
+function renderPorts(){ 
+    const wrap=document.getElementById('portsList'); wrap.innerHTML=''; 
+    state.ports.forEach((p,idx)=>{ 
+        const el=document.createElement('div'); el.style.cssText='display: flex; justify-content: space-between; align-items: center; padding:6px;margin-bottom:6px;border-radius:8px;background:rgba(85,107,47,0.03)'; 
+        let portLeadersDisplay = ''; 
+        if (state.portLeaders[p.id]?.length > 0) { const leaderNames = state.portLeaders[p.id].map(leaderId => state.people.find(person => person.id === leaderId)?.name).filter(Boolean).join(', '); if (leaderNames) { portLeadersDisplay = `<span class="badge">قادة: ${leaderNames}</span>`; } } 
+        el.innerHTML = `<div><strong>${p.name}</strong> — سعة: ${p.count} <span class="badge badge-score">وزن: ${p.difficulty||1} ن</span> ${p.allowCivilian? '':'<span style="color:#9b3223">(بدون مدني)</span>'} ${portLeadersDisplay}</div>`; 
+        const right=document.createElement('div'); 
+        const editBtn=document.createElement('button'); editBtn.className='small'; editBtn.textContent='✏️ تعديل'; editBtn.onclick=()=>editPort(p.id); 
+        const exBtn=document.createElement('button'); exBtn.className='small'; exBtn.textContent='⚙️ استثناءات'; exBtn.onclick=()=>editPortExceptions(p.id); 
+        const del=document.createElement('button'); del.className='small'; del.textContent='حذف'; del.onclick=()=>{ if(confirm('حذف المنفذ؟')){ state.ports.splice(idx,1); state.shifts.forEach(shift => delete shift.assignments[p.name]); state.people.forEach(person => { if (person.fixedPort === p.id) { delete person.fixedPort; delete person.fixedPortName; } }); for (const personId in state.personHistory) { state.personHistory[personId] = state.personHistory[personId].filter(h => h.portName !== p.name); } delete state.portLeaders[p.id]; delete state.lastLeaderIndex[p.id]; saveLocal(); renderAll(); } }; 
+        right.append(editBtn, exBtn, del); el.appendChild(right); wrap.appendChild(el); 
+    }); 
+}
+
+function editPortExceptions(portId){ const port=state.ports.find(x=>x.id===portId); if(!port) return; const rows = state.people.map(p=>{ const checked = port.exceptions?.includes(p.id) ? 'checked':''; return `<label style="display:flex;justify-content:space-between;align-items:center;padding:6px"><span>${p.rankName} ${p.name}</span><input type="checkbox" data-pid="${p.id}" ${checked}></label>`; }).join(''); showModal(`<h3>استثناءات ${port.name}</h3><div style="max-height:300px;overflow:auto;margin-top:8px">${rows}</div><div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"><button class="small" id="savePortExceptions">حفظ</button><button class="small btn-ghost" id="closeModalBtn">إلغاء</button></div>`); document.getElementById('closeModalBtn').onclick=closeModal; document.getElementById('savePortExceptions').onclick=()=>{ port.exceptions = Array.from(document.querySelectorAll('[data-pid]')).filter(i=>i.checked).map(i=>i.getAttribute('data-pid')); saveLocal(); closeModal(); renderPorts(); }; }
+function renderLeaves(){ const wrap=document.getElementById('leaveList'); wrap.innerHTML=''; state.leaves.forEach((l,idx)=>{ const p = state.people.find(x=>x.id===l.personId) || {name:'—'}; const visible = !state.hiddenLeaves.includes(l.id); if(!visible && !state.leaveHiddenMode) return; const el=document.createElement('div'); el.style.cssText='display:flex; justify-content:space-between; align-items:center; padding:6px;margin-bottom:6px;border-radius:8px;background:rgba(85,107,47,0.03)'; el.innerHTML = `<div><strong>${p.name}</strong> <span class="badge">${l.type}</span> من ${l.from} إلى ${l.to} (شفتات: ${l.leaveShifts})</div>`; const controls=document.createElement('div'); const btn=document.createElement('button'); btn.className='small'; btn.textContent = visible ? 'إخفاء' : 'إظهار'; btn.onclick=()=>{ if(visible){ state.hiddenLeaves.push(l.id); } else { state.hiddenLeaves = state.hiddenLeaves.filter(x=>x!==l.id); } saveLocal(); renderLeaves(); }; const del=document.createElement('button'); del.className='small'; del.textContent='حذف'; del.onclick=()=>{ if(confirm('حذف الإجازة؟')){ state.leaves.splice(idx,1); saveLocal(); renderLeaves(); } }; controls.append(btn, del); el.appendChild(controls); wrap.appendChild(el); }); populateSelects(); }
+function renderHolidays() { const wrap = document.getElementById('holidaysList'); wrap.innerHTML = ''; state.holidays.forEach(h => { const el = document.createElement('div'); el.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:6px;margin-bottom:6px;border-radius:8px;background:rgba(85,107,47,0.03)'; el.innerHTML = `<div><strong>${h.name}</strong> — <span class="badge">${formatDateLocalized(h.date)}</span></div>`; const delBtn = document.createElement('button'); delBtn.className = 'small'; delBtn.textContent = 'حذف'; delBtn.onclick = () => { if (confirm('متأكد من حذف الإجازة؟')) { state.holidays = state.holidays.filter(x => x.id !== h.id); saveLocal(); renderHolidays(); } }; el.appendChild(delBtn); wrap.appendChild(el); }); }
+
+document.getElementById('addPersonBtn').addEventListener('click', ()=>{ 
+    const name=document.getElementById('personName').value.trim(); const rank=parseInt(document.getElementById('personRank').value); const workSystem=document.getElementById('personWorkSystem').value; const startBal=parseInt(document.getElementById('personStartBalance').value)||0; 
+    if(!name || isNaN(rank)) return alert('أكمل الاسم والرتبة'); 
+    state.people.push({id:uid(),name,rank,rankName:rankNames[rank]||'—',workSystem,startBalance:startBal,addedAt:new Date().toISOString()}); 
+    document.getElementById('personName').value=''; document.getElementById('personStartBalance').value=''; 
+    saveLocal(); renderAll(); showSaveNotice();
+});
+document.getElementById('addHolidayBtn').addEventListener('click', () => { const name = document.getElementById('holidayName').value.trim(); const date = document.getElementById('holidayDate').value; if (!name || !date) return alert('أدخل اسم وتاريخ الإجازة.'); state.holidays.push({ id: uid(), name, date }); document.getElementById('holidayName').value = ''; document.getElementById('holidayDate').value = ''; saveLocal(); renderHolidays(); showSaveNotice(); });
+document.getElementById('addPortBtn').addEventListener('click', ()=>{ const name=document.getElementById('portName').value.trim(); const count=parseInt(document.getElementById('portCount').value)||1; const diff=parseInt(document.getElementById('portDifficulty').value)||1; const allow=document.getElementById('portAllowCivilian').checked; if(!name) return alert('أدخل اسم المنفذ'); state.ports.push({id:uid(),name,count,difficulty:diff,allowCivilian:allow,exceptions:[]}); document.getElementById('portName').value=''; document.getElementById('portCount').value=''; document.getElementById('portDifficulty').value=1; saveLocal(); renderAll(); showSaveNotice(); });
+document.getElementById('addLeaveBtn').addEventListener('click', ()=>{ const pid=document.getElementById('leavePerson').value; const type=document.getElementById('leaveType').value; const from=document.getElementById('leaveFrom').value; const shifts = parseInt(document.getElementById('leaveShifts').value); if(!pid || !from || !shifts) return alert('أكمل البيانات'); const days = shifts * 3; const to = dateAddISO(from, days-1); const leave={id:uid(),personId:pid,type,from,to,leaveShifts:shifts}; state.leaves.push(leave); state.hiddenLeaves.push(leave.id); saveLocal(); renderLeaves(); showSaveNotice(); });
+document.getElementById('toggleHiddenLeaves').addEventListener('click', ()=>{ state.leaveHiddenMode = !state.leaveHiddenMode; renderLeaves(); });
+
+document.getElementById('btnShowLeaveReport').addEventListener('click', () => {
+    const personId = document.getElementById('leaveReportPersonSelect').value; const resultDiv = document.getElementById('leaveReportResult');
+    if (!personId) { resultDiv.innerHTML = '<div style="text-align:center; color:red">الرجاء اختيار اسم الفرد أولاً.</div>'; return; }
+    const person = state.people.find(p => p.id === personId); if (!person) { resultDiv.innerHTML = '<div style="text-align:center; color:red">بيانات الفرد غير موجودة.</div>'; return; } 
+    const personLeaves = state.leaves.filter(l => l.personId === personId).sort((a, b) => new Date(b.from) - new Date(a.from));
+    if (personLeaves.length === 0) { resultDiv.innerHTML = `<div><strong>${person.rankName} ${person.name}</strong>: لا توجد إجازات مسجلة.</div>`; return; }
+    let totalShifts = 0; let html = `<div style="margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;"><strong>سجل إجازات: ${person.rankName} ${person.name}</strong></div><table style="width:100%; font-size:0.9rem;"><thead style="background:#f9f9f9"><tr><th style="padding:5px; text-align:right">النوع</th><th style="padding:5px; text-align:right">من</th><th style="padding:5px; text-align:right">إلى</th><th style="padding:5px; text-align:center">نبطشيات</th></tr></thead><tbody>`;
+    personLeaves.forEach(l => { totalShifts += (parseInt(l.leaveShifts) || 0); html += `<tr><td style="border-bottom:1px solid #eee; padding:4px;">${l.type}</td><td style="border-bottom:1px solid #eee; padding:4px;">${formatShortDate(l.from)}</td><td style="border-bottom:1px solid #eee; padding:4px;">${formatShortDate(l.to)}</td><td style="border-bottom:1px solid #eee; padding:4px; text-align:center; font-weight:bold;">${l.leaveShifts}</td></tr>`; });
+    html += `</tbody></table><div style="margin-top:10px; text-align:left; background:#e8f5e9; padding:5px; border-radius:5px;"><strong>إجمالي النبطشيات المخصومة: ${totalShifts}</strong></div>`;
+    resultDiv.innerHTML = html;
+});
+document.getElementById('reportPeopleBtn').addEventListener('click', () => { document.querySelector('.tab[data-tab="reports"]').click(); document.getElementById('reportPersonSelect').value = '_all_'; document.getElementById('generatePersonReport').click(); });
+
+function isOnLeave(personId, date){ 
+    if (!personId || !date) return false; const person = state.people.find(p => p.id === personId); if (!person) return false;
+    if (person.workSystem === 'daily') { const dayOfWeek = new Date(date).getDay(); if (dayOfWeek === 5) return true; if (state.holidays.some(h => h.date === date)) return true; }
+    const checkDate = new Date(date); if (state.leaves.some(l => l.personId === personId && checkDate >= new Date(l.from) && checkDate <= new Date(l.to))) return true;
+    if (person.workSystem === '24/48') { const history = state.personHistory[personId] || []; const workedYesterday = history.some(h => h.date === dateAddISO(date, -1)); const workedDayBeforeYesterday = history.some(h => h.date === dateAddISO(date, -2)); if (workedYesterday || workedDayBeforeYesterday) return true; }
+    return false;
+}
+
+function autoDistribute(date, name){ 
+  try {
+    if(!date) return alert('اختر تاريخًا');
+    const supId = document.getElementById('preSelectSupervisor').value || null; const offId = document.getElementById('preSelectOfficer').value || null;
+    if(!supId || !offId) return alert('يجب تعيين المنوب والضابط أولاً');
+    const shiftLeadersIds = [supId, offId];
+    let availableForDuty = state.people.filter(p => { if(!p || !p.id) return false; if(shiftLeadersIds.includes(p.id)) return false; return !isOnLeave(p.id, date); });
+    if(availableForDuty.length===0) return alert('لا يوجد أفراد متاحون');
+    const assignments = {}; state.ports.forEach(p=> assignments[p.id]=[]); const assignedIds = new Set(shiftLeadersIds);
+    let remainingPool = [...availableForDuty].sort((a,b)=> { const personA = state.people.find(p => p.id === a.id); const personB = state.people.find(p => p.id === b.id); if (!personA || !personB) return 0; const scoreA = getPersonLoad(a.id); const scoreB = getPersonLoad(b.id); if (scoreA !== scoreB) return scoreA - scoreB; const hA = state.personHistory[a.id] || []; const hB = state.personHistory[b.id] || []; const lastA = hA.length > 0 ? new Date(hA[hA.length - 1].date).getTime() : 0; const lastB = hB.length > 0 ? new Date(hB[hB.length - 1].date).getTime() : 0; if (lastA !== lastB) return lastA - lastB; return personA.rank - personB.rank; });
+    const sortedPorts = [...state.ports].sort((a,b) => (b.difficulty||1) - (a.difficulty||1));
+    
+    // PHASE 0: STRICT LEADERS & EXCEPTIONS
+    for (const port of state.ports) {
+        if (state.portLeaders[port.id] && state.portLeaders[port.id].length > 0) {
+            const candidates = remainingPool.filter(p => state.portLeaders[port.id].includes(p.id) && !assignedIds.has(p.id) && !port.exceptions?.includes(p.id));
+            if (candidates.length > 0) {
+                candidates.sort((a, b) => { const hA = state.personHistory[a.id] || []; const hB = state.personHistory[b.id] || []; const lastDateA = hA.slice().reverse().find(h => h.portName === port.name)?.date || '1970-01-01'; const lastDateB = hB.slice().reverse().find(h => h.portName === port.name)?.date || '1970-01-01'; if (lastDateA !== lastDateB) return new Date(lastDateA) - new Date(lastDateB); const rankA = state.people.find(p => p.id === a.id)?.rank || 99; const rankB = state.people.find(p => p.id === b.id)?.rank || 99; return rankA - rankB; });
+                const leaderToAssign = candidates[0]; assignments[port.id].push(leaderToAssign.id); assignedIds.add(leaderToAssign.id); if(!state.personHistory[leaderToAssign.id]) state.personHistory[leaderToAssign.id]=[]; state.personHistory[leaderToAssign.id].push({date,portName:port.name});
+            }
+        }
+    }
+    remainingPool = remainingPool.filter(p => !assignedIds.has(p.id));
+    // PHASE 1: Fixed
+    for(const p of remainingPool){
+        if (p.fixedPort) { const port = state.ports.find(x=>x.id===p.fixedPort); if (port && assignments[port.id].length < port.count && !port.exceptions?.includes(p.id)) { assignments[port.id].push(p.id); assignedIds.add(p.id); if(!state.personHistory[p.id]) state.personHistory[p.id]=[]; state.personHistory[p.id].push({date,portName:port.name}); } }
+    }
+    remainingPool = remainingPool.filter(p => !assignedIds.has(p.id));
+
+    // PHASE 1.5: LARGE PORT (>7) MUST HAVE CIVILIAN
+    for (const port of state.ports) {
+        if (port.count > 7 && port.allowCivilian) {
+            const hasCivilian = assignments[port.id].some(id => state.people.find(p => p.id === id)?.rank === 99);
+            if (!hasCivilian) {
+                const candidateIndex = remainingPool.findIndex(p => p.rank === 99 && !port.exceptions?.includes(p.id));
+                if (candidateIndex !== -1) {
+                    const civ = remainingPool[candidateIndex];
+                    assignments[port.id].push(civ.id); assignedIds.add(civ.id);
+                    if(!state.personHistory[civ.id]) state.personHistory[civ.id]=[]; state.personHistory[civ.id].push({date, portName:port.name});
+                    remainingPool.splice(candidateIndex, 1);
+                }
+            }
+        }
+    }
+
+    // PHASE 2: General (Strict)
+    const peopleToIterate = [...remainingPool]; 
+    for(const currentPerson of peopleToIterate){
+        if(assignedIds.has(currentPerson.id)) continue; 
+        const hist = state.personHistory[currentPerson.id] || [];
+        for(const port of sortedPorts){
+            if(assignments[port.id].length >= port.count) continue; 
+            const isCurrentPortPriority = isPriorityPort(port);
+            if(port.exceptions?.includes(currentPerson.id)) continue;
+            if(currentPerson.rank===99 && !port.allowCivilian) continue;
+            
+            // STRICT RANK SEPARATION (FIX 37)
+            if(currentPerson.rank > 7) { // Rank > 7 means NCO or Civilian (99)
+                 const hasLowRank = assignments[port.id].some(id => {
+                     const existing = state.people.find(x => x.id === id);
+                     return existing && existing.rank > 7; 
+                 });
+                 if(hasLowRank) continue; 
+            }
+
+            if (currentPerson.rank <= 2) { const hasHighRank = assignments[port.id].some(id => { const existing = state.people.find(x => x.id === id); return existing && existing.rank <= 2; }); if (hasHighRank) continue; }
+            
+            let rotationLimit = isCurrentPortPriority ? 2 : 1; let recentPorts = (rotationLimit === 2) ? hist.slice(-2).map(h => h.portName) : hist.slice(-1).map(h => h.portName);
+            if(recentPorts.includes(port.name)) continue; 
+            assignments[port.id].push(currentPerson.id); assignedIds.add(currentPerson.id); if(!state.personHistory[currentPerson.id]) state.personHistory[currentPerson.id]=[]; state.personHistory[currentPerson.id].push({date,portName:port.name}); break; 
+        }
+    }
+    const reserve = availableForDuty.filter(p => !assignedIds.has(p.id)).map(p=>({ id: p.id, display: `${p.rankName} ${p.name}` }));
+    const snapshot = { id:uid(), date, title:name||`نبطشية ${date}`, assignments:{}, reserve, stats:{officers:0,nco:0,enlisted:0,civilians:0,total:0}, shiftSupervisorId: supId, dutyOfficerId: offId };
+    for(const p of state.ports){ 
+        assignments[p.id] = [...new Set(assignments[p.id])]; const assignedPersons = assignments[p.id].map(perId => { const person = state.people.find(x => x.id === perId); if (!person) return null; return { id: perId, display: `${person.rankName} ${person.name}`, isLeader: false, rank: person.rank }; }).filter(Boolean);
+        snapshot.assignments[p.name] = ensureHighestRankNonCivilianIsLeader(assignedPersons, p.id);
+        (assignments[p.id] || []).forEach(perId=>{ const per = state.people.find(x => x.id === perId); if (per) { snapshot.stats.total++; if(per.rank===99) snapshot.stats.civilians++; else if(per.rank<=7) snapshot.stats.officers++; else if(per.rank<=11) snapshot.stats.nco++; else snapshot.stats.enlisted++; } }); 
+    }
+    state.shifts.unshift(snapshot); state.currentShift = snapshot; saveLocal(); renderShift(snapshot); renderHistory(); showSaveNotice(); 
+  } catch (error) { console.error(error); alert(`خطأ: ${error.message}`); }
+}
+
+function renderStrengthReport(snap) {
+    const div = document.getElementById('strengthReportArea'); if(!snap) { div.innerHTML=''; return; }
+    const counts = { total: {}, leave: {}, present: {}, assigned: {}, reserve: {} };
+    rankNames.forEach((_, i) => { counts.total[i]=0; counts.leave[i]=0; counts.present[i]=0; counts.assigned[i]=0; counts.reserve[i]=0; });
+    state.people.forEach(p => {
+        if (!p) return; let r = p.rank; if(r === 99) r = 14; counts.total[r]++;
+        const isShiftLeader = (p.id === snap.shiftSupervisorId || p.id === snap.dutyOfficerId); const isUnavailable = isOnLeave(p.id, snap.date);
+        if(isUnavailable && !isShiftLeader) { counts.leave[r]++; } else if (!isUnavailable) { counts.present[r]++; } 
+        let assigned = isShiftLeader; if(!assigned) for(let k in snap.assignments) if(snap.assignments[k].some(x=>x.id===p.id)) assigned = true;
+        if(assigned) counts.assigned[r]++; if(snap.reserve.some(rv=>rv.id===p.id)) counts.reserve[r]++;
+    });
+    const assignedIDs = new Set(); if(snap.shiftSupervisorId) assignedIDs.add(snap.shiftSupervisorId); if(snap.dutyOfficerId) assignedIDs.add(snap.dutyOfficerId); for(let portName in snap.assignments) { snap.assignments[portName].forEach(p => assignedIDs.add(p.id)); } const totalAssignedCount = assignedIDs.size;
+    let html = `<div class="strength-header">تمام قوة المجموعة (${formatDateLocalized(snap.date)})</div><div class="strength-wrapper"><table class="strength-table"><thead><tr><th class="label-col">البيان</th>`; rankNames.forEach(rn => html += `<th>${rn}</th>`); html += `<th class="total-col">الإجمالي</th></tr></thead><tbody>`;
+    const labels = { total: 'القوة المصدقة', leave: 'خوارج (إجازات)', present: 'القوة الموجودة', assigned: 'المعينون', reserve: 'الاحتياط' };
+    for(let key in labels) { html += `<tr><td class="label-col">${labels[key]}</td>`; let rowSum = 0; rankNames.forEach((_, i) => { let val = counts[key][i]; rowSum += val; html += `<td>${val || '-'}</td>`; }); if (key === 'assigned') { rowSum = totalAssignedCount; } html += `<td class="total-col">${rowSum}</td></tr>`; } html += `</tbody></table></div>`; div.innerHTML = html;
+}
+
+document.getElementById('generatePersonReport').addEventListener('click', ()=>{ 
+    const sel = document.getElementById('reportPersonSelect').value; const reportArea = document.getElementById('reportArea'); reportArea.innerHTML = ''; 
+    const peopleToReport = sel === '_all_' ? state.people.slice().sort((a,b) => a.rank - b.rank) : [state.people.find(p => p.id === sel)].filter(Boolean); 
+    peopleToReport.forEach(p => { if (!p) return; const score = getPersonLoad(p.id); const hist = state.personHistory[p.id] || []; let histHtml = '<div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">'; if (hist.length > 0) { hist.slice().sort((a, b) => new Date(a.date) - new Date(b.date)).forEach(h => { const port = state.ports.find(pt => pt.name === h.portName); const w = port?port.difficulty:1; histHtml += `<div class="port-shift-entry"><span>${h.portName}</span> <small>(${w})</small><br>${formatShortDate(h.date)}</div>`; }); } else { histHtml += '<em>لا يوجد سجل.</em>'; } histHtml += '</div>'; const personEntry = document.createElement('div'); personEntry.className = 'report-person-entry'; personEntry.innerHTML = `<div><strong>${p.rankName} ${p.name}</strong> - النقاط: <span style="color:var(--danger);font-weight:bold">${score}</span></div>${histHtml}`; reportArea.appendChild(personEntry); });
+});
+
+async function manualDistribute(date,name){ 
+    if(!date) return alert('اختر تاريخ'); 
+    const supId = document.getElementById('preSelectSupervisor').value || null; const offId = document.getElementById('preSelectOfficer').value || null;
+    if(!supId || !offId) return alert('يجب تعيين المنوب والضابط أولاً');
+    const shiftLeadersIds = [supId, offId]; const peopleAvailable = state.people.filter(p => !isOnLeave(p.id, date) && !shiftLeadersIds.includes(p.id)); 
+    const htmlParts = state.ports.map(p=>{ const validPeople = peopleAvailable.filter(pp => !p.exceptions?.includes(pp.id)); const options = validPeople.map(pp=>`<option value="${pp.id}">${pp.rankName} ${pp.name}</option>`).join(''); return `<div style="margin-bottom:10px"><h4>${p.name} — سعة ${p.count}</h4><select id="manual_${p.id}" class="input" multiple style="height:120px;width:100%">${options}</select></div>`; }).join(''); 
+    showModal(`<h3>توزيع يدوي — ${formatDateLocalized(date)}</h3><p style="color:var(--danger); font-weight:bold;">ملاحظة: المنوب والضابط والمستثنون غير مدرجين في القائمة.</p><div style="max-height:60vh;overflow:auto;margin-top:8px">${htmlParts}</div><div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"><button class="small" id="doManual">حفظ</button><button class="small btn-ghost" id="closeModalBtn">إلغاء</button></div>`); 
+    document.getElementById('closeModalBtn').onclick=closeModal; document.getElementById('doManual').onclick=async ()=>{ 
+        const assignments = {}; const assigned=new Set(shiftLeadersIds); 
+        for (const p of state.ports) { const sel = Array.from(document.getElementById(`manual_${p.id}`).selectedOptions).map(o => o.value); if (sel.length > p.count) { if (!confirm(`تحذير: منفذ "${p.name}" سعته ${p.count} واخترت ${sel.length}. هل تريد المتابعة؟`)) return; } assignments[p.name] = sel; sel.forEach(id=>assigned.add(id)); } 
+        const reserve = peopleAvailable.filter(p => !assigned.has(p.id)).map(p=>({id: p.id, display: `${p.rankName} ${p.name}`})); 
+        const snapshot={ id:uid(),date,title:name||`نبطشية ${date}`,assignments:{},reserve, stats:{officers:0,nco:0,enlisted:0,civilians:0,total:0}, shiftSupervisorId: supId, dutyOfficerId: offId }; 
+        for(const p of state.ports){ const arr = assignments[p.name]||[]; const persons = arr.map(id=>state.people.find(x=>x.id===id)).filter(Boolean).sort((a,b)=>a.rank-b.rank); snapshot.assignments[p.name]=ensureHighestRankNonCivilianIsLeader( persons.map((per)=>({ id:per.id, display:`${per.rankName} ${per.name}`, isLeader: false })), p.id ); persons.forEach(per=>{ snapshot.stats.total++; if(per.rank===99) snapshot.stats.civilians++; else if(per.rank<=7) snapshot.stats.officers++; else if(per.rank<=11) snapshot.stats.nco++; else snapshot.stats.enlisted++; }); (snapshot.assignments[p.name]||[]).forEach(it=>{ if(!state.personHistory[it.id]) state.personHistory[it.id]=[]; if(!state.personHistory[it.id].some(entry => entry.date === date && entry.portName === p.name)) { state.personHistory[it.id].push({date,portName:p.name}); } }); } 
+        state.shifts.unshift(snapshot); state.currentShift = snapshot; saveLocal(); closeModal(); renderShift(snapshot); renderHistory(); showSaveNotice(); 
+    }; 
+}
+
+function renderShift(snap){ 
+    state.currentShift = snap; 
+    document.getElementById('setSupervisorBtn').disabled = !snap; 
+    document.getElementById('shiftTitle').innerHTML = `<div style="font-weight:700;color:var(--olive-deep)">${snap.title} — ${formatDateLocalized(snap.date)}</div><hr style="border:none;border-top:1px solid rgba(0,0,0,0.06);margin-top:8px"><div class="no-print" style="margin-top:8px"><button class="small" id="editWholeShiftBtn">✏️ تعديل النبطشية</button></div>`; 
+    const supervisorArea = document.getElementById('supervisorInfoArea'); 
+    const editLeadersBtn = `<button class="small no-print" style="float:left" onclick="editShiftLeaders('${snap.id}')">تعديل القادة</button>`;
+    supervisorArea.innerHTML = ''; 
+    if (snap.shiftSupervisorId || snap.dutyOfficerId) { let supervisorHtml = '<div class="supervisor-info">'; if (snap.shiftSupervisorId) { const s = state.people.find(p => p.id === snap.shiftSupervisorId); supervisorHtml += `<div><strong>منوب المجموعة:</strong> ${s ? s.rankName + ' ' + s.name : 'غير محدد'}</div>`; } if (snap.dutyOfficerId) { const o = state.people.find(p => p.id === snap.dutyOfficerId); supervisorHtml += `<div><strong>ضابط النبطشية:</strong> ${o ? o.rankName + ' ' + o.name : 'غير محدد'}</div>`; } supervisorHtml += editLeadersBtn + '</div>'; supervisorArea.innerHTML = supervisorHtml; } else { supervisorArea.innerHTML = `<div class="supervisor-info">لم يتم تعيين قادة ${editLeadersBtn}</div>`; }
+    renderStrengthReport(snap);
+    const tbody=document.getElementById('shiftTbody'); tbody.innerHTML=''; 
+    let assignmentCounter = 1; const rowColors = ['rgba(227, 242, 253, 0.4)', 'rgba(243, 229, 245, 0.4)', 'rgba(232, 245, 233, 0.4)', 'rgba(255, 243, 224, 0.4)', 'rgba(255, 235, 238, 0.4)', 'rgba(224, 247, 250, 0.4)'];
+    state.ports.forEach((p, index) => {
+        const tr=document.createElement('tr'); tr.style.backgroundColor = rowColors[index % rowColors.length]; tr.style.borderBottom = "2px solid #aaa"; 
+        const td1=document.createElement('td'); td1.innerHTML = `<div class="vertical-port-name">${p.name}</div><div class="x-small">(${p.difficulty||1})</div>`; 
+        const td2=document.createElement('td'); 
+        const updatedArr = ensureHighestRankNonCivilianIsLeader(snap.assignments[p.name] || [], p.id); 
+        td2.innerHTML = updatedArr.length? updatedArr.map(a=>{ 
+            const personDetails = state.people.find(x => x.id === a.id); const personRankName = personDetails ? `${personDetails.rankName} ${personDetails.name}` : a.display; 
+            const actionsHtml = `<div class="person-assignment-actions no-print"><button class="small x-small" title="تعيين كقائد للمنفذ" onclick="setManualPortLeader('${a.id}', '${p.name}')" style="background:#fbc02d;color:#fff">⭐</button><button class="small x-small" title="تبديل" onclick="openSwapDialog(state.currentShift, '${a.id}', '${p.name}')">↔️</button><button class="small x-small" title="التحاق بالاحتياط" onclick="handlePersonAction('to_reserve', '${a.id}', '${p.name}')">🔄</button><button class="small x-small" title="تسجيل إجازة طارئة" onclick="handlePersonAction('to_leave', '${a.id}', '${p.name}')">🌴</button><button class="small x-small" title="إزالة من النبطشية" onclick="handlePersonAction('remove', '${a.id}', '${p.name}')">❌</button></div>`; 
+            const counterDisplay = `<span class="badge" style="margin-left: 10px; background: #fff; border:1px solid #ddd; font-weight: bold;">${assignmentCounter++}</span>`; 
+            return `<div data-pid="${a.id}" style="margin-bottom:6px; padding:4px; border-bottom:1px solid rgba(0,0,0,0.05)">${counterDisplay}${actionsHtml}${personRankName}</div>`; 
+        }).join('') : '<span style="color:var(--muted)">فارغ</span>'; 
+        const td3=document.createElement('td'); const leader = updatedArr.find(x=>x.isLeader); td3.innerHTML = leader ? `<strong>${leader.display}</strong>` : '—'; 
+        const td4=document.createElement('td'); td4.innerHTML = `<button class="small btn-ghost no-print" data-action="editPort_${p.id}">تعديل</button>`; 
+        tr.append(td1, td2, td3, td4); tbody.appendChild(tr); 
+    }); 
+    recalculateStatsAndReserve(snap); renderStats(snap.stats); renderReserve(snap.reserve); 
+    Array.from(document.querySelectorAll('[data-action^="editPort_"]')).forEach(btn=>{ btn.addEventListener('click', ()=>{ const portId = btn.getAttribute('data-action').split("_")[1]; editPortAssignments(portId, snap); }); }); 
+    document.getElementById('editWholeShiftBtn')?.addEventListener('click', ()=> openShiftEditor(snap)); 
+}
+
+function editShiftLeaders(shiftId) {
+    const snap = state.shifts.find(s => s.id === shiftId);
+    const military = state.people.filter(p => p.rank !== 99).sort((a,b)=>a.rank-b.rank);
+    const options = military.map(p => `<option value="${p.id}">${p.rankName} ${p.name}</option>`).join('');
+    showModal(`<h3>تعديل القادة</h3><div class="row"><label style="width:80px">المنوب:</label><select id="newSup" class="input"><option value="">-- اختر --</option>${options}</select></div><div class="row"><label style="width:80px">الضابط:</label><select id="newOff" class="input"><option value="">-- اختر --</option>${options}</select></div><div style="margin-top:10px;text-align:left"><button class="small" id="saveNewLeaders">حفظ</button></div>`);
+    document.getElementById('newSup').value = snap.shiftSupervisorId || ''; document.getElementById('newOff').value = snap.dutyOfficerId || '';
+    document.getElementById('saveNewLeaders').onclick = () => {
+        const sup = document.getElementById('newSup').value || null; const off = document.getElementById('newOff').value || null;
+        if(sup && off && sup === off) return alert('لا يمكن اختيار نفس الشخص');
+        [snap.shiftSupervisorId, snap.dutyOfficerId].forEach(oldId => { if(oldId) { for(let pname in snap.assignments) { snap.assignments[pname] = snap.assignments[pname].filter(x => x.id !== oldId); snap.reserve = snap.reserve.filter(x => x.id !== oldId); if(state.personHistory[oldId]) state.personHistory[oldId] = state.personHistory[oldId].filter(h => !(h.date === snap.date && h.portName === pname)); } } });
+        snap.shiftSupervisorId = sup; snap.dutyOfficerId = off; saveLocal(); closeModal(); renderShift(snap);
+    };
+}
+
+function openSwapDialog(snap, personAId, portA) {
+    const personA = state.people.find(p => p.id === personAId); if (!personA) return;
+    const allPeople = [{ id: personAId, display: personA.rankName + ' ' + personA.name, location: portA }]; const otherOptions = [];
+    for (const portName in snap.assignments) { snap.assignments[portName].forEach(p => { if (p.id !== personAId) { const person = state.people.find(x => x.id === p.id); if (person) otherOptions.push({ id: p.id, display: person.rankName + ' ' + person.name, location: portName }); } }); }
+    snap.reserve.forEach(p => { otherOptions.push({ id: p.id, display: p.display, location: 'الاحتياط' }); });
+    const optionsHtml = otherOptions.map(p => `<option value="${p.id}_${p.location}">${p.display} (${p.location})</option>`).join('');
+    const modalHtml = `<h3>تبديل: ${personA.rankName} ${personA.name} (${portA})</h3><p>اختر الفرد والموقع للتبديل معه:</p><select id="swapTarget" class="input" style="width:100%;margin-bottom:10px;"><option value="">-- اختر فرد للتبديل --</option>${optionsHtml}</select><div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"><button class="small" id="doSwapBtn">تبديل</button><button class="small btn-ghost" id="closeModalBtn">إلغاء</button></div>`;
+    showModal(modalHtml);
+    document.getElementById('closeModalBtn').onclick = closeModal;
+    document.getElementById('doSwapBtn').onclick = () => {
+        const targetValue = document.getElementById('swapTarget').value; if (!targetValue) return alert('يجب اختيار فرد للتبديل معه.');
+        const [personBId, locationB] = targetValue.split('_'); const personB = state.people.find(p => p.id === personBId); if (!personB) return;
+        let portAId = null; let portBId = null; const portObjA = state.ports.find(p => p.name === portA); if(portObjA) portAId = portObjA.id; if (locationB !== 'الاحتياط') { const portObjB = state.ports.find(p => p.name === locationB); if(portObjB) portBId = portObjB.id; }
+        if (portA !== 'الاحتياط') { const portAAssignments = snap.assignments[portA] || []; const indexA = portAAssignments.findIndex(p => p.id === personAId); const isManualLeaderA = portAAssignments[indexA]?.isManualLeader || false; snap.assignments[portA] = portAAssignments.filter(p => p.id !== personAId); if (locationB !== 'الاحتياط') { snap.assignments[portA].push({ id: personBId, display: personB.rankName + ' ' + personB.name, isLeader: false, isManualLeader: isManualLeaderA }); } }
+        if (locationB === 'الاحتياط') { snap.reserve = snap.reserve.filter(p => p.id !== personBId); if (portA !== 'الاحتياط') { snap.reserve.push({ id: personAId, display: personA.rankName + ' ' + personA.name }); } } else { const portBAssignments = snap.assignments[locationB] || []; const indexB = portBAssignments.findIndex(p => p.id === personBId); const isManualLeaderB = portBAssignments[indexB]?.isManualLeader || false; snap.assignments[locationB] = portBAssignments.filter(p => p.id !== personBId); if (portA !== 'الاحتياط') { snap.assignments[locationB].push({ id: personAId, display: personA.rankName + ' ' + personA.name, isLeader: false, isManualLeader: isManualLeaderB }); } }
+        [personAId, personBId].forEach(id => { if (state.personHistory[id]) { state.personHistory[id] = state.personHistory[id].filter(h => h.date !== snap.date); } });
+        if (portA !== 'الاحتياط' && locationB !== 'الاحتياط') { if (!state.personHistory[personBId]) state.personHistory[personBId] = []; state.personHistory[personBId].push({ date: snap.date, portName: portA }); if (!state.personHistory[personAId]) state.personHistory[personAId] = []; state.personHistory[personAId].push({ date: snap.date, portName: locationB }); } else if (portA !== 'الاحتياط' && locationB === 'الاحتياط') { if (!state.personHistory[personBId]) state.personHistory[personBId] = []; state.personHistory[personBId].push({ date: snap.date, portName: portA }); } else if (portA === 'الاحتياط' && locationB !== 'الاحتياط') { if (!state.personHistory[personAId]) state.personHistory[personAId] = []; state.personHistory[personAId].push({ date: snap.date, portName: locationB }); }
+        if (portA !== 'الاحتياط') snap.assignments[portA] = ensureHighestRankNonCivilianIsLeader(snap.assignments[portA] || [], portAId); if (locationB !== 'الاحتياط') snap.assignments[locationB] = ensureHighestRankNonCivilianIsLeader(snap.assignments[locationB] || [], portBId);
+        saveLocal(); closeModal(); renderShift(snap); showSaveNotice();
+    };
+}
+
+function handlePersonAction(action, personId, portName) {
+    if (!state.currentShift) return; const snap = state.currentShift; const person = state.people.find(p => p.id === personId); if (!person) return;
+    snap.assignments[portName] = (snap.assignments[portName] || []).filter(p => p.id !== personId); const portObj = state.ports.find(p => p.name === portName); const portId = portObj ? portObj.id : null;
+    if (action === 'to_reserve') { if (!snap.reserve.some(p => p.id === personId)) { snap.reserve.push({ id: person.id, display: `${person.rankName} ${person.name}` }); } } else if (action === 'to_leave') { const leaveExists = state.leaves.some(l => l.personId === personId && l.from === snap.date); if (!leaveExists && confirm(`هل تريد تسجيل إجازة طارئة ليوم واحد لـ ${person.name}؟`)) { state.leaves.push({ id: uid(), personId, type: 'طارئة', from: snap.date, to: snap.date, leaveShifts: 1 }); snap.reserve = snap.reserve.filter(p => p.id !== personId); } } 
+    if (state.personHistory[personId]) { state.personHistory[personId] = state.personHistory[personId].filter(entry => !(entry.date === snap.date && entry.portName === portName)); } 
+    saveLocal(); snap.assignments[portName] = ensureHighestRankNonCivilianIsLeader(snap.assignments[portName] || [], portId); renderShift(snap); showSaveNotice(); 
+}
+
+function recalculateStatsAndReserve(snap) { 
+    snap.stats = {officers:0,nco:0,enlisted:0,civilians:0,total:0}; const assignedIds = new Set(); if(snap.shiftSupervisorId) assignedIds.add(snap.shiftSupervisorId); if(snap.dutyOfficerId) assignedIds.add(snap.dutyOfficerId); 
+    for (const portName in snap.assignments) { snap.assignments[portName].forEach(assignment => { assignedIds.add(assignment.id); const per = state.people.find(p => p.id === assignment.id); if (per) { snap.stats.total++; if(per.rank===99) snap.stats.civilians++; else if(per.rank<=7) snap.stats.officers++; else if(per.rank<=11) snap.stats.nco++; else snap.stats.enlisted++; } }); } 
+    const sup = state.people.find(p => p.id === snap.shiftSupervisorId); const off = state.people.find(p => p.id === snap.dutyOfficerId);
+    if(sup) { if(sup.rank===99) snap.stats.civilians++; else if(sup.rank<=7) snap.stats.officers++; else if(sup.rank<=11) snap.stats.nco++; else snap.stats.enlisted++; snap.stats.total++; }
+    if(off && sup?.id !== off?.id) { if(off.rank===99) snap.stats.civilians++; else if(off.rank<=7) snap.stats.officers++; else if(off.rank<=11) snap.stats.nco++; else snap.stats.enlisted++; snap.stats.total++; }
+    snap.reserve = state.people.filter(p => !assignedIds.has(p.id) && !isOnLeave(p.id, snap.date)).map(p => ({id: p.id, display: `${p.rankName} ${p.name}`})); 
+}
+
+function renderStats(stats){ const area=document.getElementById('statsArea'); area.innerHTML = `<div class="stats-row" style="display:flex;gap:12px;padding:8px;border-radius:8px;background:rgba(0,0,0,0.03)"><div>ضباط<br><strong>${stats.officers}</strong></div><div>صف<br><strong>${stats.nco}</strong></div><div>أفراد<br><strong>${stats.enlisted}</strong></div><div>مدنيين<br><strong>${stats.civilians}</strong></div><div>الإجمالي<br><strong>${stats.total}</strong></div></div>`; }
+function renderReserve(list){ const area=document.getElementById('reserveArea'); if(!list || list.length===0){ area.innerHTML=''; return; } let html = `<div style="padding:8px;border-radius:8px;background:rgba(0,0,0,0.03)"><strong>الاحتياط:</strong><div style="margin-top:5px;">`; list.forEach(p => { const person = state.people.find(x => x.id === p.id); const name = person ? `${person.rankName} ${person.name}` : p.display || 'غير معروف'; html += `<span>${name} <button class="small attachBtn no-print" data-pid="${p.id}">إلحاق</button> ، </span>`; }); area.innerHTML = html + `</div></div>`; document.querySelectorAll('.attachBtn').forEach(btn => btn.addEventListener('click', (e) => openAttachDialog(e.target.getAttribute('data-pid'), state.currentShift)));}
+async function openAttachDialog(personId, snap) { const person = state.people.find(p => p.id === personId); if (!person || !snap || isOnLeave(personId, snap.date) || snap.shiftSupervisorId === personId || snap.dutyOfficerId === personId) { return alert(`${person?.rankName} ${person?.name} غير متاح.`); } const availablePorts = state.ports.filter(port => !(port.exceptions?.includes(personId)) && !(person.rank === 99 && !port.allowCivilian)); if (availablePorts.length === 0) { return alert(`لا توجد منافذ متاحة لـ ${person.name}.`); } const options = availablePorts.map(p => `<option value="${p.id}">${p.name}</option>`).join(''); showModal(`<h3>إلحاق ${person.rankName} ${person.name}</h3><div style="margin-top:8px"><label>اختر المنفذ:</label><select id="attachPortSelect" class="input">${options}</select><div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"><button class="small" id="doAttachBtn">إلحاق</button><button class="small btn-ghost" id="closeModalBtn">إلغاء</button></div></div>`); document.getElementById('closeModalBtn').onclick = closeModal; document.getElementById('doAttachBtn').onclick = async () => { const portId = document.getElementById('attachPortSelect').value; const port = state.ports.find(p => p.id === portId); if (!port) return alert('اختر منفذًا.'); const assigned = snap.assignments[port.name] || []; if (assigned.length >= port.count) { if (!confirm(`تحذير: منفذ "${port.name}" سعته ${port.count} وهو ممتلئ. هل تريد المتابعة؟`)) return; } assigned.push({ id: person.id, display: `${person.rankName} ${person.name}`, isLeader: false }); snap.assignments[port.name] = ensureHighestRankNonCivilianIsLeader(assigned, port.id); snap.reserve = snap.reserve.filter(p => p.id !== personId); if (!state.personHistory[personId]) state.personHistory[personId] = []; state.personHistory[personId].push({ date: snap.date, portName: port.name }); saveLocal(); closeModal(); renderShift(snap); showSaveNotice(); }; }
+function renderHistory(filter=''){ const wrap=document.getElementById('historyList'); wrap.innerHTML=''; const list = state.shifts.filter(s=>{ if(!filter) return true; const f=filter.toLowerCase(); return (s.title?.toLowerCase().includes(f)) || (s.date?.includes(f)) || (Object.values(s.assignments).flat().some(ii => (state.people.find(p => p.id === ii.id)?.name || '').toLowerCase().includes(f))); }); list.forEach((s,idx)=>{ const el=document.createElement('div'); el.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:6px;margin-bottom:6px;border-radius:8px;background:rgba(85,107,47,0.03)'; el.innerHTML = `<div><strong>${s.title}</strong> — ${s.date} — (إجمالي:${s.stats?.total || 0})</div>`; const right=document.createElement('div'); const view=document.createElement('button'); view.className='small'; view.textContent='👁️ عرض'; view.onclick=()=>renderShift(s); const use=document.createElement('button'); view.className='small'; view.textContent='🔁 كنموذج'; use.onclick=()=>{ document.getElementById('shiftDate').value = s.date; document.getElementById('shiftName').value = s.title; }; const edit=document.createElement('button'); edit.className='small'; edit.textContent='✏️ تعديل'; edit.setAttribute('data-editshift', s.id); const del=document.createElement('button'); del.className='small'; del.textContent='حذف'; del.onclick=()=>{ if(confirm('حذف النبطشية؟')){ const shiftToDelete = list[idx]; if (shiftToDelete?.assignments) { for (const portName in shiftToDelete.assignments) { shiftToDelete.assignments[portName].forEach(a => { if (state.personHistory[a.id]) { state.personHistory[a.id] = state.personHistory[a.id].filter( e => !(e.date === shiftToDelete.date && e.portName === portName) ); } }); } } state.shifts = state.shifts.filter(shift => shift.id !== shiftToDelete.id); saveLocal(); renderHistory(document.getElementById('historySearch').value); if (state.currentShift?.id === shiftToDelete.id) { document.getElementById('shiftTbody').innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted)">لم يتم التوزيع</td></tr>'; ['shiftTitle','statsArea','reserveArea','supervisorInfoArea','strengthReportArea'].forEach(id=>document.getElementById(id).innerHTML=''); state.currentShift = null; document.getElementById('setSupervisorBtn').disabled = true; } } }; right.append(view, use, edit, del); el.appendChild(right); wrap.appendChild(el); }); }
+document.getElementById('printChooserBtn').addEventListener('click', ()=>{ showModal(`<h3>اختيار الطباعة</h3><div style="margin-top:8px"><label><input type="checkbox" id="print_shifts" checked/> توزيع النبطشية الحالي</label><br><label><input type="checkbox" id="print_leaves"/> الإجازات</label><br><label><input type="checkbox" id="print_report_people"/> تقرير الأفراد</label></div><div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"><button class="small" id="doPrint">طباعة</button><button class="small btn-ghost" id="closeModalBtn">إلغاء</button></div>`); document.getElementById('closeModalBtn').onclick=closeModal; document.getElementById('doPrint').onclick=async ()=>{ const printWindow = window.open('', '_blank'); printWindow.document.write('<html><head><meta charset="utf-8"><title>طباعة</title>'); Array.from(document.querySelectorAll('style')).forEach(s => printWindow.document.head.appendChild(s.cloneNode(true))); printWindow.document.write('</head><body dir="rtl">'); 
+    let content = [];
+    if(document.getElementById('print_shifts').checked && state.currentShift) { const snap = state.currentShift; let supervisorHtml = ''; if (snap.shiftSupervisorId || snap.dutyOfficerId) { supervisorHtml += '<div class="supervisor-info">'; if (snap.shiftSupervisorId) { const s = state.people.find(p => p.id === snap.shiftSupervisorId); supervisorHtml += `<div><strong>منوب المجموعة:</strong> ${s ? s.rankName + ' ' + s.name : ''}</div>`; } if (snap.dutyOfficerId) { const o = state.people.find(p => p.id === snap.dutyOfficerId); supervisorHtml += `<div><strong>ضابط النبطشية:</strong> ${o ? o.rankName + ' ' + o.name : ''}</div>`; } supervisorHtml += '</div>'; } const shiftTableHtml = document.getElementById('shiftTableWrap').innerHTML; const statsHtml = document.getElementById('statsArea').innerHTML; const reserveHtml = document.getElementById('reserveArea').innerHTML; const titleHtml = document.getElementById('shiftTitle').innerHTML; const strengthHtml = document.getElementById('strengthReportArea').innerHTML; content.push(`<div class="print-page-wrapper"><div class="print-top-section"><div class="print-section"><h2>توزيع النبطشية</h2>${titleHtml}${supervisorHtml}${shiftTableHtml}${statsHtml}${reserveHtml}</div></div><div class="print-bottom-section">${strengthHtml}</div></div>`); } 
+    if(document.getElementById('print_leaves').checked) { let leavesHtml = `<div class="print-section" style="page-break-before: always;"><h2>الإجازات</h2><div class="table"><table><thead><tr><th>الفرد</th><th>النوع</th><th>من</th><th>إلى</th><th>النبطشيات</th></tr></thead><tbody>`; leavesHtml += state.leaves.length === 0 ? `<tr><td colspan="5" align="center">لا توجد</td></tr>` : state.leaves.map(l => { const p = state.people.find(x => x.id === l.personId) || {name: '—', rankName: '—'}; return `<tr><td>${p.rankName} ${p.name}</td><td>${l.type}</td><td>${formatDateLocalized(l.from)}</td><td>${formatDateLocalized(l.to)}</td><td>${l.leaveShifts}</td></tr>`; }).join(''); leavesHtml += `</tbody></table></div></div>`; content.push(leavesHtml); } 
+    if(document.getElementById('print_report_people').checked) { let reportHtml = `<div class="print-section" style="page-break-before: always;"><h2>تقرير الأفراد (مجمع)</h2>`; if (!state.personHistory || Object.keys(state.personHistory).length === 0) { reportHtml += '<div style="text-align:center;padding:20px;">لا يوجد سجل نبطشيات</div>'; } else { const sortedPeople = state.people.slice().sort((a,b)=>a.rank-b.rank); sortedPeople.forEach(p => { const hist = state.personHistory[p.id] || []; if(hist.length === 0) return; const aggMap = {}; hist.forEach(h => { if(!aggMap[h.portName]) aggMap[h.portName] = []; aggMap[h.portName].push(h.date); }); reportHtml += `<div class="report-person-entry"><div style="margin-bottom:6px; border-bottom:1px solid #ccc; padding-bottom:4px;"><strong>${p.rankName} ${p.name}</strong> - إجمالي النبطشيات: ${hist.length}</div><div style="display:flex; flex-wrap:wrap;">`; for (const [portName, dates] of Object.entries(aggMap)) { dates.sort((a,b) => new Date(a) - new Date(b)); const formattedDates = dates.map(d => formatShortDate(d)).join('، '); reportHtml += `<div class="consolidated-report-item"><div class="cri-header"><span>${portName}</span><span class="cri-count">${dates.length}</span></div><div class="cri-dates">${formattedDates}</div></div>`; } reportHtml += `</div></div>`; }); } reportHtml += `</div>`; content.push(reportHtml); } 
+    printWindow.document.write(content.join('')); printWindow.document.close(); printWindow.focus(); setTimeout(()=>printWindow.print(), 500); closeModal(); 
+}; });
+['historySearch', 'searchHistoryBtn', 'clearSearchBtn'].forEach(id => { const el = document.getElementById(id); if (el.tagName === 'INPUT') el.addEventListener('input', ()=> renderHistory(el.value.trim())); else if (id === 'clearSearchBtn') el.addEventListener('click', ()=> { document.getElementById('historySearch').value=''; renderHistory(); }); else el.addEventListener('click', ()=> renderHistory(document.getElementById('historySearch').value.trim())); });
+document.getElementById('exportBtn').addEventListener('click', ()=>{ const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`nb_v22_backup_${todayISO()}.json`; a.click(); URL.revokeObjectURL(url); });
+document.getElementById('loadBtn').addEventListener('click', ()=>{ const inp = document.getElementById('hiddenImportInput'); inp.value = ''; inp.click(); });
+document.getElementById('hiddenImportInput').addEventListener('change', (e) => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = () => { try { let res = r.result; if (res.charCodeAt(0) === 0xFEFF) res = res.slice(1); const importedState = JSON.parse(res); Object.keys(importedState).forEach(key => { state[key] = importedState[key]; }); saveLocal(); renderAll(); showSaveNotice(); } catch(err) { alert('خطأ في الاستيراد: الملف تالف أو غير مدعوم.\n' + err.message); } }; r.readAsText(f); });
+document.getElementById('saveBtn').addEventListener('click', ()=>{ saveLocal(); showSaveNotice(); }); 
+document.getElementById('resetBtn').addEventListener('click', ()=>{ if(confirm('إعادة ضبط كل البيانات؟')){ localStorage.removeItem('nb_v22_state'); localStorage.removeItem(STORAGE_KEY); location.reload(); } });
+document.getElementById('setSupervisorBtn').addEventListener('click', () => { if (!state.currentShift) return; const snap = state.currentShift; editShiftLeaders(snap.id); });
+function renderAll(){ renderPeople(); renderPorts(); renderLeaves(); renderHolidays(); renderHistory(); if(state.shifts?.length>0) renderShift(state.shifts[0]); else { document.getElementById('setSupervisorBtn').disabled = true; } populateSelects(); }
+document.getElementById('autoDistributeBtn').addEventListener('click', ()=> autoDistribute(document.getElementById('shiftDate').value, document.getElementById('shiftName').value.trim()));
+document.getElementById('manualDistributeBtn').addEventListener('click', ()=> manualDistribute(document.getElementById('shiftDate').value, document.getElementById('shiftName').value.trim()));
+document.getElementById('modalBack').addEventListener('click',(e)=>{ if(e.target.id==='modalBack') closeModal(); });
+async function editPortAssignments(portId, snap) { 
+    const port = state.ports.find(p => p.id === portId); if (!port) return; 
+    const shiftLeadersIds = [snap.shiftSupervisorId, snap.dutyOfficerId].filter(Boolean); const peopleAvailable = state.people.filter(p => !isOnLeave(p.id, snap.date) && !shiftLeadersIds.includes(p.id)); 
+    const validPeople = peopleAvailable.filter(pp => !port.exceptions?.includes(pp.id));
+    const assigned = snap.assignments[port.name] || []; const options = validPeople.map(p => `<option value="${p.id}" ${assigned.some(a => a.id === p.id) ? "selected" : ""}>${p.rankName} ${p.name}</option>`).join(''); 
+    showModal(`<h3>تعديل ${port.name}</h3><label>الأفراد (المستبعدون: المجازون وقادة النبطشية):</label><select id="editPortSel" multiple class="input" style="height:180px;width:100%">${options}</select><div style="margin-top:10px;display:flex;gap:8px;justify-content:flex-end"><button class="small" id="editPortSave">حفظ</button><button class="small btn-ghost" id="closeModalBtn">إلغاء</button></div>`); 
+    document.getElementById('closeModalBtn').onclick = closeModal; document.getElementById('editPortSave').onclick = async () => { const selected = Array.from(document.getElementById('editPortSel').selectedOptions).map(o => o.value); if (selected.length > port.count) { if (!confirm(`تحذير: منفذ "${port.name}" سعته ${port.count} واخترت ${selected.length}. متابعة؟`)) return; } const persons = selected.map(id => state.people.find(x => x.id === id)).filter(Boolean); const oldIds = new Set((snap.assignments[port.name] || []).map(item => item.id)); const newIds = new Set(persons.map(item => item.id)); oldIds.forEach(id => { if (!newIds.has(id) && state.personHistory[id]) { state.personHistory[id] = state.personHistory[id].filter(e => !(e.date === snap.date && e.portName === port.name)); } }); newIds.forEach(id => { if (!oldIds.has(id)) { if (!state.personHistory[id]) state.personHistory[id] = []; state.personHistory[id].push({ date: snap.date, portName: port.name }); } }); snap.assignments[port.name] = ensureHighestRankNonCivilianIsLeader(persons.map(per => ({ id: per.id, display: `${per.rankName} ${per.name}`, isLeader: false })), port.id); saveLocal(); closeModal(); renderShift(snap); showSaveNotice(); }; 
+}
+async function openShiftEditor(snap) { 
+    const shiftLeadersIds = [snap.shiftSupervisorId, snap.dutyOfficerId].filter(Boolean); const peopleAvailable = state.people.filter(p => !isOnLeave(p.id, snap.date) && !shiftLeadersIds.includes(p.id)); 
+    let html = `<h3>تعديل النبطشية — ${formatDateLocalized(snap.date)}</h3><p style="color:var(--danger); font-weight:bold;">ملاحظة: المنوب والضابط غير مدرجين في هذه القائمة.</p><div style="max-height:70vh; overflow:auto; margin-top:10px">`; 
+    state.ports.forEach(port => { const assigned = snap.assignments[port.name] || []; const validPeople = peopleAvailable.filter(pp => !port.exceptions?.includes(pp.id)); html += `<div style="margin-bottom:15px; padding:10px; border:1px solid #eee; border-radius:8px"><h4>${port.name} — سعة: ${port.count}</h4><label>الأفراد:</label><select multiple class="input" style="width:100%; height:140px" id="editShift_${port.id}">`; html += validPeople.map(p=>`<option value="${p.id}" ${assigned.some(a=>a.id===p.id) ? "selected":""}>${p.rankName} ${p.name}</option>`).join(''); html += `</select></div>`; }); html += `</div><div style="margin-top:10px; display:flex; justify-content:flex-end; gap:10px"><button class="small" id="saveShiftEditBtn">💾 حفظ</button><button class="small btn-ghost" id="closeModalBtn">إلغاء</button></div>`; 
+    showModal(html); document.getElementById('closeModalBtn').onclick = closeModal; document.getElementById('saveShiftEditBtn').onclick = () => saveShiftEdit(snap); 
+}
+async function saveShiftEdit(snap) { 
+    const newAssignmentsMap = {}; for (const port of state.ports) { const sel = Array.from(document.getElementById(`editShift_${port.id}`).selectedOptions).map(o => o.value); if (sel.length > port.count) { if (!confirm(`تحذير: منفذ "${port.name}" سعته ${port.count} واخترت ${sel.length}. متابعة؟`)) return; } const persons = sel.map(id => state.people.find(p => p.id === id)).filter(Boolean); newAssignmentsMap[port.name] = ensureHighestRankNonCivilianIsLeader(persons.map(per => ({ id: per.id, display: `${per.rankName} ${per.name}`, isLeader: false })), port.id); } 
+    state.people.forEach(person => { if (state.personHistory[person.id]) { state.personHistory[person.id] = state.personHistory[person.id].filter(entry => entry.date !== snap.date); } }); for (const portName in newAssignmentsMap) { newAssignmentsMap[portName].forEach(a => { if (!state.personHistory[a.id]) state.personHistory[a.id] = []; state.personHistory[a.id].push({ date: snap.date, portName: portName }); }); } snap.assignments = newAssignmentsMap; saveLocal(); closeModal(); renderShift(snap); showSaveNotice(); 
+}
+window.addEventListener('load', () => { const oldRender = window.renderHistory; window.renderHistory = function(filter = ''){ oldRender(filter); document.querySelectorAll("[data-editshift]").forEach(b=>{ b.onclick = ()=>{ const id=b.getAttribute("data-editshift"); const snap = state.shifts.find(s=>s.id===id); if(snap) openShiftEditor(snap); }; }); }; const loaded = loadLocal(); renderAll(); if(loaded) { const n=document.getElementById('saveNotice'); if(n) { n.innerHTML = '📂 تم استرجاع البيانات المحفوظة'; n.style.background = '#43a047'; n.style.display='block'; setTimeout(()=>{ n.style.display='none'; }, 3000); } } });
+document.addEventListener("DOMContentLoaded", ()=>{ const btn = document.getElementById("circleLeadersBtn"); if (!btn) return; btn.onclick = ()=>{ let html = ''; const portsWithLeaders = state.ports.filter(p => state.portLeaders[p.id]?.length > 0); if (portsWithLeaders.length > 0) { portsWithLeaders.forEach(port => { const leaderNames = state.portLeaders[port.id].map(id => state.people.find(p => p.id === id)).filter(Boolean).map(l => `${l.rankName} ${l.name}`).join(', '); html += `<div style="margin-bottom: 8px; padding: 6px; background: rgba(85,107,47,0.02); border-radius: 6px;"><strong>${port.name}:</strong> <span>${leaderNames}</span> <button class="small btn-ghost" style="margin-right: 10px;" onclick="editSpecificGateLeaders('${port.id}')">تعديل</button></div>`; }); } else { html = '<p style="color:var(--muted)">لم يتم تحديد قادة بعد.</p>'; } const portOptions = state.ports.map(p => `<option value="${p.id}">${p.name}</option>`).join(''); showModal(`<h3>إدارة قادة البوابات</h3><div style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #eee;"><h4>القادة الحاليون:</h4><div id="currentGateLeaders">${html}</div></div><div style="margin-bottom: 10px;"><h4>إضافة/تعديل:</h4><select id="selectPortForLeaders" class="input" style="width:100%;margin-bottom: 10px;"><option value="">اختر منفذ...</option>${portOptions}</select><label>اختر القادة (المدنيون مستبعدون):</label><select id="assignableLeadersSel" multiple class="input" style="width:100%;height:150px">${state.people.filter(p => p.rank !== 99).map(p=>`<option value="${p.id}">${p.rankName} ${p.name}</option>`).join('')}</select></div><div style="margin-top:10px;display:flex;gap:10px;justify-content:flex-end"><button class="small" id="saveGateLeadersConfig">حفظ</button><button class="small btn-ghost" id="closeModalBtn">إلغاء</button></div>`); document.getElementById("closeModalBtn").onclick=closeModal; document.getElementById("saveGateLeadersConfig").onclick=saveGateLeadersConfiguration; document.getElementById('selectPortForLeaders').addEventListener('change', (e) => { const portId = e.target.value; const sel = document.getElementById('assignableLeadersSel'); Array.from(sel.options).forEach(o => o.selected = false); if (portId && state.portLeaders[portId]) { state.portLeaders[portId].forEach(id => { const o = sel.querySelector(`option[value="${id}"]`); if (o) o.selected = true; }); } }); };});
+function saveGateLeadersConfiguration() { const portId = document.getElementById("selectPortForLeaders").value; const leaderIds = Array.from(document.getElementById("assignableLeadersSel").selectedOptions).map(o => o.value); if (!portId) return alert("اختر منفذًا."); state.portLeaders[portId] = leaderIds; saveLocal(); closeModal(); renderPorts(); showSaveNotice(); document.getElementById("circleLeadersBtn").click(); }
+function editSpecificGateLeaders(portId) { closeModal(); document.getElementById("circleLeadersBtn").click(); setTimeout(() => { const select = document.getElementById('selectPortForLeaders'); if (select) { select.value = portId; select.dispatchEvent(new Event('change')); } }, 50); }
+function ensureHighestRankNonCivilianIsLeader(personsArray, portId) {
+    if (!personsArray || personsArray.length === 0) return [];
+    personsArray.sort((a, b) => { const pA = state.people.find(x => x.id === a.id); const pB = state.people.find(x => x.id === b.id); const rankA = pA ? pA.rank : 999; const rankB = pB ? pB.rank : 999; return rankA - rankB; });
+    const manualLeader = personsArray.find(p => p.isManualLeader === true); let leaderId = null;
+    const validLeaders = personsArray.filter(p => { const personData = state.people.find(x => x.id === p.id); const r = personData ? personData.rank : 99; return r <= 7 && r !== 99; });
+    if (manualLeader) { leaderId = manualLeader.id; } else {
+        if (portId && state.portLeaders[portId]?.length > 0) { const availableDesignatedLeaders = personsArray.filter(person => state.portLeaders[portId].includes(person.id)); if (availableDesignatedLeaders.length > 0) { availableDesignatedLeaders.sort((a, b) => { const pA = state.people.find(x => x.id === a.id); const pB = state.people.find(x => x.id === b.id); return (pA?pA.rank:99) - (pB?pB.rank:99); }); leaderId = availableDesignatedLeaders[0].id; } }
+        if (!leaderId && validLeaders.length > 0) { validLeaders.sort((a, b) => { const pA = state.people.find(x => x.id === a.id); const pB = state.people.find(x => x.id === b.id); return (pA?pA.rank:99) - (pB?pB.rank:99); }); leaderId = validLeaders[0].id; }
+    }
+    return personsArray.map(a => ({ ...a, isLeader: (leaderId && a.id === leaderId), isManualLeader: a.isManualLeader || (leaderId === a.id && !manualLeader) }));
+}
+function setManualPortLeader(personId, portName) {
+    if (!state.currentShift) return; const list = state.currentShift.assignments[portName]; if (!list) return;
+    const target = list.find(p => p.id === personId); if (!target) return; const portObj = state.ports.find(p => p.name === portName); const portId = portObj ? portObj.id : null;
+    const isAlreadyManualLeader = target.isManualLeader; list.forEach(p => delete p.isManualLeader); if (!isAlreadyManualLeader) { target.isManualLeader = true; }
+    state.currentShift.assignments[portName] = ensureHighestRankNonCivilianIsLeader(list, portId); saveLocal(); renderShift(state.currentShift); showSaveNotice();
+}
+</script>
+</body>
+</html>

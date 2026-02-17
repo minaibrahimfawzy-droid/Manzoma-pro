@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>System 2030 - Smart Lanes Manager (Auto Calc)</title>
+<style>
+  /* --- الأساسيات --- */
+  * { box-sizing: border-box; }
+  body {
+    background-color: #0f0f0f;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 10px;
+    font-size: 14px;
+    overflow-x: hidden;
+  }
+
+  /* --- شاشة الإعدادات --- */
+  #settingsOverlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9); z-index: 8888;
+      display: none; justify-content: center; align-items: flex-start;
+      overflow-y: auto; padding: 20px; backdrop-filter: blur(5px);
+  }
+  .settings-box {
+      background: #1e1e1e; width: 100%; max-width: 600px;
+      padding: 20px; border-radius: 8px; border: 1px solid #333;
+      margin-top: 30px; margin-bottom: 30px;
+  }
+  .set-row { margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 15px; }
+  .set-inp { 
+      width: 100%; background: #111; border: 1px solid #444; color: #fff; 
+      padding: 8px; border-radius: 4px; margin-top: 5px; font-size: 13px;
+  }
+  .set-label { color: #90caf9; font-weight: bold; display: block; margin-bottom: 5px; }
+  .btn-close-set { 
+      background: #c62828; color: white; border: none; padding: 5px 15px; 
+      border-radius: 4px; float: left; cursor: pointer; font-weight: bold;
+  }
+  
+  /* ستايل الحارات في الإعدادات */
+  .lanes-container {
+      display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; margin-bottom: 8px;
+      background: #151515; padding: 8px; border-radius: 4px; border: 1px dashed #333;
+  }
+  .lane-chip {
+      background: #263238; color: #fff; padding: 4px 10px; border-radius: 15px;
+      font-size: 12px; display: flex; align-items: center; gap: 6px; border: 1px solid #37474f;
+  }
+  .btn-x {
+      background: #b71c1c; color: white; border: none; border-radius: 50%;
+      width: 16px; height: 16px; line-height: 14px; text-align: center;
+      cursor: pointer; font-size: 10px; font-weight: bold;
+  }
+  .add-lane-row { display: flex; gap: 5px; margin-top: 5px; }
+  .btn-plus { background: #2e7d32; color: white; border:none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+
+  /* --- الهيدر --- */
+  .info-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #1e1e1e; padding: 8px 15px; border-radius: 6px;
+      margin-bottom: 15px; border: 1px solid #333; color: #ffca28; font-weight: 600;
+      font-size: 13px;
+  }
+  .settings-btn {
+      background: transparent; border: 1px solid #555; color: #ccc;
+      padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 16px;
+  }
+  /* أزرار التنقل بالتاريخ */
+  .nav-btn {
+      background: transparent; border: none; color: #ffca28; font-size: 18px;
+      cursor: pointer; padding: 0 8px; vertical-align: middle; transition: 0.2s;
+  }
+  .nav-btn:hover { color: #fff; transform: scale(1.2); }
+  .date-txt { font-size: 15px; margin: 0 5px; color: #eee; font-weight: bold; }
+
+  /* --- أزرار البوابات --- */
+  .gates-bar { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; }
+  .gate-btn {
+      flex: 1; min-width: 100px; padding: 10px; background: #252525; border: 1px solid #333;
+      color: #bbb; border-radius: 6px; cursor: pointer; font-weight: bold;
+      transition: 0.2s; font-size: 13px;
+  }
+  .gate-btn.active {
+      background: #0d47a1; color: white; border-color: #42a5f5;
+      box-shadow: 0 0 8px rgba(13, 71, 161, 0.5);
+  }
+
+  /* --- الحاويات --- */
+  .section {
+      background: #181818; border: 1px solid #333; padding: 12px;
+      margin-bottom: 20px; border-radius: 8px; position: relative;
+  }
+  .section.active { border: 1px solid #00e676; box-shadow: 0 0 5px rgba(0,230,118,0.1); }
+  .section.locked { opacity: 0.6; pointer-events: none; filter: grayscale(1); }
+  .section.locked .header-row { pointer-events: auto; filter: none; }
+
+  .header-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px; border-bottom: 1px solid #333; padding-bottom: 8px;
+  }
+  .header-row h3 { margin: 0; font-size: 16px; color: #eee; }
+  
+  .lock-btn {
+      padding: 4px 10px; border-radius: 15px; font-size: 11px; cursor: pointer; border: none;
+  }
+  .lock-btn.closed { background: #333; color: #888; }
+  .lock-btn.opened { background: #b71c1c; color: white; animation: pulse 2s infinite; }
+  .lock-btn.active { background: transparent; color: #00e676; font-weight: bold; cursor: default; }
+  @keyframes pulse { 0% {opacity:1;} 50% {opacity:0.6;} 100% {opacity:1;} }
+
+  /* --- البطاقات --- */
+  .lane-card {
+      display: flex; background: #202020; border: 1px solid #2a2a2a;
+      border-radius: 6px; margin-bottom: 6px; overflow: hidden;
+  }
+  .lane-name-box {
+      width: 28%; background: #252525; border-left: 1px solid #333;
+      padding: 5px; display: flex; flex-direction: column; justify-content: center;
+  }
+  .lane-name-input {
+      width: 100%; background: transparent; border: none; color: #ddd;
+      font-weight: bold; font-size: 12px; text-align: center;
+  }
+  .lane-data-box { width: 72%; padding: 4px; display: flex; flex-direction: column; gap: 2px; }
+  .input-row {
+      display: flex; align-items: center; background: #141414;
+      border-radius: 3px; padding: 0 6px; height: 28px;
+  }
+  .num-input {
+      flex: 1; background: transparent; border: none; color: #fff;
+      font-size: 14px; font-weight: bold; text-align: center;
+  }
+  .num-input:focus { outline: none; background: #222; }
+  .input-label { width: 45px; font-size: 10px; color: #888; font-weight: bold; }
+  
+  /* ألوان الصفوف */
+  .row-fees { border-right: 2px solid #1e88e5; }
+  .row-scales { border-right: 2px solid #fdd835; }
+  .row-epay { border-right: 2px solid #ab47bc; }
+  /* تم تعديل لون صف الإجمالي ليكون واضحاً أنه قابل للكتابة */
+  .row-total { background:#00251a; border-right:3px solid #00e676; }
+  .row-total input { color: #00e676; }
+
+  /* --- جدول التدفق --- */
+  .traffic-section {
+      background: #161616; border: 1px solid #333; border-radius: 6px;
+      padding: 8px; margin-top: 15px;
+  }
+  .traffic-header {
+      background: #263238; color: #cfd8dc; padding: 6px; border-radius: 4px;
+      margin-bottom: 8px; font-weight: bold; font-size: 13px; text-align: center;
+  }
+  .traffic-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .traffic-table th { background: #212121; color: #90a4ae; padding: 6px; border: 1px solid #333; }
+  .traffic-table td { border: 1px solid #333; padding: 4px; text-align: center; vertical-align: middle; }
+  .traffic-table tr:nth-child(even) { background: #1b1b1b; }
+  
+  .cat-check { width: 16px; height: 16px; cursor: pointer; accent-color: #00e676; }
+  .tr-inp { width: 100%; background: transparent; border: none; color: #fff; text-align: center; font-weight: bold; }
+  .tr-inp:disabled { color: #444; }
+  .tr-inp.count { color: #29b6f6; background: #000; padding: 2px; border-radius: 3px; font-size: 13px; }
+  
+  .traffic-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px; padding-top: 8px; border-top: 1px solid #333;
+  }
+  .diff-box { font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+  .diff-ok { color: #69f0ae; background: rgba(0, 230, 118, 0.05); }
+  .diff-err { color: #ef5350; background: rgba(244, 67, 54, 0.05); }
+
+  /* --- الإجماليات التفصيلية --- */
+  .breakdown-bar {
+      display: flex; gap: 6px; margin-top: 15px; border-top: 1px solid #333; padding-top: 12px; flex-wrap: wrap;
+  }
+  .bd-box {
+      flex: 1; min-width: 110px; background: #202020; padding: 8px; border-radius: 5px;
+      text-align: center; border: 1px solid #333;
+  }
+  .bd-box label { display: block; font-size: 11px; color: #90a4ae; margin-bottom: 3px; }
+  .bd-box span { display: block; font-size: 16px; font-weight: bold; }
+
+  /* --- تنسيق الإجماليات --- */
+  .totals-bar { 
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; 
+  }
+  .t-box { 
+      flex: 1; min-width: 140px;
+      background: #212121; padding: 0 12px; border-radius: 6px; 
+      display: flex; justify-content: space-between; align-items: center; 
+      height: 42px; border: 1px solid #333; transition: 0.2s;
+  }
+  .t-box small { font-size: 11px; color: #aaa; font-weight: 600; white-space: nowrap; }
+  .t-box input, .t-box span { 
+      text-align: left; font-size: 15px; font-weight: bold; 
+      background: transparent; border: none; color: #fff; width: 70px; direction: ltr;
+  }
+  .t-box input:focus { outline: none; }
+  
+  .t-box.manual { border-right: 3px solid #ff9800; }
+  .t-box.sup { border-right: 3px solid #9e9e9e; }
+  .t-box.fees { border-right: 3px solid #2196f3; }
+  .t-box.scales { border-right: 3px solid #fdd835; }
+  .t-box.epay { border-right: 3px solid #ab47bc; }
+  .t-box.combo { border-right: 3px solid #ff7043; background: #252020; }
+  
+  .t-box.main { 
+      flex-basis: 100%; width: 100%;
+      background: #00332a; border: 1px solid #004d40;
+      border-right: 3px solid #00e676; height: 48px; margin-top: 5px;
+  }
+  .t-box.main small { color: #b9f6ca; font-size: 13px; }
+  .t-box.main span { font-size: 20px; color: #00e676; width: auto; }
+
+  /* --- الأزرار --- */
+  .action-btn { width: 100%; padding: 8px; border-radius: 5px; border: none; color: white; font-weight: bold; cursor: pointer; margin-top: 8px; font-size: 13px; }
+  .btn-add { background: #333; border: 1px dashed #555; color: #999; }
+  .btn-auto { background: #1565c0; color: white; margin-bottom: 8px; }
+  .btn-auto:hover { background: #1976d2; }
+  .btn-save { background: #2e7d32; }
+  .btn-reset { background: #c62828; }
+  .btn-blue { background: #1976d2; margin-top: 5px; }
+  .btn-del { background: #b71c1c; margin-top: 5px; font-size: 12px; width: auto; padding: 5px 10px; float: left; }
+  .btn-rename { background: #f57f17; margin-top: 5px; font-size: 12px; width: auto; padding: 5px 10px; display:inline-block; }
+  
+  /* --- الملخص --- */
+  .summary-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .summary-table th { background: #212121; padding: 6px; font-size: 11px; border: 1px solid #333; color: #bbb; }
+  .summary-table td { border: 1px solid #333; padding: 5px; text-align: center; font-size: 13px; }
+  .grand-box { background: #004d40; padding: 12px; border-radius: 6px; text-align: center; margin-top: 15px; border: 2px solid #00e676; }
+
+  /* --- فاصل العنوان --- */
+  .sub-header {
+      margin-top: 25px; border-top: 1px dashed #444; padding-top: 10px;
+      font-size: 14px; font-weight: bold; color: #b0bec5; text-align: center; margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- شاشة الإعدادات -->
+<div id="settingsOverlay">
+    <div class="settings-box">
+        <div style="overflow:hidden; margin-bottom:15px;">
+            <button class="btn-close-set" onclick="closeSettings()">إغلاق X</button>
+            <h3 style="margin:0; text-align:center; color:#fff">⚙️ إدارة البوابات والحارات</h3>
+        </div>
+
+        <div id="settingsContent"></div>
+
+        <div class="set-row" style="border:none; margin-top:20px; background:#252525; padding:10px; border-radius:6px;">
+            <span class="set-label" style="color:#69f0ae">➕ إنشاء بوابة جديدة</span>
+            <input type="text" id="newGateName" class="set-inp" placeholder="اكتب اسم البوابة هنا...">
+            <button class="action-btn btn-blue" onclick="addNewGate()">إنشاء البوابة</button>
+        </div>
+    </div>
+</div>
+
+<div class="info-bar">
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    <div style="display:flex; align-items:center;">
+        <!-- أزرار التنقل بالتاريخ -->
+        <button class="nav-btn" onclick="changeDate(-1)">◀</button>
+        <span id="dateDisplay" class="date-txt">--</span>
+        <button class="nav-btn" onclick="changeDate(1)">▶</button>
+        <span id="clockDisplay" style="margin-right:15px; color:#ffca28; font-family:monospace; font-size:15px;">00:00</span>
+    </div>
+</div>
+
+<div class="gates-bar" id="gatesContainer"></div>
+
+<div class="section" style="padding: 10px;">
+    <input type="text" id="operatorName" placeholder="اسم القائم بالعمل" style="width:100%; padding:10px; background:#212121; border:1px solid #333; color:white; border-radius:6px; text-align:center; font-size:14px;">
+</div>
+
+<!-- صباحي -->
+<div class="section" id="secMorning">
+    <div class="header-row">
+        <h3>☀️ الوردية الصباحية (9 ص - 11 م)</h3>
+        <button id="btnLockMorning" class="lock-btn" onclick="toggleLock('morning')">🔒</button>
+    </div>
+    
+    <div id="containerMorning"></div>
+    <button class="action-btn btn-add" onclick="addLane('morning')">+ إضافة حارة</button>
+    
+    <div class="totals-bar">
+        <div class="t-box manual"><small>موازين يدوي</small><input type="number" id="mMan" placeholder="0" style="color:#ffb74d"></div>
+        <div class="t-box sup"><small>الرقابة</small><input type="number" id="mSup" placeholder="0"></div>
+        <div class="t-box fees"><small>رسوم نقدي</small><span id="mFees" style="color:#42a5f5">0</span></div>
+        <div class="t-box scales"><small>موازين</small><span id="mScales" style="color:#ffee58">0</span></div>
+        <div class="t-box epay"><small>إلكتروني</small><span id="mEpay" style="color:#ce93d8">0</span></div>
+        <div class="t-box combo"><small>إلكتروني+موازين</small><span id="mCombo" style="color:#ff7043">0</span></div>
+        
+        <div class="t-box main"><small>الإجمالي</small><span id="mTotal">0</span></div>
+    </div>
+
+    <div class="traffic-section">
+        <div class="traffic-header">🚦 تفاصيل التذاكر (الوردية الصباحية)</div>
+        <button class="action-btn btn-auto" onclick="autoDistribute('morning')">⚡ توزيع عشوائي متوازن (0 متبقي)</button>
+        <table class="traffic-table">
+            <thead>
+                <tr><th style="width:15%">اختيار</th><th style="width:15%">الفئة</th><th style="width:35%">عدد التذاكر</th><th style="width:35%">القيمة</th></tr>
+            </thead>
+            <tbody id="mTrafficBody"></tbody>
+        </table>
+        <div class="traffic-footer"><div id="mDiffBox" class="diff-box diff-ok">المتبقي: 0.00</div></div>
+    </div>
+</div>
+
+<!-- مسائي -->
+<div class="section" id="secEvening">
+    <div class="header-row">
+        <h3>🌙 الوردية المسائية (10 م - 11 ص)</h3>
+        <button id="btnLockEvening" class="lock-btn" onclick="toggleLock('evening')">🔒</button>
+    </div>
+    
+    <div id="containerEvening"></div>
+    <button class="action-btn btn-add" onclick="addLane('evening')">+ إضافة حارة</button>
+    
+    <div class="totals-bar">
+        <div class="t-box manual"><small>موازين يدوي</small><input type="number" id="eMan" placeholder="0" style="color:#ffb74d"></div>
+        <div class="t-box sup"><small>الرقابة</small><input type="number" id="eSup" placeholder="0"></div>
+        <div class="t-box fees"><small>رسوم نقدي</small><span id="eFees" style="color:#42a5f5">0</span></div>
+        <div class="t-box scales"><small>موازين</small><span id="eScales" style="color:#ffee58">0</span></div>
+        <div class="t-box epay"><small>إلكتروني</small><span id="eEpay" style="color:#ce93d8">0</span></div>
+        <div class="t-box combo"><small>إلكتروني+موازين</small><span id="eCombo" style="color:#ff7043">0</span></div>
+
+        <div class="t-box main"><small>الإجمالي</small><span id="eTotal">0</span></div>
+    </div>
+
+    <div class="traffic-section">
+        <div class="traffic-header">🚦 تفاصيل التذاكر (الوردية المسائية)</div>
+        <button class="action-btn btn-auto" onclick="autoDistribute('evening')">⚡ توزيع عشوائي متوازن (0 متبقي)</button>
+        <table class="traffic-table">
+            <thead>
+                <tr><th style="width:15%">اختيار</th><th style="width:15%">الفئة</th><th style="width:35%">عدد التذاكر</th><th style="width:35%">القيمة</th></tr>
+            </thead>
+            <tbody id="eTrafficBody"></tbody>
+        </table>
+        <div class="traffic-footer"><div id="eDiffBox" class="diff-box diff-ok">المتبقي: 0.00</div></div>
+    </div>
+</div>
+
+<!-- ملخص اليوم -->
+<div class="section">
+    <div class="header-row"><h3>📊 ملخص فئات التذاكر (صباحي + مسائي)</h3></div>
+    <table class="summary-table">
+        <thead>
+            <tr><th>الفئة</th><th>تذاكر صباحي</th><th>تذاكر مسائي</th><th>إجمالي التذاكر</th><th>إجمالي القيمة</th></tr>
+        </thead>
+        <tbody id="trafficSummaryBody"></tbody>
+    </table>
+
+    <div class="sub-header">🛣️ ملخص إيرادات الحارات (تفصيلي)</div>
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>اسم الحارة</th>
+                <th style="color:#90caf9">إيراد صباحي</th>
+                <th style="color:#ffcc80">إيراد مسائي</th>
+                <th style="color:#69f0ae">الإجمالي العام</th>
+            </tr>
+        </thead>
+        <tbody id="laneSummaryBody"></tbody>
+    </table>
+    
+    <div class="breakdown-bar">
+        <div class="bd-box"><label>إجمالي نقدي</label><span id="bdFees" style="color:#42a5f5">0.00</span></div>
+        <div class="bd-box"><label>إجمالي رقابة</label><span id="bdSup" style="color:#ef5350">0.00</span></div>
+        <div class="bd-box"><label>إجمالي إلكتروني</label><span id="bdEpay" style="color:#ab47bc">0.00</span></div>
+        <div class="bd-box"><label>إجمالي موازين</label><span id="bdScales" style="color:#ffee58">0.00</span></div>
+        <div class="bd-box" style="border:1px solid #ff7043"><label style="color:#ffab91">إلكتروني + موازين</label><span id="bdCombo" style="color:#ff7043">0.00</span></div>
+    </div>
+
+    <div class="grand-box">
+        <div style="color:#b2dfdb; font-size:13px; margin-bottom:5px;">الإجمالي العام النهائي (نقدي + فيزا + موازين + رقابة)</div>
+        <div id="gTotal" style="color:#00e676; font-size:28px; font-weight:900;">0.00</div>
+    </div>
+</div>
+
+<!-- التحكم -->
+<div class="section">
+    <div style="display:flex; gap:8px;">
+        <button class="action-btn btn-save" onclick="saveData(false)">💾 حفظ البيانات</button>
+        <button class="action-btn btn-reset" onclick="resetDay()">♻️ إنهاء اليوم</button>
+    </div>
+    <div style="margin-top:20px; border-top:1px solid #333; padding-top:10px;">
+        <select id="historyList" style="width:100%; padding:10px; background:#212121; color:white; border:none; border-radius:5px; margin-bottom:10px; font-size:13px;"></select>
+        <button class="action-btn" style="background:#455a64; margin-top:0;" onclick="loadFromHistory()">📂 استرجاع السجل</button>
+    </div>
+</div>
+
+<script>
+/* --- المتغيرات --- */
+const CATEGORIES = [5, 10, 15, 20, 25, 30, 35, 50];
+let GATES = {
+    'helwan': { name: 'بوابة حلوان', lanes: ['ن ١ دخول', 'ن ٢ دخول', 'م ١ دخول', 'م ٢ دخول', 'ن ١ خروج', 'ن ٢ خروج'] },
+    'kuraymat': { name: 'بوابة الكريمات', lanes: ['حارة ١', 'حارة ٢', 'ميزان ١', 'ميزان ٢'] }
+};
+let curGate = 'helwan';
+let curDate = ''; // سيتم تحديده عند البدء
+let unlock = { morning: false, evening: false };
+let trafficData = { morning: {}, evening: {} };
+
+window.onload = () => {
+    if(localStorage.getItem('custom_gates')) {
+        GATES = JSON.parse(localStorage.getItem('custom_gates'));
+    }
+    if(!GATES[curGate]) curGate = Object.keys(GATES)[0];
+
+    renderGates(); 
+    initDate(); // تحديد التاريخ مرة واحدة في البداية
+    updateClock(); // تشغيل الساعة
+    setInterval(updateClock, 1000); // تحديث الساعة فقط
+    loadData();
+    
+    document.getElementById('mSup').oninput = calc; document.getElementById('eSup').oninput = calc;
+    document.getElementById('mMan').oninput = calc; document.getElementById('eMan').oninput = calc;
+    setInterval(() => saveData(true), 5000);
+};
+
+/* --- إدارة التاريخ والوقت (المنطق المعدل) --- */
+function initDate() {
+    const now = new Date();
+    const h = now.getHours();
+    
+    let d = new Date(now); 
+    
+    curDate = d.toISOString().split('T')[0];
+    document.getElementById('dateDisplay').innerText = curDate;
+    
+    // ضبط الأقفال حسب الأوقات المطلوبة
+    const isMorningActive = (h >= 9 && h < 23);
+    const isEveningActive = (h >= 22 || h < 11);
+
+    setLock('morning', isMorningActive); 
+    setLock('evening', isEveningActive);
+}
+
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clockDisplay').innerText = now.toLocaleTimeString('ar-EG', {hour:'2-digit',minute:'2-digit'});
+}
+
+// دالة لتغيير التاريخ (أزرار التنقل)
+function changeDate(offset) {
+    saveData(true); // حفظ الشاشة الحالية قبل الانتقال
+    
+    let d = new Date(curDate);
+    d.setDate(d.getDate() + offset);
+    curDate = d.toISOString().split('T')[0];
+    
+    document.getElementById('dateDisplay').innerText = curDate;
+    
+    // إعادة تحميل البيانات للتاريخ الجديد
+    loadData();
+}
+
+/* --- الجداول والعمليات --- */
+function renderTrafficTable(shift) {
+    const tbody = document.getElementById(shift === 'morning' ? 'mTrafficBody' : 'eTrafficBody');
+    tbody.innerHTML = '';
+    CATEGORIES.forEach(cat => {
+        const saved = trafficData[shift][cat] || { checked: false, count: 0 };
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="checkbox" class="cat-check" ${saved.checked?'checked':''} onchange="toggleCat('${shift}', ${cat}, this)"></td>
+            <td style="color:#fff; font-weight:bold;">${cat}</td>
+            <td><input type="number" class="tr-inp count" value="${saved.count}" ${saved.checked?'':'disabled'} oninput="updateTrafficCount('${shift}', ${cat}, this.value)"></td>
+            <td class="row-val" style="color:#bbb">0</td>`;
+        tbody.appendChild(tr);
+    });
+    calcTraffic(shift);
+}
+function toggleCat(shift, cat, chk) {
+    const inp = chk.closest('tr').querySelector('.count');
+    if(chk.checked) { inp.disabled = false; if(!trafficData[shift][cat]) trafficData[shift][cat]={checked:true,count:0}; trafficData[shift][cat].checked=true; }
+    else { inp.disabled = true; inp.value = 0; if(trafficData[shift][cat]) { trafficData[shift][cat].checked=false; trafficData[shift][cat].count=0; } }
+    calcTraffic(shift);
+}
+function updateTrafficCount(shift, cat, val) {
+    if(!trafficData[shift][cat]) trafficData[shift][cat]={checked:true,count:0};
+    trafficData[shift][cat].count = parseFloat(val)||0;
+    calcTraffic(shift);
+}
+
+function autoDistribute(shift) {
+    const feesId = shift === 'morning' ? 'mFees' : 'eFees';
+    let totalFees = parseFloat(document.getElementById(feesId).innerText) || 0;
+    if(totalFees <= 0) { alert('لا توجد رسوم نقدية لتوزيعها'); return; }
+    const tbody = document.getElementById(shift === 'morning' ? 'mTrafficBody' : 'eTrafficBody');
+    const checkboxes = tbody.querySelectorAll('.cat-check:checked');
+    if(checkboxes.length === 0) { alert('يرجى اختيار فئة واحدة على الأقل'); return; }
+    
+    let processingCats = [];
+    checkboxes.forEach(chk => {
+        let tr = chk.closest('tr');
+        processingCats.push({ 
+            val: parseFloat(tr.querySelector('td:nth-child(2)').innerText), 
+            input: tr.querySelector('.count'), 
+            count: 0 
+        });
+    });
+
+    processingCats.sort((a, b) => b.val - a.val);
+    let smallestCat = processingCats[processingCats.length - 1]; 
+    let otherCats = processingCats.slice(0, processingCats.length - 1); 
+    let remaining = totalFees;
+
+    otherCats.forEach(cat => {
+        let idealShare = remaining / (otherCats.length + 1); 
+        let maxTickets = Math.floor(remaining / cat.val);
+        let idealTickets = Math.floor(idealShare / cat.val);
+        let randomFactor = 0.8 + (Math.random() * 0.4); 
+        let count = Math.floor(idealTickets * randomFactor);
+        if (count > maxTickets) count = maxTickets;
+        if (count < 0) count = 0;
+        cat.count = count;
+        remaining -= (count * cat.val);
+    });
+
+    let smallCount = Math.floor(remaining / smallestCat.val);
+    smallestCat.count += smallCount;
+    remaining -= (smallCount * smallestCat.val);
+
+    let attempts = 0;
+    while (remaining > 0 && attempts < 1000) {
+        let donor = processingCats.find(c => c !== smallestCat && c.count > 0);
+        if (!donor) break; 
+        donor.count--;
+        remaining += donor.val;
+        let add = Math.floor(remaining / smallestCat.val);
+        smallestCat.count += add;
+        remaining -= (add * smallestCat.val);
+        attempts++;
+    }
+
+    processingCats.forEach(p => { 
+        p.input.value = p.count; 
+        updateTrafficCount(shift, p.val, p.count); 
+    });
+    calcTraffic(shift);
+}
+
+function calcTraffic(shift) {
+    const tbody = document.getElementById(shift === 'morning' ? 'mTrafficBody' : 'eTrafficBody');
+    const rows = tbody.querySelectorAll('tr');
+    let currentTotalVal = 0;
+    rows.forEach((tr, idx) => {
+        const cat = CATEGORIES[idx], countInp = tr.querySelector('.count'), valCell = tr.querySelector('.row-val');
+        const val = (parseFloat(countInp.value)||0) * cat;
+        valCell.innerText = val.toFixed(0); currentTotalVal += val;
+    });
+    const targetFees = parseFloat(document.getElementById(shift==='morning'?'mFees':'eFees').innerText)||0;
+    const diff = targetFees - currentTotalVal;
+    const diffBox = document.getElementById(shift==='morning'?'mDiffBox':'eDiffBox');
+    
+    if(Math.abs(diff) < 0.1) { 
+        diffBox.className='diff-box diff-ok'; 
+        diffBox.innerText='✅ التوزيع مطابق (0.00)'; 
+    } else { 
+        diffBox.className='diff-box diff-err'; 
+        diffBox.innerText = `⚠️ المتبقي: ${diff.toFixed(2)}`; 
+    }
+    updateSummaryTable();
+}
+
+function updateSummaryTable() {
+    const tbody = document.getElementById('trafficSummaryBody'); tbody.innerHTML = '';
+    let gT = 0, gV = 0;
+    CATEGORIES.forEach(cat => {
+        const m = trafficData['morning'][cat]?.count||0, e = trafficData['evening'][cat]?.count||0, t = m+e, v = t*cat;
+        gT+=t; gV+=v;
+        if(t>0) tbody.innerHTML+=`<tr><td style="color:#ffca28;font-weight:bold">${cat}</td><td>${m}</td><td>${e}</td><td style="color:#4fc3f7">${t}</td><td style="color:#00e676">${v.toFixed(2)}</td></tr>`;
+    });
+    tbody.innerHTML+=`<tr style="background:#004d40;font-weight:bold"><td>الإجمالي</td><td>-</td><td>-</td><td>${gT}</td><td>${gV.toFixed(2)}</td></tr>`;
+}
+
+function updateLaneSummary() {
+    const tbody = document.getElementById('laneSummaryBody'); tbody.innerHTML = '';
+    const mCards = document.querySelectorAll('#containerMorning .lane-card');
+    const eCards = document.querySelectorAll('#containerEvening .lane-card');
+    const count = Math.max(mCards.length, eCards.length);
+    for(let i=0; i<count; i++) {
+        const mCard = mCards[i], eCard = eCards[i];
+        const name = mCard ? mCard.querySelector('.lane-name-input').value : (eCard ? eCard.querySelector('.lane-name-input').value : 'حارة '+(i+1));
+        
+        const mF = mCard ? (parseFloat(mCard.querySelector('.inp-fees').value)||0) : 0;
+        const mS = mCard ? (parseFloat(mCard.querySelector('.inp-scales').value)||0) : 0;
+        const mEp = mCard ? (parseFloat(mCard.querySelector('.inp-epay').value)||0) : 0;
+        
+        const eF = eCard ? (parseFloat(eCard.querySelector('.inp-fees').value)||0) : 0;
+        const eS = eCard ? (parseFloat(eCard.querySelector('.inp-scales').value)||0) : 0;
+        const eEp = eCard ? (parseFloat(eCard.querySelector('.inp-epay').value)||0) : 0;
+        
+        const mVal = mF + mS + mEp;
+        const eVal = eF + eS + eEp;
+        const total = mVal + eVal;
+        
+        tbody.innerHTML += `
+            <tr>
+                <td style="color:#e0e0e0; font-weight:bold">${name}</td>
+                <td style="color:#90caf9">${mVal.toFixed(2)}</td>
+                <td style="color:#ffcc80">${eVal.toFixed(2)}</td>
+                <td style="color:#69f0ae; font-weight:bold">${total.toFixed(2)}</td>
+            </tr>`;
+    }
+}
+
+function createCard(shift, name, f='', s='', ep='', t='') {
+    const container = document.getElementById(shift === 'morning' ? 'containerMorning' : 'containerEvening');
+    const card = document.createElement('div'); card.className = 'lane-card';
+    // حساب الإجمالي المبدئي في حال التحميل من الذاكرة
+    let initialTotal = 0;
+    if(t) initialTotal = parseFloat(t);
+    else initialTotal = (parseFloat(f)||0) + (parseFloat(s)||0) + (parseFloat(ep)||0);
+
+    card.innerHTML = `
+        <div class="lane-name-box"><input type="text" class="lane-name-input" value="${name}"></div>
+        <div class="lane-data-box">
+            <div class="input-row row-fees"><span class="input-label">رسوم</span><input type="number" class="num-input inp-fees" placeholder="0" value="${f}"></div>
+            <div class="input-row row-epay"><span class="input-label">فيزا</span><input type="number" class="num-input inp-epay" placeholder="0" value="${ep}"></div>
+            <div class="input-row row-scales"><span class="input-label">موازين</span><input type="number" class="num-input inp-scales" placeholder="0" value="${s}"></div>
+            <div class="input-row row-total"><span class="input-label" style="color:#00e676">إجمالي</span><input type="number" class="num-input inp-total" placeholder="0" value="${initialTotal > 0 ? initialTotal : ''}"></div>
+        </div>`;
+    container.appendChild(card);
+    
+    // إضافة مستمعي الأحداث للحقول
+    // الحقول الفرعية: تحسب الإجمالي
+    const inputs = card.querySelectorAll('.inp-fees, .inp-scales, .inp-epay');
+    inputs.forEach(i => i.oninput = () => { cardCalc(card, 'sub'); calc(); });
+    
+    // حقل الإجمالي: يحسب الموازين
+    const totalInput = card.querySelector('.inp-total');
+    totalInput.oninput = () => { cardCalc(card, 'total'); calc(); };
+
+    card.querySelector('.lane-name-input').oninput = () => { saveData(true); calc(); };
+    
+    // لا نستدعي cardCalc هنا حتى لا نعيد الكتابة على القيم عند الإنشاء
+    // cardCalc(card, 'sub'); 
+}
+
+// دالة الحساب الذكية للحارة (تعمل في الاتجاهين)
+function cardCalc(card, source) {
+    const fInp = card.querySelector('.inp-fees');
+    const sInp = card.querySelector('.inp-scales');
+    const epInp = card.querySelector('.inp-epay');
+    const tInp = card.querySelector('.inp-total');
+
+    const f = parseFloat(fInp.value) || 0;
+    const s = parseFloat(sInp.value) || 0;
+    const ep = parseFloat(epInp.value) || 0;
+    const t = parseFloat(tInp.value) || 0;
+
+    if (source === 'total') {
+        // إذا قام المستخدم بتغيير الإجمالي -> نحسب الموازين
+        // الموازين = الإجمالي - (الرسوم + الفيزا)
+        const newScales = t - (f + ep);
+        // نعرض النتيجة في خانة الموازين
+        sInp.value = newScales.toFixed(2).replace('.00', '');
+    } else {
+        // إذا قام المستخدم بتغيير الرسوم أو الفيزا أو الموازين -> نحسب الإجمالي
+        // الإجمالي = الرسوم + الفيزا + الموازين
+        const newTotal = f + s + ep;
+        // نعرض النتيجة في خانة الإجمالي
+        tInp.value = newTotal.toFixed(2).replace('.00', '');
+    }
+}
+
+function calc() {
+    let gT = 0; 
+    let tFeesM=0, tFeesE=0;
+    let tScalesM=0, tScalesE=0;
+    let tSupM=0, tSupE=0;
+    let tEpayM=0, tEpayE=0; 
+
+    ['morning', 'evening'].forEach(sh => {
+        let f=0, s=0, ep=0, t=0;
+        document.getElementById(sh==='morning'?'containerMorning':'containerEvening').querySelectorAll('.lane-card').forEach(card => {
+            const vf = parseFloat(card.querySelector('.inp-fees').value)||0;
+            const vs = parseFloat(card.querySelector('.inp-scales').value)||0;
+            const vep = parseFloat(card.querySelector('.inp-epay').value)||0;
+            const vt = parseFloat(card.querySelector('.inp-total').value)||0; // نأخذ القيمة الظاهرة للإجمالي
+            
+            f+=vf; s+=vs; ep+=vep; t+=vt; // نجمع الإجماليات كما هي
+        });
+        const sup = parseFloat(document.getElementById(sh==='morning'?'mSup':'eSup').value)||0;
+        const man = parseFloat(document.getElementById(sh==='morning'?'mMan':'eMan').value)||0;
+        
+        const totalScalesForShift = s + man;
+
+        document.getElementById(sh==='morning'?'mFees':'eFees').innerText = f.toFixed(2);
+        document.getElementById(sh==='morning'?'mScales':'eScales').innerText = totalScalesForShift.toFixed(2);
+        document.getElementById(sh==='morning'?'mEpay':'eEpay').innerText = ep.toFixed(2);
+        
+        const comboTotal = totalScalesForShift + ep;
+        document.getElementById(sh==='morning'?'mCombo':'eCombo').innerText = comboTotal.toFixed(2);
+
+        const shiftTotal = t + man + sup; // نستخدم مجموع الإجماليات (t) هنا
+        document.getElementById(sh==='morning'?'mTotal':'eTotal').innerText = shiftTotal.toFixed(2);
+        
+        if(sh==='morning') { tFeesM=f; tScalesM=totalScalesForShift; tSupM=sup; tEpayM=ep; }
+        else { tFeesE=f; tScalesE=totalScalesForShift; tSupE=sup; tEpayE=ep; }
+        
+        gT += shiftTotal;
+        calcTraffic(sh);
+    });
+
+    document.getElementById('bdFees').innerText = (tFeesM + tFeesE).toFixed(2);
+    document.getElementById('bdEpay').innerText = (tEpayM + tEpayE).toFixed(2);
+    document.getElementById('bdScales').innerText = (tScalesM + tScalesE).toFixed(2);
+    document.getElementById('bdSup').innerText = (tSupM + tSupE).toFixed(2);
+    
+    const totalComboAll = (tEpayM + tEpayE) + (tScalesM + tScalesE);
+    document.getElementById('bdCombo').innerText = totalComboAll.toFixed(2);
+
+    document.getElementById('gTotal').innerText = gT.toFixed(2);
+    updateLaneSummary();
+}
+
+function addLane(sh) { 
+    // التعديل الجديد: طلب الاسم وإضافته للورديتين معاً
+    let name = prompt("أدخل اسم الحارة الجديدة:", "حارة إضافية");
+    if(name) {
+        createCard('morning', name);
+        createCard('evening', name);
+        calc();
+        saveData(true);
+    }
+}
+
+function renderGates() {
+    const div = document.getElementById('gatesContainer'); div.innerHTML = '';
+    Object.keys(GATES).forEach(k => {
+        const b = document.createElement('button'); 
+        b.className = `gate-btn ${k===curGate?'active':''}`;
+        b.innerText = GATES[k].name;
+        b.onclick = () => switchGate(k);
+        div.appendChild(b);
+    });
+}
+
+function switchGate(gateKey) {
+    saveData(false);
+    curGate = gateKey;
+    document.querySelectorAll('.gate-btn').forEach(btn => btn.classList.remove('active'));
+    renderGates();
+    unlock = {morning: false, evening: false}; 
+    loadData(); 
+    // لا نعيد تعيين التاريخ هنا، بل نبقي على التاريخ المختار حالياً
+}
+
+function getData() {
+    const getLanes = (id) => {
+        const arr = []; 
+        document.getElementById(id).querySelectorAll('.lane-card').forEach(c => arr.push({
+            name: c.querySelector('.lane-name-input').value, 
+            f: c.querySelector('.inp-fees').value, 
+            s: c.querySelector('.inp-scales').value,
+            ep: c.querySelector('.inp-epay').value,
+            t: c.querySelector('.inp-total').value // نحفظ الإجمالي أيضاً
+        })); 
+        return arr;
+    };
+    return { date: curDate, gate: curGate, op: document.getElementById('operatorName').value, mSup: document.getElementById('mSup').value, eSup: document.getElementById('eSup').value, mMan: document.getElementById('mMan').value, eMan: document.getElementById('eMan').value, m: getLanes('containerMorning'), e: getLanes('containerEvening'), traffic: trafficData };
+}
+
+function saveData(auto) { 
+    const d = getData(); 
+    localStorage.setItem(`wardia_${d.date}_${d.gate}`, JSON.stringify(d)); 
+    if(!auto) { alert('تم الحفظ بنجاح'); updateHist(); } 
+}
+
+function loadData() {
+    const k = `wardia_${curDate}_${curGate}`; const raw = localStorage.getItem(k);
+    document.getElementById('containerMorning').innerHTML = ''; document.getElementById('containerEvening').innerHTML = '';
+    trafficData = { morning: {}, evening: {} };
+    if(raw) {
+        const d = JSON.parse(raw);
+        document.getElementById('operatorName').value = d.op||''; document.getElementById('mSup').value = d.mSup||''; document.getElementById('eSup').value = d.eSup||'';
+        document.getElementById('mMan').value = d.mMan||''; document.getElementById('eMan').value = d.eMan||'';
+        // تمرير t (الإجمالي) إذا كان موجوداً في البيانات المحفوظة
+        d.m.forEach(l => createCard('morning', l.name, l.f, l.s, l.ep||'', l.t||'')); 
+        d.e.forEach(l => createCard('evening', l.name, l.f, l.s, l.ep||'', l.t||''));
+        if(d.traffic) trafficData = d.traffic;
+    } else { 
+        const gateInfo = GATES[curGate];
+        if(gateInfo && gateInfo.lanes) {
+            gateInfo.lanes.forEach(n => { createCard('morning', n); createCard('evening', n); }); 
+        }
+    }
+    renderTrafficTable('morning'); renderTrafficTable('evening'); calc(); updateHist();
+}
+
+function setLock(sh, active) {
+    const sec = document.getElementById(sh==='morning'?'secMorning':'secEvening');
+    const btn = document.getElementById(sh==='morning'?'btnLockMorning':'btnLockEvening');
+    const open = unlock[sh];
+    if(!active && !open) { sec.className = 'section locked'; btn.innerText = '🔒 مغلق'; btn.className = 'lock-btn closed'; }
+    else { sec.className = active ? 'section active' : 'section'; btn.innerText = (!active && open) ? '🔓 يدوي' : '✨ نشط'; btn.className = (!active && open) ? 'lock-btn opened' : 'lock-btn active'; }
+}
+function toggleLock(sh) {
+    // تحديث الشرط ليتوافق مع التوقيتات الجديدة عند الضغط اليدوي
+    const h = new Date().getHours(); 
+    // الصباحي نشط من 9 ل 23، المسائي من 22 ل 11
+    const isM = (h >= 9 && h < 23);
+    const isE = (h >= 22 || h < 11);
+
+    if((sh==='morning' && isM) || (sh==='evening' && isE)) { 
+        // لا مشكلة، هو يريد فتح القفل يدوياً في وقته
+    }
+    unlock[sh] = !unlock[sh]; 
+    
+    // تحديث حالة الأقفال
+    const nowH = new Date().getHours();
+    setLock('morning', (nowH >= 9 && nowH < 23));
+    setLock('evening', (nowH >= 22 || nowH < 11));
+}
+
+/* --- الإعدادات المتقدمة --- */
+function openSettings() {
+    const modal = document.getElementById('settingsOverlay');
+    const content = document.getElementById('settingsContent');
+    content.innerHTML = '';
+
+    Object.keys(GATES).forEach(key => {
+        const g = GATES[key];
+        let lanesHtml = '';
+        g.lanes.forEach((lane, idx) => {
+            lanesHtml += `
+            <div class="lane-chip">
+                ${lane}
+                <button class="btn-x" onclick="removeLaneFromGate('${key}', ${idx})">✕</button>
+            </div>`;
+        });
+
+        content.innerHTML += `
+            <div class="set-row">
+                <span class="set-label">اسم البوابة</span>
+                <div style="display:flex; gap:10px; margin-bottom:10px;">
+                    <input type="text" id="name_${key}" class="set-inp" value="${g.name}" style="margin:0">
+                    <button class="action-btn btn-rename" onclick="saveGateName('${key}')">حفظ الاسم</button>
+                </div>
+                
+                <span class="set-label">الحارات الحالية:</span>
+                <div class="lanes-container">
+                    ${lanesHtml.length > 0 ? lanesHtml : '<span style="color:#666; font-size:12px">لا توجد حارات</span>'}
+                </div>
+
+                <div class="add-lane-row">
+                    <input type="text" id="newLane_${key}" class="set-inp" placeholder="اسم حارة جديدة" style="margin:0">
+                    <button class="btn-plus" onclick="addLaneToGate('${key}')">➕</button>
+                </div>
+
+                ${Object.keys(GATES).length > 1 ? `<div style="margin-top:15px; border-top:1px dashed #333; padding-top:10px;"><button class="action-btn btn-del" onclick="deleteGate('${key}')">حذف البوابة بالكامل</button></div>` : ''}
+            </div>`;
+    });
+    modal.style.display = 'flex';
+}
+function closeSettings() { document.getElementById('settingsOverlay').style.display = 'none'; }
+
+function saveGateName(key) {
+    const name = document.getElementById(`name_${key}`).value;
+    if(!name) { alert('الاسم مطلوب'); return; }
+    GATES[key].name = name;
+    localStorage.setItem('custom_gates', JSON.stringify(GATES));
+    alert('تم حفظ الاسم');
+    renderGates();
+}
+
+function addLaneToGate(key) {
+    const inp = document.getElementById(`newLane_${key}`);
+    const val = inp.value.trim();
+    if(!val) return;
+    
+    // تحديث البيانات الأساسية
+    GATES[key].lanes.push(val);
+    localStorage.setItem('custom_gates', JSON.stringify(GATES));
+    
+    // التعديل الجديد: التحديث الفوري للواجهة
+    if(curGate === key) {
+        createCard('morning', val);
+        createCard('evening', val);
+        saveData(true);
+        calc();
+    }
+
+    inp.value = '';
+    openSettings(); 
+}
+
+function removeLaneFromGate(key, idx) {
+    if(!confirm('حذف هذه الحارة من الإعدادات؟')) return;
+    GATES[key].lanes.splice(idx, 1);
+    localStorage.setItem('custom_gates', JSON.stringify(GATES));
+    openSettings();
+}
+
+function addNewGate() {
+    const name = document.getElementById('newGateName').value;
+    if(!name) { alert('أدخل اسم البوابة'); return; }
+    const id = 'gate_' + new Date().getTime(); 
+    GATES[id] = { name: name, lanes: [] }; 
+    localStorage.setItem('custom_gates', JSON.stringify(GATES));
+    alert('تم إنشاء البوابة. قم بإضافة الحارات الآن.');
+    document.getElementById('newGateName').value = '';
+    openSettings(); 
+    renderGates();
+}
+
+function deleteGate(key) {
+    if(!confirm('هل أنت متأكد من حذف هذه البوابة؟ ستفقد إعداداتها.')) return;
+    delete GATES[key];
+    localStorage.setItem('custom_gates', JSON.stringify(GATES));
+    if(curGate === key) {
+        curGate = Object.keys(GATES)[0];
+        loadData();
+    }
+    openSettings();
+    renderGates();
+}
+
+/* --- السجل والتاريخ --- */
+function updateHist() {
+    const s = document.getElementById('historyList'); s.innerHTML = '<option value="">-- سجلات سابقة --</option>';
+    Object.keys(localStorage).filter(k=>k.startsWith('wardia_')).sort().reverse().forEach(k => { const p = k.split('_'); s.innerHTML += `<option value="${k}">${p[1]} - ${GATES[p.slice(2).join('_')]?.name || 'بوابة ممسوحة'}</option>`; });
+}
+function loadFromHistory() {
+    const k = document.getElementById('historyList').value; if(!k || !confirm('استرجاع؟')) return;
+    const d = JSON.parse(localStorage.getItem(k)); 
+    curDate = d.date; // تحديث التاريخ الحالي ليكون تاريخ السجل المسترجع
+    curGate = d.gate; 
+    
+    // تحديث الواجهة
+    document.getElementById('dateDisplay').innerText = curDate;
+    renderGates();
+    
+    document.getElementById('containerMorning').innerHTML = ''; document.getElementById('containerEvening').innerHTML = '';
+    document.getElementById('operatorName').value = d.op||''; document.getElementById('mSup').value = d.mSup||''; document.getElementById('eSup').value = d.eSup||'';
+    document.getElementById('mMan').value = d.mMan||''; document.getElementById('eMan').value = d.eMan||'';
+    d.m.forEach(l => createCard('morning', l.name, l.f, l.s, l.ep||'', l.t||'')); 
+    d.e.forEach(l => createCard('evening', l.name, l.f, l.s, l.ep||'', l.t||''));
+    if(d.traffic) trafficData = d.traffic; renderTrafficTable('morning'); renderTrafficTable('evening'); calc();
+}
+function resetDay() {
+    if(!confirm('إنهاء اليوم؟')) return; saveData(false);
+    document.getElementById('operatorName').value = ''; document.getElementById('mSup').value = ''; document.getElementById('eSup').value = '';
+    document.getElementById('mMan').value = ''; document.getElementById('eMan').value = '';
+    document.getElementById('containerMorning').innerHTML = ''; document.getElementById('containerEvening').innerHTML = '';
+    trafficData = { morning: {}, evening: {} }; 
+    const gateInfo = GATES[curGate];
+    if(gateInfo) gateInfo.lanes.forEach(n => { createCard('morning', n); createCard('evening', n); });
+    renderTrafficTable('morning'); renderTrafficTable('evening'); 
+    
+    // عند إنهاء اليوم، نعيد التاريخ للتاريخ الحالي الفعلي
+    initDate();
+    saveData(true); calc();
+}
+</script>
+</body>
+</html>

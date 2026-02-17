@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>التصفيات</title>
+  <style>
+    body {
+      font-family: "Cairo", Tahoma, Arial, sans-serif;
+      background: linear-gradient(to bottom, #fff7e6, #fce9d2);
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #d35400;
+      color: white;
+      text-align: center;
+      padding: 40px;
+      font-size: 48px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      border-bottom: 5px solid #a84300;
+    }
+    #datetime {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 30px;
+      color: #444;
+    }
+    main {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 40px;
+      background: #fff;
+      border-radius: 25px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      font-size: 34px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 25px 0 15px;
+      color: #d35400;
+      font-size: 36px;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .option-btn {
+      flex: 1;
+      padding: 30px;
+      font-size: 34px;
+      border: 4px solid #3498db;
+      border-radius: 18px;
+      background: #ecf6fc;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s ease;
+      min-width: 200px;
+    }
+    .option-btn.active, .option-btn:hover {
+      background: #3498db;
+      color: white;
+      transform: scale(1.2);
+    }
+    input {
+      width: 100%;
+      padding: 28px;
+      margin: 20px 0 30px;
+      border: 4px solid #bbb;
+      border-radius: 15px;
+      font-size: 34px;
+      box-sizing: border-box; /* لضمان عدم خروج الحقل عن الإطار */
+    }
+    button {
+      width: 100%;
+      padding: 28px;
+      font-size: 34px;
+      background: #e67e22;
+      color: white;
+      border: none;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #ca6f1e;
+    }
+    #result {
+      margin-top: 30px;
+      padding: 30px;
+      background: #fffaf5;
+      border-radius: 18px;
+      box-shadow: inset 0 3px 10px rgba(0,0,0,0.08);
+      font-size: 34px;
+      line-height: 2;
+    }
+    .highlight {
+      color: #c0392b;
+      font-size: 38px;
+      font-weight: bold;
+    }
+    #quotes {
+      margin-top: 50px;
+      padding: 30px;
+      background: #fef5e7;
+      border-top: 4px solid #e67e22;
+      border-radius: 15px;
+      font-size: 30px;
+      line-height: 2.2;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>التصفيات</header>
+  <div id="datetime"></div>
+
+  <main id="mainContent">
+    <label>اختيار نوع العملية:</label>
+    <div class="options" id="operationOptions">
+      <div class="option-btn" data-value="export">تصدير</div>
+      <div class="option-btn" data-value="internal">داخلي</div>
+    </div>
+
+    <label>اختيار نوع المركبة:</label>
+    <div class="options" id="vehicleOptions">
+      <div class="option-btn" data-value="trailer">تريلا</div>
+      <div class="option-btn" data-value="truck">جرار</div>
+    </div>
+
+    <label>أدخل الوزن الكلي:</label>
+    <input type="number" id="totalWeight" placeholder="أدخل الوزن بالكيلو أو الطن">
+
+    <label>اختيار عدد المحاور:</label>
+    <div class="options" id="axlesOptions">
+      <div class="option-btn" data-value="5">5 محاور</div>
+      <div class="option-btn" data-value="6">6 محاور</div>
+      <div class="option-btn" data-value="7">7 محاور</div>
+    </div>
+
+    <button onclick="calculate()">احسب</button>
+    <div id="result"></div>
+
+    <!-- تم نقل الآيات والحكم هنا لتظهر دائماً -->
+    <div id="quotes">
+      <h3 style="color:#d35400;font-size:34px; margin-top:0;">آيات وحكم اليوم</h3>
+      <p id="quran"></p>
+      <p id="bible"></p>
+      <p id="wisdom"></p>
+    </div>
+  </main>
+
+  <script>
+    function updateDateTime() {
+      const now = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit' };
+      document.getElementById('datetime').textContent = now.toLocaleString('ar-EG', options);
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+    function setupOptions(id) {
+      const container = document.getElementById(id);
+      container.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          container.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    }
+    setupOptions('operationOptions');
+    setupOptions('vehicleOptions');
+    setupOptions('axlesOptions');
+
+    function getSelectedValue(id) {
+      const active = document.querySelector(`#${id} .option-btn.active`);
+      return active ? active.getAttribute('data-value') : null;
+    }
+
+    function calculate() {
+      const operation = getSelectedValue('operationOptions');
+      const vehicle = getSelectedValue('vehicleOptions');
+      const axles = parseInt(getSelectedValue('axlesOptions'));
+      let totalWeight = parseFloat(document.getElementById('totalWeight').value);
+
+      if (!operation || !vehicle || isNaN(axles)) {
+        alert("من فضلك اختر كل الخيارات.");
+        return;
+      }
+      if (isNaN(totalWeight)) {
+        alert("من فضلك أدخل وزن صحيح.");
+        return;
+      }
+
+      if (axles === 7) totalWeight += 5;
+
+      let rate = (operation === 'export') ? 35 : 23.10;
+      let allowedWeight = 0;
+      if (axles === 7) allowedWeight = 67;
+      else if (axles === 6) allowedWeight = (vehicle === 'trailer') ? 57 : 60;
+      else if (axles === 5) allowedWeight = (vehicle === 'trailer') ? 50 : 53;
+
+      let excess = totalWeight - allowedWeight;
+      if (excess < 0) excess = 0;
+
+      let finalAmount = excess * rate;
+
+      document.getElementById('result').innerHTML = `
+        <p>الوزن المدخل (بعد التعديل إن وجد): <span class="highlight">${totalWeight}</span></p>
+        <p>المسموح: <span>${allowedWeight}</span></p>
+        <p>الوزن الزائد: <span>${excess}</span></p>
+        <p>المبلغ النهائي: <span class="highlight">${finalAmount.toFixed(2)} جنيه</span></p>
+      `;
+    }
+
+    const quranVerses = [
+      "وَقُولُوا لِلنَّاسِ حُسْنًا (البقرة 83)",
+      "إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ (البقرة 195)",
+      "وَجَعَلْنَاكُمْ شُعُوبًا وَقَبَائِلَ لِتَعَارَفُوا (الحجرات 13)"
+    ];
+    const bibleVerses = [
+      "أَحِبُّوا بَعْضُكُمْ بَعْضًا (يوحنا 13:34)",
+      "طُوبَى لِلْوُدَعَاءِ (متى 5:5)",
+      "كُلُّ مَا تُرِيدُونَ أَنْ يَفْعَلَ النَّاسُ بِكُمُ افْعَلُوا هكَذَا (متى 7:12)"
+    ];
+    const wisdoms = [
+      "من جد وجد ومن زرع حصد",
+      "الصبر مفتاح الفرج",
+      "التسامح زينة الفضائل",
+      "التواضع يرفع صاحبه"
+    ];
+
+    function setQuotes() {
+      const today = new Date().getDate();
+      function randomItem(arr) {
+        return arr[(today + Math.floor(Math.random()*arr.length)) % arr.length];
+      }
+      document.getElementById('quran').textContent = "آية قرآنية: " + randomItem(quranVerses);
+      document.getElementById('bible').textContent = "آية من الإنجيل: " + randomItem(bibleVerses);
+      document.getElementById('wisdom').textContent = "حكمة: " + randomItem(wisdoms);
+    }
+    setQuotes();
+  </script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>System 2026 Pro [HYBRID]</title>
+<style>
+    /* الستايل كما هو لم يتغير */
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none;overflow:hidden}
+    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:0.3s}
+    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:2px;box-sizing:border-box}
+    input:focus{border-color:#58a6ff;box-shadow:0 0 5px rgba(88,166,255,0.3)}
+    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;transition:0.2s;position:relative;overflow:hidden}
+    button.main-btn:active{transform:scale(0.98)}
+    button.main-btn:disabled{background:#30363d;cursor:not-allowed;color:#8b949e}
+    .logout-btn{background:#da3633;color:white;border:none;padding:6px 12px;font-size:12px;font-weight:bold;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px}
+    .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px;animation:shake 0.3s;background:rgba(218,54,51,0.1);padding:5px;border-radius:4px;border:1px solid rgba(218,54,51,0.3)}
+    #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
+    .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;border-bottom:1px solid #30363d;padding-bottom:15px}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
+    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;text-decoration:none;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;transition:0.2s;text-align:center;-webkit-tap-highlight-color:transparent}
+    .app-btn:active{background:#30363d;transform:scale(0.95)}
+    .icon{font-size:28px;margin-bottom:8px}
+    .backup-area{margin-top:20px;padding-top:15px;border-top:1px dashed #30363d;display:flex;flex-direction:column;gap:10px}
+    .bk-btn{width:100%;padding:12px;border-radius:6px;border:none;color:white;font-weight:bold;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-export{background:#1f6feb}
+    .btn-import{background:#8b949e}
+    .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+    .modal-box{background:#161b22;border:1px solid #30363d;padding:20px;border-radius:10px;width:100%;max-width:350px;text-align:center}
+    textarea.code-box{width:100%;height:120px;background:#0d1117;color:#58a6ff;border:1px solid #30363d;border-radius:5px;padding:10px;font-size:10px;resize:none;margin:10px 0;box-sizing:border-box}
+    .loader{border:3px solid #f3f3f3;border-top:3px solid #238636;border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;display:none;margin:0 auto}
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+</style>
+</head>
+<body oncontextmenu="return false">
+
+<!-- شاشة القفل -->
+<div id="lock-screen">
+    <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
+    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
+    <p style="font-size:11px;color:#8b949e;">Hybrid Secure Access</p>
+    <p id="devID" style="font-size:12px;color:#58a6ff;font-family:monospace;margin:10px 0;background:#0d1117;padding:5px;border-radius:4px;border:1px dashed #30363d"></p>
+    <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
+    <button class="main-btn" id="loginBtn">
+        <span id="btnText">تحقق ودخول</span>
+        <div class="loader" id="btnLoad"></div>
+    </button>
+    <p id="eMsg" class="error">⛔ الكود غير صحيح!</p>
+    <p id="banMsg" class="error" style="color:#da3633;">🚫 تم إيقاف النظام عن بعد!</p>
+</div>
+
+<!-- القائمة -->
+<div id="app-menu">
+    <div class="menu-header">
+        <h2 style="margin:0; font-size:18px; color:#fff;">الرئيسية</h2>
+        <button id="logoutBtn" class="logout-btn"><span>خروج</span> 🚪</button>
+    </div>
+    <div class="grid">
+        <div class="app-btn" onclick="go('Nabatshia.html')"><span class="icon">📅</span>النبطشية</div>
+        <div class="app-btn" onclick="go('2.html')"><span class="icon">🌙</span>الورديات</div>
+        <div class="app-btn" onclick="go('3.html')"><span class="icon">⚖️</span>التصفيات</div>
+        <div class="app-btn" onclick="go('4.html')"><span class="icon">📝</span>اللمات</div>
+        <div class="app-btn" onclick="go('5.html')"><span class="icon">🌊</span>التدفق</div>
+        <div class="app-btn" onclick="go('6.html')"><span class="icon">🏗️</span>المهيئ والمواسير</div>
+    </div>
+    <div class="backup-area">
+        <button class="bk-btn btn-export" id="bkExport">📤 حفظ نسخة من البيانات</button>
+        <button class="bk-btn btn-import" id="bkImport">📥 استرجاع البيانات</button>
+    </div>
+</div>
+
+<!-- نافذة النسخ -->
+<div id="exportModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 style="margin:0 0 10px 0;color:#fff">📦 كود النسخ الاحتياطي</h3>
+        <textarea class="code-box" id="exportBox" readonly></textarea>
+        <button class="main-btn" onclick="_cp()" style="margin-bottom:10px">نسخ الكود 📋</button>
+        <button class="bk-btn" onclick="document.getElementById('exportModal').style.display='none'" style="background:transparent;border:1px solid #da3633;color:#da3633">إغلاق</button>
+    </div>
+</div>
+
+<script>
+/* 
+   SYSTEM 2026 - HYBRID CORE (Online/Offline)
+   Modified to support offline access
+*/
+(function(){
+    const _k = {
+        t: atob("ODU5Njk5Mzc0NTpBQUcwRlhIOExGcXdlTEg1bmxQVGNGcEVNMDdCSGhhYnJIdw=="),
+        g: atob("LTEwMDM4ODY1MjgxMTQ="),
+        s: atob("QWRtaW5fMjZf"),
+        u: localStorage.getItem("_u_id") || "ID-" + Math.floor(Math.random() * 8999 + 1000)
+    };
+    
+    const _p = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+
+    if(!localStorage.getItem("_u_id")) localStorage.setItem("_u_id", _k.u);
+    document.getElementById("devID").innerText = _k.u;
+
+    const _gp = () => {
+        const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
+        let i = (y - 2026) * 2;
+        if (d.getMonth() >= 5) i += 1; 
+        return _p[i % 5];
+    };
+
+    // دالة إرسال التليجرام (تعمل فقط عند وجود إنترنت)
+    const _snd = async (act, xtra = "") => {
+        if (!navigator.onLine) return; // إذا لا يوجد نت، تجاهل الإرسال
+        
+        let ip = "N/A";
+        let dev = "Offline Mode";
+        
+        try {
+            // محاولة سريعة لجلب الـ IP مع مهلة قصيرة
+            const c = new AbortController();
+            setTimeout(() => c.abort(), 1500);
+            const r = await fetch('https://api.ipify.org?format=json', {signal: c.signal});
+            const j = await r.json();
+            ip = j.ip;
+        } catch(e) {}
+
+        const ua = navigator.userAgent;
+        if(ua.match(/Android/i)) dev = "Android 📱";
+        else if(ua.match(/iPhone|iPad/i)) dev = "iOS 🍏";
+        else if(ua.match(/Windows/i)) dev = "PC 💻";
+        else dev = "Mobile 🌐";
+
+        const txt = encodeURIComponent(
+            "🚨 <b>SYS_LOG</b>\n" +
+            "🆔: <code>" + _k.u + "</code>\n" +
+            "🎬: " + act + "\n" +
+            "🌍: " + ip + "\n" +
+            "📱: " + dev + "\n" +
+            xtra
+        );
+
+        try {
+            fetch("https://api.telegram.org/bot" + _k.t + "/sendMessage?chat_id=" + _k.g + "&text=" + txt + "&parse_mode=HTML");
+        } catch(e) {}
+    };
+
+    // دالة فحص الحظر (محسنة لتعمل مع ضعف أو انقطاع النت)
+    const _chk = async () => {
+        // 1. إذا المتصفح يعلم يقيناً أنه لا يوجد نت، تخطى الفحص فوراً
+        if (!navigator.onLine) return "OK";
+
+        try {
+            // 2. وضع مهلة زمنية (3 ثواني) للفحص، لو السيرفر ماردش اعتبره سليم
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+            const r = await fetch("https://api.telegram.org/bot" + _k.t + "/getChat?chat_id=" + _k.g + "&v=" + Date.now(), { signal: controller.signal });
+            clearTimeout(timeoutId); // إلغاء التايمر إذا تم الاتصال بنجاح
+
+            const j = await r.json();
+            if (j.ok && j.result.description) {
+                let d = j.result.description.toUpperCase().replace(/\s/g, '');
+                let uid = _k.u.toUpperCase().replace(/\s/g, '');
+                if (d.includes("⛔")) return "LOCK";
+                if (d.includes("BAN:" + uid) || d.includes("BAN" + uid)) return "BAN";
+            }
+        } catch(e) {
+            // في حالة الخطأ أو انقطاع النت أثناء الفحص، اسمح بالدخول
+            return "OK";
+        }
+        return "OK";
+    };
+
+    const _doL = async () => {
+        const inp = document.getElementById("pIn");
+        const val = inp.value.trim();
+
+        if(val.length < 1) {
+            inp.focus();
+            return;
+        }
+
+        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        const hash = btoa(_k.s + enVal);
+        const truePass = _gp();
+
+        const b = document.getElementById("loginBtn");
+        const l = document.getElementById("btnLoad");
+        const t = document.getElementById("btnText");
+        const e = document.getElementById("eMsg");
+        const m = document.getElementById("banMsg");
+
+        e.style.display="none"; m.style.display="none";
+        b.disabled=true; t.style.display="none"; l.style.display="block";
+
+        // التحقق من الباسورد محلياً أولاً
+        if (hash !== truePass) {
+            setTimeout(() => {
+                _snd("WRONG_PASS", "🔑 Tried: " + enVal);
+                l.style.display="none"; t.style.display="block"; b.disabled=false;
+                e.style.display="block";
+            }, 800);
+            return;
+        }
+
+        // باسورد صحيح - فحص الحالة (سريع جداً الآن في حالة عدم وجود نت)
+        const st = await _chk();
+        
+        l.style.display="none"; t.style.display="block"; b.disabled=false;
+
+        if (st !== "OK") {
+            m.innerText = (st === "LOCK") ? "⛔ النظام مغلق للصيانة" : "🚫 تم حظر هذا الجهاز";
+            m.style.display="block";
+            localStorage.removeItem("_tkn_auth");
+            _snd("BLOCKED_LOGIN", "Status: " + st);
+        } else {
+            localStorage.setItem("_tkn_auth", hash);
+            _ui(true);
+            _snd("LOGIN_SUCCESS", "✅ User Logged In");
+        }
+    };
+
+    const _ui = (isLog) => {
+        document.getElementById("lock-screen").style.display = isLog ? "none" : "block";
+        document.getElementById("app-menu").style.display = isLog ? "block" : "none";
+    };
+
+    window._cp = () => { document.getElementById("exportBox").select(); document.execCommand("copy"); alert("✅ تم النسخ"); };
+    window.go = (u) => window.location.href = u;
+
+    window.onload = () => {
+        if (localStorage.getItem("_tkn_auth") === _gp()) {
+            // فحص عند الفتح (مع دعم الأوفلاين)
+            _chk().then(st => {
+                if(st === "OK") {
+                    _ui(true);
+                } else {
+                    localStorage.removeItem("_tkn_auth");
+                    _ui(false);
+                    document.getElementById("banMsg").style.display = "block";
+                }
+            });
+        }
+
+        document.getElementById("loginBtn").onclick = _doL;
+        document.getElementById("pIn").addEventListener("keypress", (e) => { if(e.key === 'Enter') _doL(); });
+
+        document.getElementById("logoutBtn").onclick = () => {
+            if(confirm("هل تود الخروج؟")) {
+                localStorage.removeItem("_tkn_auth");
+                location.reload();
+            }
+        };
+
+        document.getElementById("bkExport").onclick = () => {
+            try {
+                const d = btoa(unescape(encodeURIComponent(JSON.stringify(localStorage))));
+                document.getElementById("exportBox").value = d;
+                document.getElementById("exportModal").style.display = "flex";
+            } catch(e) { alert("خطأ"); }
+        };
+
+        document.getElementById("bkImport").onclick = () => {
+            const c = prompt("كود الاستعادة:");
+            if(c) {
+                try {
+                    const d = JSON.parse(decodeURIComponent(escape(atob(c))));
+                    if(confirm("سيتم استبدال البيانات، متأكد؟")) {
+                        localStorage.clear();
+                        for(let k in d) localStorage.setItem(k, d[k]);
+                        alert("✅ تم"); location.reload();
+                    }
+                } catch(e) { alert("❌ الكود خطأ"); }
+            }
+        };
+    };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>System 2026 Loader</title>
+<style>
+    body {
+        background-color: #0d1117;
+        color: #c9d1d9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        user-select: none;
+    }
+    .loader-container {
+        text-align: center;
+        padding: 20px;
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        width: 85%;
+        max-width: 320px;
+    }
+    .loader {
+        border: 4px solid #30363d;
+        border-top: 4px solid #238636;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px auto;
+    }
+    .status-text {
+        font-size: 13px;
+        color: #8b949e;
+        margin-bottom: 10px;
+    }
+    .progress-bar {
+        width: 100%;
+        background-color: #30363d;
+        border-radius: 4px;
+        height: 6px;
+        overflow: hidden;
+        margin-top: 10px;
+        display: none;
+    }
+    .progress-fill {
+        height: 100%;
+        background-color: #238636;
+        width: 0%;
+        transition: width 0.3s;
+    }
+    .error-msg {
+        color: #da3633;
+        font-size: 12px;
+        margin-top: 15px;
+        display: none;
+        border: 1px solid rgba(218, 54, 51, 0.4);
+        padding: 10px;
+        border-radius: 6px;
+        background: rgba(218, 54, 51, 0.1);
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+</head>
+<body oncontextmenu="return false">
+
+    <div class="loader-container">
+        <div class="loader" id="spinner"></div>
+        <h3 style="margin:0 0 10px 0; color:#fff">نظام 2026</h3>
+        <div class="status-text" id="status">جاري الاتصال...</div>
+        <div class="progress-bar" id="pBar"><div class="progress-fill" id="pFill"></div></div>
+        <div class="error-msg" id="errorBox"></div>
+    </div>
+
+<script>
+    // ============================================================
+    // الرابط الخاص بك
+    // ============================================================
+    const REPO_URL = "https://raw.githubusercontent.com/minaibrahimfawzy-droid/Manzoma-pro/main/";
+
+    // لاحظ: تم تغيير index.html إلى home.html في القائمة
+    const APP_FILES = [
+        "home.html",      // <-- دي شاشة القفل بتاعتك (غيرت اسمها هنا)
+        "Nabatshia.html", 
+        "2.html",         
+        "3.html",         
+        "4.html",         
+        "5.html",         
+        "6.html"          
+    ];
+    // ============================================================
+
+    const uiStatus = document.getElementById("status");
+    const uiError = document.getElementById("errorBox");
+    const uiPBar = document.getElementById("pBar");
+    const uiPFill = document.getElementById("pFill");
+    const uiSpinner = document.getElementById("spinner");
+
+    // كود الحقن (لتشغيل التنقل من الذاكرة)
+    const INJECTED_SCRIPT = `
+    <script>
+        window.go = function(pageName) {
+            // لو الزرار بيحاول يروح لـ index.html هنحوله لـ home.html
+            if(pageName === "index.html") pageName = "home.html";
+            
+            const storedPage = localStorage.getItem("sys_file_" + pageName);
+            if(storedPage) {
+                document.open();
+                document.write(storedPage);
+                document.close();
+            } else {
+                alert("⛔ الملف غير موجود: " + pageName);
+                location.reload(); 
+            }
+        };
+        document.oncontextmenu = function(){return false;};
+    <\/script>
+    `;
+
+    async function bootSystem() {
+        let localVer = parseFloat(localStorage.getItem("sys_version")) || 0;
+
+        // 1. التحديث عبر الإنترنت
+        if (navigator.onLine) {
+            uiStatus.innerText = "فحص التحديثات...";
+            try {
+                const vResponse = await fetch(REPO_URL + "version.json?t=" + Date.now());
+                if (vResponse.ok) {
+                    const vData = await vResponse.json();
+                    const remoteVer = parseFloat(vData.version);
+
+                    if (remoteVer > localVer) {
+                        uiStatus.innerText = `تحديث متوفر (v${remoteVer})...`;
+                        uiPBar.style.display = "block";
+                        
+                        let count = 0;
+                        for (const fileName of APP_FILES) {
+                            count++;
+                            uiStatus.innerText = `تحميل: ${fileName}`;
+                            uiPFill.style.width = Math.round((count / APP_FILES.length) * 100) + "%";
+                            
+                            const fResponse = await fetch(REPO_URL + fileName + "?t=" + Date.now());
+                            if (!fResponse.ok) throw new Error("فشل: " + fileName);
+                            
+                            let content = await fResponse.text();
+
+                            if(content.includes("</body>")) {
+                                content = content.replace("</body>", INJECTED_SCRIPT + "</body>");
+                            } else {
+                                content += INJECTED_SCRIPT;
+                            }
+
+                            localStorage.setItem("sys_file_" + fileName, content);
+                        }
+                        localStorage.setItem("sys_version", remoteVer);
+                        uiStatus.innerText = "✅ تم التحديث!";
+                        await new Promise(r => setTimeout(r, 500));
+                    }
+                }
+            } catch (err) {
+                console.log("Offline/Error", err);
+                uiStatus.innerText = "وضع عدم الاتصال...";
+            }
+        }
+
+        // 2. التشغيل (يفتح home.html بدل index.html)
+        setTimeout(() => {
+            // هنا التغيير المهم: بنجيب home.html
+            const startPage = localStorage.getItem("sys_file_home.html");
+
+            if (startPage) {
+                document.open();
+                document.write(startPage);
+                document.close();
+            } else {
+                uiSpinner.style.display = "none";
+                uiPBar.style.display = "none";
+                uiStatus.style.display = "none";
+                uiError.style.display = "block";
+                uiError.innerHTML = `
+                    ⚠️ <b>تنبيه هام</b><br><br>
+                    لم يتم العثور على ملفات النظام.<br>
+                    يرجى <b>توصيل الإنترنت</b> ثم إعادة فتح التطبيق لتنزيل الملفات لأول مرة.
+                `;
+            }
+        }, 1000);
+    }
+
+    bootSystem();
+</script>
+</body>
+</html>
