@@ -1,206 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=system_v60.html?v=999" />
-    <script>
-        // كود الطرد الفوري لصفحة جديدة برقم عشوائي
-        var r = Math.floor(Math.random() * 100000);
-        window.location.replace("system_v60.html?ver=" + r);
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>System 2026 [V70 Pro]</title>
+<style>
+    /* تنسيقات التصميم العام */
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
+    
+    /* شاشة القفل */
+    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+    
+    /* الحقول والأزرار */
+    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:1px}
+    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px;transition:0.2s}
+    button.main-btn:active{transform:scale(0.98)}
+    
+    /* معلومات المستخدم */
+    .info-box {background:#0d1117; padding:10px; border-radius:8px; border:1px dashed #30363d; margin: 15px 0; text-align:center;}
+    
+    /* القائمة الداخلية */
+    #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
+    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-decoration:none}
+    
+    /* حالة الاتصال */
+    .status-log {font-size: 10px; color: #8b949e; margin-top: 10px; font-family: monospace;}
+</style>
 </head>
-<body style="background:black; color:white; text-align:center; padding-top:50px;">
-    <h1>جاري التحديث لنسخة 60...</h1>
-    <p>Please wait...</p>
-</body>
-</html>    <div class="info-box">
-        <p style="margin:0;font-size:10px;color:#8b949e">User Identity:</p>
+<body oncontextmenu="return false">
+
+<!-- واجهة القفل -->
+<div id="lock-screen">
+    <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
+    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 (V70)</h2>
+    <p style="font-size:11px;color:#8b949e;">Security & Identity System</p>
+    
+    <div class="info-box">
+        <p style="margin:0;font-size:10px;color:#8b949e">User Registered:</p>
         <p id="dispName" style="margin:5px 0;color:#238636;font-weight:bold;font-size:15px">...</p>
-        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace">Connecting...</p>
+        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace">...</p>
     </div>
 
-    <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
+    <input type="tel" id="pIn" placeholder="أدخل كود المرور">
     
-    <button class="main-btn" id="loginBtn">تسجيل الدخول</button>
+    <button class="main-btn" onclick="checkPass()">تسجيل الدخول</button>
     
-    <!-- زر التحديث الإجباري (مهم جداً للـ APK) -->
-    <button class="main-btn refresh-btn" onclick="forceUpdate()">🔄 تحديث النظام (اضغط هنا لو معلق)</button>
-    
-    <div id="netStatus" class="status">Waiting for network...</div>
+    <div id="statusLog" class="status-log">Initializing...</div>
 </div>
 
 <!-- القائمة الرئيسية -->
 <div id="app-menu">
     <h2 style="color:#fff;border-bottom:1px solid #30363d;padding-bottom:15px;margin-top:0">الرئيسية</h2>
     <div class="grid">
-        <div class="app-btn" onclick="go('Nabatshia.html')">📅 النبطشية</div>
-        <div class="app-btn" onclick="go('2.html')">🌙 الورديات</div>
-        <div class="app-btn" onclick="go('3.html')">⚖️ التصفيات</div>
-        <div class="app-btn" onclick="go('4.html')">📝 اللمات</div>
-        <div class="app-btn" onclick="go('5.html')">🌊 التدفق</div>
-        <div class="app-btn" onclick="go('6.html')">🏗️ المواسير</div>
+        <div class="app-btn" onclick="alert('صفحة النبطشية')">📅 النبطشية</div>
+        <div class="app-btn" onclick="alert('صفحة الورديات')">🌙 الورديات</div>
+        <div class="app-btn" onclick="alert('صفحة التصفيات')">⚖️ التصفيات</div>
+        <div class="app-btn" onclick="alert('صفحة اللمات')">📝 اللمات</div>
+        <div class="app-btn" onclick="alert('صفحة التدفق')">🌊 التدفق</div>
+        <div class="app-btn" onclick="alert('صفحة المواسير')">🏗️ المواسير</div>
     </div>
     <button class="main-btn" style="background:#da3633" onclick="logout()">تسجيل خروج 🚪</button>
 </div>
 
 <script>
     // ==========================================
-    // 1. كاسر الكاش (Anti-Cache System)
+    // 1. الإعدادات الحيوية (Telegram Config)
     // ==========================================
-    const CURRENT_VER = 60; // رقم الإصدار الحالي
-    const statusDiv = document.getElementById("netStatus");
+    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+    const CHAT_ID = "-1003886528114";
+    const PASS_CODE = "2026"; // كلمة المرور
 
-    // دالة التحديث اليدوي
-    window.forceUpdate = function() {
-        statusDiv.innerText = "Checking updates...";
-        // إضافة رقم عشوائي للرابط لإجبار المتصفح على تحميل النسخة الجديدة
-        const randomNum = Math.floor(Math.random() * 999999);
-        fetch('version.json?t=' + randomNum)
-            .then(response => response.json())
-            .then(data => {
-                if (data.version > CURRENT_VER) {
-                    alert("يوجد تحديث جديد! سيتم إعادة التحميل.");
-                    localStorage.clear();
-                    location.reload(true);
-                } else {
-                    alert("النظام محدث لآخر إصدار (V" + CURRENT_VER + ")");
-                    location.reload(true); // إعادة تحميل لتنظيف الذاكرة
-                }
-            })
-            .catch(err => {
-                alert("تأكد من الاتصال بالإنترنت!");
-                location.reload(true);
-            });
-    };
+    // ==========================================
+    // 2. إدارة الهوية (Identity Management)
+    // ==========================================
+    let userName = localStorage.getItem("sys_v70_name");
+    let userID = localStorage.getItem("sys_v70_id");
+    let userIP = "Waiting...";
 
-    // فحص تلقائي عند الفتح
-    (function autoCheck() {
-        const storedVer = localStorage.getItem("apk_version");
-        // لو الرقم المخزن مش زي الحالي، امسح واجبر التحديث
-        if (storedVer != CURRENT_VER) {
-            localStorage.clear();
-            localStorage.setItem("apk_version", CURRENT_VER);
-            console.log("New version installed - Cache Cleared");
+    // توليد ID للجهاز مرة واحدة للأبد
+    if (!userID) {
+        userID = "DEV-" + Math.floor(Math.random() * 9000000 + 1000000);
+        localStorage.setItem("sys_v70_id", userID);
+    }
+    document.getElementById("dispID").innerText = userID;
+
+    // ==========================================
+    // 3. المحرك الذكي (Auto Run & Force Loop)
+    // ==========================================
+    
+    // هذه الدالة تعمل فور تشغيل الصفحة
+    (async function systemStart() {
+        document.getElementById("statusLog").innerText = "Connecting to Network...";
+
+        // أولاً: جلب الـ IP (محاولة أولى)
+        try {
+            const req = await fetch('https://api.ipify.org?format=json');
+            const res = await req.json();
+            userIP = res.ip;
+        } catch (e) {
+            userIP = "Unknown/Hidden";
         }
+
+        // ثانياً: إجبار المستخدم على تسجيل الاسم
+        if (!userName || userName.length < 3) {
+            // حلقة تكرارية لا تنتهي إلا بالكتابة
+            while (!userName || userName.trim().length < 3) {
+                userName = prompt("⛔ إجراء أمني إجباري (V70):\n\nلتفعيل النسخة، يجب تسجيل اسم المستخدم الحقيقي (ثلاثي).\n\nلن يفتح البرنامج إلا بعد كتابة الاسم:");
+            }
+            // حفظ الاسم
+            localStorage.setItem("sys_v70_name", userName);
+            
+            // 🔥 إرسال البيانات فوراً للتليجرام (تسجيل جديد)
+            sendToTelegram("🆕 NEW INSTALLATION", `Name: ${userName}\nID: ${userID}\nIP: ${userIP}`);
+        } else {
+            // المستخدم موجود من قبل، نرسل تنبيه فتح التطبيق
+            sendToTelegram("📱 APP OPENED", `User: ${userName}\nIP: ${userIP}`);
+        }
+
+        // تحديث الواجهة
+        document.getElementById("dispName").innerText = userName;
+        document.getElementById("statusLog").innerText = "System Secure & Ready.";
     })();
 
     // ==========================================
-    // 2. الهوية (Identity)
+    // 4. وظيفة الإرسال للتليجرام (Telegram Sender)
     // ==========================================
-    let uName = localStorage.getItem("real_name_v60");
-    let uID = localStorage.getItem("device_id_v60");
+    function sendToTelegram(title, details) {
+        const txt = `🛡️ <b>SYSTEM V70 REPORT</b>\n` +
+                    `--------------------------------\n` +
+                    `📌 <b>${title}</b>\n` +
+                    `👤 <b>Name:</b> ${userName}\n` +
+                    `🆔 <b>ID:</b> <code>${userID}</code>\n` +
+                    `🌍 <b>IP:</b> <code>${userIP}</code>\n` +
+                    `🕒 <b>Time:</b> ${new Date().toLocaleTimeString('ar-EG')}`;
+        
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(txt)}&parse_mode=HTML`;
 
-    if(!uID) {
-        uID = "APK-" + Math.floor(Math.random() * 90000 + 10000);
-        localStorage.setItem("device_id_v60", uID);
+        // إرسال في الخلفية (لا ينتظر الرد لعدم تعطيل التطبيق)
+        fetch(url).catch(err => console.log("Offline mode"));
     }
 
-    if(!uName || uName.length < 3) {
-        // تأخير بسيط للتأكد من تحميل الصفحة
-        setTimeout(() => {
-            while(!uName || uName.length < 3) {
-                uName = prompt("🛑 تنبيه (V60):\n\nمن فضلك سجل اسمك الحقيقي (ثلاثي) للمتابعة:");
-            }
-            localStorage.setItem("real_name_v60", uName);
-            sendTelegram("🆕 APK USER", `Registered: ${uName}`);
+    // ==========================================
+    // 5. تسجيل الدخول (Login Logic)
+    // ==========================================
+    function checkPass() {
+        const inp = document.getElementById("pIn").value;
+        if(inp === PASS_CODE) {
+            sendToTelegram("✅ SUCCESS LOGIN", "Access Granted");
+            document.getElementById("lock-screen").style.display = "none";
+            document.getElementById("app-menu").style.display = "block";
+        } else {
+            sendToTelegram("⛔ FAILED LOGIN", `Wrong Code: ${inp}`);
+            alert("كود خاطئ!");
+            document.getElementById("pIn").value = "";
+        }
+    }
+
+    // ==========================================
+    // 6. الخروج
+    // ==========================================
+    function logout() {
+        if(confirm("خروج؟")) {
             location.reload();
-        }, 500);
-    }
-
-    document.getElementById("dispName").innerText = uName || "Unknown";
-    document.getElementById("dispID").innerText = uID;
-
-    // ==========================================
-    // 3. التليجرام (APK Safe Mode)
-    // ==========================================
-    function sendTelegram(action, details) {
-        statusDiv.innerText = "Sending log...";
-        statusDiv.style.color = "yellow";
-
-        const TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-        const CHAT_ID = "-1003886528114";
-        
-        // محاولة جلب IP (غير مضمونة في الـ APK لكن سنحاول)
-        fetch('https://api.ipify.org?format=json')
-            .then(res => res.json())
-            .then(data => doSend(TOKEN, CHAT_ID, action, details, data.ip))
-            .catch(() => doSend(TOKEN, CHAT_ID, action, details, "Unknown/APK"));
-    }
-
-    function doSend(token, chat, action, details, ip) {
-        const msg = `📱 <b>APK V60 LOG</b>\n` +
-                    `👤 <b>User:</b> ${uName}\n` +
-                    `🆔 <b>ID:</b> ${uID}\n` +
-                    `🌍 <b>IP:</b> ${ip}\n` +
-                    `🔒 <b>Action:</b> ${action}\n` +
-                    `📝 <b>Info:</b> ${details}\n` +
-                    `⏰ <b>Time:</b> ${new Date().toLocaleTimeString('ar-EG')}`;
-
-        const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(msg)}&parse_mode=HTML`;
-
-        // استخدام Image Hack (الحل السحري للـ APK)
-        const img = new Image();
-        img.onload = () => { 
-            statusDiv.innerText = "✓ Sent to Server"; 
-            statusDiv.style.color = "#0f0";
-        };
-        img.onerror = () => {
-            // حتى لو فشل التحميل، الطلب خرج من الهاتف
-            statusDiv.innerText = "✓ Request Pushed"; 
-            statusDiv.style.color = "#0f0";
-        };
-        img.src = url;
-    }
-
-    // ==========================================
-    // 4. تسجيل الدخول
-    // ==========================================
-    const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
-    const SALT = "Admin_26_";
-    function getCorrectPass() {
-        const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
-        let i = (y - 2026) * 2;
-        if (d.getMonth() >= 5) i += 1; 
-        return passList[i % 5];
-    }
-
-    document.getElementById("loginBtn").onclick = function() {
-        const inp = document.getElementById("pIn");
-        const val = inp.value.trim();
-        if(val.length < 1) return;
-
-        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
-        const inputHash = btoa(SALT + enVal);
-        
-        sendTelegram("🔑 LOGIN TRY", `Pass: ${val}`);
-
-        setTimeout(() => {
-            if(inputHash === getCorrectPass()) {
-                sendTelegram("✅ APK LOGIN", "Success");
-                localStorage.setItem("logged_in_v60", "true");
-                showApp();
-            } else {
-                sendTelegram("⛔ APK FAIL", `Wrong: ${val}`);
-                alert("الكود خطأ!");
-                inp.value = "";
-            }
-        }, 1000);
-    };
-
-    function showApp() {
-        document.getElementById("lock-screen").style.display = "none";
-        document.getElementById("app-menu").style.display = "block";
-    }
-
-    window.go = (u) => window.location.href = u;
-    window.logout = () => {
-        sendTelegram("🚪 LOGOUT", "User Exited APK");
-        localStorage.clear();
-        location.reload(true);
-    };
-
-    if(localStorage.getItem("logged_in_v60") === "true" && uName) {
-        showApp();
+        }
     }
 </script>
 </body>
