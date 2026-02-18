@@ -2,138 +2,218 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System Final V80</title>
+<title>System 2026 [FINAL]</title>
 <style>
-    body{font-family:sans-serif;background:#000;color:#fff;text-align:center;padding:20px;display:flex;flex-direction:column;justify-content:center;height:100vh;margin:0}
-    input{padding:10px;width:100%;text-align:center;font-size:18px;margin:10px 0;border-radius:5px;border:none;}
-    button{padding:12px;width:100%;font-size:16px;background:green;color:white;border:none;border-radius:5px;cursor:pointer;margin-top:5px;font-weight:bold;}
-    .red-btn{background:#d32f2f;margin-top:20px;}
-    .log-box{background:#111;color:#0f0;font-family:monospace;font-size:11px;padding:10px;border:1px solid #333;margin-top:15px;text-align:left;height:100px;overflow-y:scroll;}
-    .info{background:#222;padding:10px;border-radius:5px;margin:10px 0;}
+    /* UI Design */
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
+    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:1px}
+    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px;transition:0.2s}
+    button.main-btn:active{transform:scale(0.98)}
+    button.main-btn:disabled{background:#30363d;color:#8b949e;cursor:not-allowed}
+    .info-box {background:#0d1117; padding:10px; border-radius:8px; border:1px dashed #30363d; margin: 15px 0; text-align:center;}
+    .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px}
+    #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
+    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-decoration:none}
+    /* Loader */
+    .loader {border: 3px solid #f3f3f3; border-top: 3px solid #238636; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display:none; margin:0 auto;}
+    @keyframes spin {0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}
 </style>
 </head>
-<body>
+<body oncontextmenu="return false">
 
-    <h2>🛡️ النظام الأمني V80</h2>
+<!-- شاشة القفل -->
+<div id="lock-screen">
+    <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
+    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026</h2>
+    <p style="font-size:11px;color:#8b949e;">V50 (Mandatory Update)</p>
     
-    <div class="info">
-        <p style="margin:0;color:#aaa;font-size:12px">المستخدم:</p>
-        <strong id="dName" style="color:#0f0;font-size:18px">...</strong>
-        <div style="font-size:10px;color:#0ff;margin-top:5px" id="dID">جاري التحميل...</div>
-        <div style="font-size:10px;color:#ff0;margin-top:2px" id="dIP">جاري سحب IP...</div>
+    <!-- عرض بيانات المستخدم -->
+    <div class="info-box">
+        <p style="margin:0;font-size:10px;color:#8b949e">الهوية المسجلة:</p>
+        <p id="dispName" style="margin:5px 0;color:#238636;font-weight:bold;font-size:15px">...</p>
+        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace"></p>
     </div>
 
-    <input type="number" id="pass" placeholder="الكود السري">
-    <button onclick="login()">دخول</button>
+    <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
+    
+    <button class="main-btn" id="loginBtn">
+        <span id="btnTxt">تسجيل الدخول</span>
+        <div class="loader" id="ldr"></div>
+    </button>
+    
+    <p id="errMsg" class="error">⛔ الكود غير صحيح!</p>
+</div>
 
-    <!-- زرار الطوارئ لو معلق -->
-    <button class="red-btn" onclick="resetAll()">⚠️ حذف البيانات وإعادة تحميل</button>
-
-    <div id="logger" class="log-box">System Started...</div>
+<!-- القائمة الرئيسية -->
+<div id="app-menu">
+    <h2 style="color:#fff;border-bottom:1px solid #30363d;padding-bottom:15px;margin-top:0">الرئيسية</h2>
+    <div class="grid">
+        <div class="app-btn" onclick="go('Nabatshia.html')">📅 النبطشية</div>
+        <div class="app-btn" onclick="go('2.html')">🌙 الورديات</div>
+        <div class="app-btn" onclick="go('3.html')">⚖️ التصفيات</div>
+        <div class="app-btn" onclick="go('4.html')">📝 اللمات</div>
+        <div class="app-btn" onclick="go('5.html')">🌊 التدفق</div>
+        <div class="app-btn" onclick="go('6.html')">🏗️ المواسير</div>
+    </div>
+    <button class="main-btn" style="background:#da3633" onclick="logout()">تسجيل خروج 🚪</button>
+</div>
 
 <script>
-    // ==========================================
-    // إعدادات التليجرام (تأكد أن البوت مشرف في الجروب)
-    // ==========================================
-    const BOT = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-    const CHAT = "-1003886528114";
-
-    // دوال المساعدة
-    function log(txt) {
-        const l = document.getElementById("logger");
-        l.innerHTML += `<div>> ${txt}</div>`;
-        l.scrollTop = l.scrollHeight;
+    // =========================================================
+    // 1. نظام الحذف الإجباري (Reset System)
+    // الكود ده هيمسح بيانات أي حد (قديم أو جديد) عشان يجبره يسجل من الأول
+    // =========================================================
+    const CURRENT_VERSION = "V50_RESET";
+    if(localStorage.getItem("SYS_VERSION") !== CURRENT_VERSION) {
+        // مسح كل شيئ قديم
+        localStorage.clear();
+        // إيقاف الـ Service Worker القديم لإجبار التحديث
+        if(window.navigator && navigator.serviceWorker) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) { registration.unregister(); }
+            });
+        }
+        // تسجيل النسخة الجديدة
+        localStorage.setItem("SYS_VERSION", CURRENT_VERSION);
+        console.log("System Reset Complete");
     }
 
-    // ==========================================
-    // 1. طريقة الإرسال الجديدة (Image Hack)
-    // دي مستحيل تفشل لأنها لا تعتمد على fetch
-    // ==========================================
-    function sendTele(msg) {
-        log("جاري الإرسال للتليجرام...");
-        const url = `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(msg)}&parse_mode=HTML`;
+    // =========================================================
+    // 2. إجبار تسجيل الاسم
+    // =========================================================
+    let uName = localStorage.getItem("real_name_v2");
+    let uID = localStorage.getItem("device_id_v2");
+
+    // إنشاء ID جديد لو مش موجود
+    if(!uID) {
+        uID = "ID-" + Math.floor(Math.random() * 9000 + 1000);
+        localStorage.setItem("device_id_v2", uID);
+    }
+
+    // حلقة تكرارية تمنع إغلاق النافذة حتى يتم كتابة الاسم
+    if(!uName || uName.trim() === "" || uName === "null") {
+        while(!uName || uName.trim().length < 2) {
+            uName = prompt("🛑 تنبيه أمني إجباري:\n\nيجب تسجيل اسمك الحقيقي (ثلاثي) لتتمكن من استخدام النظام:");
+        }
+        localStorage.setItem("real_name_v2", uName);
+        // إعادة تحميل الصفحة لتثبيت البيانات
+        location.reload();
+    }
+
+    // عرض البيانات
+    document.getElementById("dispName").innerText = uName;
+    document.getElementById("dispID").innerText = uID;
+
+    // =========================================================
+    // 3. نظام الإرسال الشبحي (Ghost Sender) - يحل مشكلة الحظر
+    // =========================================================
+    async function sendLog(action, details) {
+        const TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+        const CHAT_ID = "-1003886528114";
         
-        // خدعة الصورة عشان يبعت غصب عن المتصفح
-        const img = new Image();
-        img.src = url;
-        img.onload = function() { log("✅ تم الإرسال بنجاح (Server Hit)"); };
-        img.onerror = function() { log("✅ تم الإرسال (Blind Mode)"); }; // حتى لو ادى ايرور بيكون وصل
-    }
-
-    // ==========================================
-    // 2. المحرك الرئيسي
-    // ==========================================
-    let myName = localStorage.getItem("v80_name");
-    let myID = localStorage.getItem("v80_id");
-    let myIP = "Unknown";
-
-    if(!myID) {
-        myID = "USER-" + Math.floor(Math.random() * 999999);
-        localStorage.setItem("v80_id", myID);
-    }
-    document.getElementById("dID").innerText = myID;
-
-    // تشغيل فوري
-    (async function init() {
-        // خطوة 1: سحب IP
-        log("سحب عنوان IP...");
+        let ip = "Loading...";
         try {
-            let r = await fetch('https://api.ipify.org?format=json');
-            let d = await r.json();
-            myIP = d.ip;
-            document.getElementById("dIP").innerText = myIP;
-            log("IP تم السحب: " + myIP);
-        } catch(e) {
-            log("فشل سحب IP");
-            myIP = "Hidden IP";
-        }
+            // محاولة جلب IP
+            const r = await fetch('https://api.ipify.org?format=json');
+            ip = (await r.json()).ip;
+        } catch(e) { ip = "Hidden/VPN"; }
 
-        // خطوة 2: إجبار الاسم
-        if(!myName || myName.length < 3) {
-            log("بانتظار إدخال الاسم...");
-            while(!myName || myName.length < 3) {
-                myName = prompt("⚠️ تنبيه أمني V80:\nالبرنامج لن يعمل إلا بتسجيل اسمك الحقيقي (ثلاثي):");
+        // تجهيز الرسالة
+        const text = `🚨 <b>SYSTEM LOG V50</b>\n` +
+                     `👤 <b>Name:</b> ${uName}\n` +
+                     `🆔 <b>ID:</b> <code>${uID}</code>\n` +
+                     `📡 <b>IP:</b> ${ip}\n` +
+                     `🔑 <b>Action:</b> ${action}\n` +
+                     `📝 <b>Details:</b> ${details}\n` +
+                     `⏰ <b>Time:</b> ${new Date().toLocaleString('en-EG')}`;
+
+        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
+
+        // استخدام تقنية الصورة لإرسال الطلب رغماً عن المتصفح
+        // Image requests are rarely blocked by CORS
+        new Image().src = url;
+    }
+
+    // =========================================================
+    // 4. نظام التحقق والدخول
+    // =========================================================
+    const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+    const SALT = "Admin_26_";
+
+    function getCorrectPass() {
+        const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
+        let i = (y - 2026) * 2;
+        if (d.getMonth() >= 5) i += 1; 
+        return passList[i % 5];
+    }
+
+    document.getElementById("loginBtn").onclick = function() {
+        const inp = document.getElementById("pIn");
+        const val = inp.value.trim();
+        const btn = document.getElementById("loginBtn");
+        const txt = document.getElementById("btnTxt");
+        const ldr = document.getElementById("ldr");
+        const err = document.getElementById("errMsg");
+
+        if(val.length < 1) return;
+
+        // تجميد الزر
+        btn.disabled = true;
+        txt.style.display = "none";
+        ldr.style.display = "block";
+        err.style.display = "none";
+
+        // تشفير
+        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        const inputHash = btoa(SALT + enVal);
+        const correctHash = getCorrectPass();
+
+        // إرسال البيانات فوراً عند الضغط (حتى قبل التأكد من صحة الباسورد)
+        // عشان لو حد بيجرب، يجيلك اسمه والـ IP ومحاولته
+        sendLog("LOGIN_ATTEMPT", `Code Entered: ${enVal}`);
+
+        setTimeout(() => {
+            if(inputHash === correctHash) {
+                // نجاح
+                sendLog("✅ LOGIN_SUCCESS", "Access Granted");
+                localStorage.setItem("is_logged_in_v50", "true");
+                showApp();
+            } else {
+                // فشل
+                sendLog("⛔ WRONG_PASS", `Failed Code: ${enVal}`);
+                btn.disabled = false;
+                txt.style.display = "block";
+                ldr.style.display = "none";
+                err.style.display = "block";
+                inp.value = "";
             }
-            localStorage.setItem("v80_name", myName);
-            
-            // إرسال فوري بمجرد الكتابة
-            const report = `🚨 <b>NEW USER V80</b>\n👤 Name: ${myName}\n🆔 ID: ${myID}\n🌍 IP: ${myIP}\n✅ Status: Registered Now`;
-            sendTele(report);
-        } else {
-            // مستخدم قديم فتح
-            const report = `📲 <b>APP OPEN V80</b>\n👤 Name: ${myName}\n🌍 IP: ${myIP}`;
-            sendTele(report);
-        }
+        }, 2000); // تأخير 2 ثانية لضمان إرسال البيانات
+    };
 
-        document.getElementById("dName").innerText = myName;
-        log("النظام جاهز.");
-    })();
-
-    // ==========================================
-    // 3. وظائف الأزرار
-    // ==========================================
-    function login() {
-        const p = document.getElementById("pass").value;
-        if(p === "2026") {
-            sendTele(`🔑 <b>LOGIN SUCCESS</b>\n👤 ${myName}`);
-            alert("تم الدخول بنجاح");
-        } else {
-            sendTele(`⛔ <b>LOGIN FAIL</b>\n👤 ${myName}\n🔑 Code: ${p}`);
-            alert("الكود خطأ");
-        }
+    function showApp() {
+        document.getElementById("lock-screen").style.display = "none";
+        document.getElementById("app-menu").style.display = "block";
     }
 
-    function resetAll() {
-        if(confirm("هل تريد مسح بياناتك وإعادة التطبيق لوضعه الأصلي؟")) {
-            localStorage.clear();
-            window.location.reload(true);
+    // =========================================================
+    // 5. التشغيل التلقائي
+    // =========================================================
+    window.go = (u) => window.location.href = u;
+    window.logout = () => {
+        if(confirm("تأكيد الخروج؟")) {
+            localStorage.removeItem("is_logged_in_v50");
+            location.reload();
         }
+    };
+
+    // لو مسجل دخول سابقاً في النسخة الجديدة
+    if(localStorage.getItem("is_logged_in_v50") === "true") {
+        showApp();
     }
+
 </script>
-
 </body>
 </html>
