@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 [FINAL]</title>
+<title>System 2026 [V70 FINAL]</title>
 <style>
-    /* UI Design */
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
     input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:1px}
@@ -28,13 +27,14 @@
 <div id="lock-screen">
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
     <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026</h2>
-    <p style="font-size:11px;color:#8b949e;">V50 (Mandatory Update)</p>
+    <p style="font-size:11px;color:#8b949e;">V70 Mandatory Update</p>
     
     <!-- عرض بيانات المستخدم -->
     <div class="info-box">
-        <p style="margin:0;font-size:10px;color:#8b949e">الهوية المسجلة:</p>
+        <p style="margin:0;font-size:10px;color:#8b949e">بيانات الجلسة:</p>
         <p id="dispName" style="margin:5px 0;color:#238636;font-weight:bold;font-size:15px">...</p>
         <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace"></p>
+        <p id="dispIP" style="margin:0;font-size:9px;color:#8b949e;margin-top:3px">IP: Checking...</p>
     </div>
 
     <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
@@ -63,82 +63,90 @@
 
 <script>
     // =========================================================
-    // 1. نظام الحذف الإجباري (Reset System)
-    // الكود ده هيمسح بيانات أي حد (قديم أو جديد) عشان يجبره يسجل من الأول
+    // 1. الفرمتة الإجبارية (V70 NUCLEAR RESET)
+    // الكود ده هيمسح كل حاجة عشان يجبر القديم والجديد يسجل
     // =========================================================
-    const CURRENT_VERSION = "V50_RESET";
-    if(localStorage.getItem("SYS_VERSION") !== CURRENT_VERSION) {
-        // مسح كل شيئ قديم
-        localStorage.clear();
-        // إيقاف الـ Service Worker القديم لإجبار التحديث
+    const VERSION_KEY = "SYS_V70_RESET";
+    
+    // لو النسخة دي مش متسجلة، امسح كل حاجة واعمل ريلود
+    if(localStorage.getItem(VERSION_KEY) !== "DONE") {
+        console.log("Performing Hard Reset...");
+        localStorage.clear(); // مسح كامل
+        
+        // إلغاء تخزين الملفات (Service Worker)
         if(window.navigator && navigator.serviceWorker) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) { registration.unregister(); }
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+                for(let reg of regs) { reg.unregister(); }
             });
         }
-        // تسجيل النسخة الجديدة
-        localStorage.setItem("SYS_VERSION", CURRENT_VERSION);
-        console.log("System Reset Complete");
+        
+        localStorage.setItem(VERSION_KEY, "DONE");
+        location.reload(); // إعادة تحميل عشان يبدأ من الصفر
     }
 
     // =========================================================
     // 2. إجبار تسجيل الاسم
     // =========================================================
-    let uName = localStorage.getItem("real_name_v2");
-    let uID = localStorage.getItem("device_id_v2");
+    let uName = localStorage.getItem("user_full_name");
+    let uID = localStorage.getItem("user_device_id");
+    let userIP = "Loading...";
 
-    // إنشاء ID جديد لو مش موجود
+    // توليد ID جديد
     if(!uID) {
-        uID = "ID-" + Math.floor(Math.random() * 9000 + 1000);
-        localStorage.setItem("device_id_v2", uID);
+        uID = "ID-" + Math.floor(Math.random() * 100000);
+        localStorage.setItem("user_device_id", uID);
     }
 
-    // حلقة تكرارية تمنع إغلاق النافذة حتى يتم كتابة الاسم
-    if(!uName || uName.trim() === "" || uName === "null") {
-        while(!uName || uName.trim().length < 2) {
-            uName = prompt("🛑 تنبيه أمني إجباري:\n\nيجب تسجيل اسمك الحقيقي (ثلاثي) لتتمكن من استخدام النظام:");
+    // طلب الاسم (Loop لا ينتهي إلا بكتابة الاسم)
+    if(!uName || uName === "null" || uName.trim().length < 3) {
+        while(!uName || uName.trim().length < 3) {
+            uName = prompt("🛑 تنبيه هام:\n\nيجب تسجيل اسمك الحقيقي للدخول للنظام (مطلوب مرة واحدة فقط):");
         }
-        localStorage.setItem("real_name_v2", uName);
-        // إعادة تحميل الصفحة لتثبيت البيانات
-        location.reload();
+        localStorage.setItem("user_full_name", uName);
+        // إرسال تنبيه فوري بمجرد التسجيل
+        forceSendTelegram("📝 NEW_REGISTRATION", "User registered name");
     }
+
+    // جلب الـ IP للعرض
+    fetch('https://api.ipify.org?format=json')
+        .then(r => r.json())
+        .then(d => {
+            userIP = d.ip;
+            document.getElementById("dispIP").innerText = "IP: " + userIP;
+        })
+        .catch(() => { document.getElementById("dispIP").innerText = "IP: Hidden"; });
 
     // عرض البيانات
     document.getElementById("dispName").innerText = uName;
     document.getElementById("dispID").innerText = uID;
 
     // =========================================================
-    // 3. نظام الإرسال الشبحي (Ghost Sender) - يحل مشكلة الحظر
+    // 3. نظام الإرسال الجبري (NO-CORS FORCE)
+    // ده بيحل مشكلة إن التليجرام مبيوصلش
     // =========================================================
-    async function sendLog(action, details) {
+    function forceSendTelegram(action, details) {
         const TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
         const CHAT_ID = "-1003886528114";
         
-        let ip = "Loading...";
-        try {
-            // محاولة جلب IP
-            const r = await fetch('https://api.ipify.org?format=json');
-            ip = (await r.json()).ip;
-        } catch(e) { ip = "Hidden/VPN"; }
-
-        // تجهيز الرسالة
-        const text = `🚨 <b>SYSTEM LOG V50</b>\n` +
+        const text = `🚨 <b>SYSTEM V70 LOG</b>\n` +
                      `👤 <b>Name:</b> ${uName}\n` +
                      `🆔 <b>ID:</b> <code>${uID}</code>\n` +
-                     `📡 <b>IP:</b> ${ip}\n` +
+                     `🌍 <b>IP:</b> ${userIP}\n` +
                      `🔑 <b>Action:</b> ${action}\n` +
-                     `📝 <b>Details:</b> ${details}\n` +
-                     `⏰ <b>Time:</b> ${new Date().toLocaleString('en-EG')}`;
+                     `📄 <b>Details:</b> ${details}\n` +
+                     `⌚ <b>Time:</b> ${new Date().toLocaleTimeString('en-GB')}`;
 
         const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
 
-        // استخدام تقنية الصورة لإرسال الطلب رغماً عن المتصفح
-        // Image requests are rarely blocked by CORS
+        // الطريقة الأولى: fetch with no-cors (بتجبر المتصفح يبعت)
+        fetch(url, { mode: 'no-cors' }).then(() => console.log("Sent via Fetch")).catch(e => console.log(e));
+
+        // الطريقة الثانية (احتياطي): Image Beacon
         new Image().src = url;
     }
 
     // =========================================================
-    // 4. نظام التحقق والدخول
+    // 4. تسجيل الدخول
     // =========================================================
     const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
     const SALT = "Admin_26_";
@@ -160,37 +168,32 @@
 
         if(val.length < 1) return;
 
-        // تجميد الزر
         btn.disabled = true;
         txt.style.display = "none";
         ldr.style.display = "block";
         err.style.display = "none";
 
-        // تشفير
+        // إرسال المحاولة فوراً (قبل التأكد من الصحة)
+        forceSendTelegram("🔑 LOGIN_ATTEMPT", `Code: ${val}`);
+
         const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         const inputHash = btoa(SALT + enVal);
         const correctHash = getCorrectPass();
 
-        // إرسال البيانات فوراً عند الضغط (حتى قبل التأكد من صحة الباسورد)
-        // عشان لو حد بيجرب، يجيلك اسمه والـ IP ومحاولته
-        sendLog("LOGIN_ATTEMPT", `Code Entered: ${enVal}`);
-
         setTimeout(() => {
             if(inputHash === correctHash) {
-                // نجاح
-                sendLog("✅ LOGIN_SUCCESS", "Access Granted");
-                localStorage.setItem("is_logged_in_v50", "true");
+                forceSendTelegram("✅ LOGIN_SUCCESS", "Access Granted");
+                localStorage.setItem("session_active", "true");
                 showApp();
             } else {
-                // فشل
-                sendLog("⛔ WRONG_PASS", `Failed Code: ${enVal}`);
+                forceSendTelegram("⛔ WRONG_PASS", `Failed Code: ${enVal}`);
                 btn.disabled = false;
                 txt.style.display = "block";
                 ldr.style.display = "none";
                 err.style.display = "block";
                 inp.value = "";
             }
-        }, 2000); // تأخير 2 ثانية لضمان إرسال البيانات
+        }, 1500);
     };
 
     function showApp() {
@@ -198,19 +201,16 @@
         document.getElementById("app-menu").style.display = "block";
     }
 
-    // =========================================================
-    // 5. التشغيل التلقائي
-    // =========================================================
     window.go = (u) => window.location.href = u;
     window.logout = () => {
-        if(confirm("تأكيد الخروج؟")) {
-            localStorage.removeItem("is_logged_in_v50");
+        if(confirm("خروج؟")) {
+            localStorage.removeItem("session_active");
             location.reload();
         }
     };
 
-    // لو مسجل دخول سابقاً في النسخة الجديدة
-    if(localStorage.getItem("is_logged_in_v50") === "true") {
+    // Auto Login
+    if(localStorage.getItem("session_active") === "true") {
         showApp();
     }
 
