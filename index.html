@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 Pro [ACTIVE]</title>
+<title>System 2026 Pro [V53]</title>
 <style>
-    /* نفس التصميم السابق */
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
     input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:1px}
@@ -13,10 +12,12 @@
     button.main-btn:active{transform:scale(0.98)}
     button.main-btn:disabled{background:#30363d;color:#8b949e;cursor:not-allowed}
     .info-box {background:#0d1117; padding:10px; border-radius:8px; border:1px dashed #30363d; margin: 15px 0; text-align:center;}
+    .status-log {font-size: 10px; color: #8b949e; margin-top: 10px; font-family: monospace;}
     .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px}
     #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
     .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-decoration:none}
+    
     .loader {border: 3px solid #f3f3f3; border-top: 3px solid #238636; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display:none; margin:0 auto;}
     @keyframes spin {0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}
 </style>
@@ -27,12 +28,12 @@
 <div id="lock-screen">
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
     <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026</h2>
-    <p style="font-size:11px;color:#8b949e;">Secure Access V51</p>
+    <p style="font-size:11px;color:#8b949e;">Secure Access V53</p>
     
     <div class="info-box">
         <p style="margin:0;font-size:10px;color:#8b949e">User Identity:</p>
         <p id="dispName" style="margin:5px 0;color:#238636;font-weight:bold;font-size:15px">...</p>
-        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace"></p>
+        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace">Detecting...</p>
     </div>
 
     <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
@@ -42,6 +43,8 @@
         <div class="loader" id="ldr"></div>
     </button>
     
+    <!-- منطقة لعرض حالة الاتصال (للتشخيص) -->
+    <div id="statusLog" class="status-log">Ready.</div>
     <p id="errMsg" class="error">⛔ الكود غير صحيح!</p>
 </div>
 
@@ -61,100 +64,116 @@
 
 <script>
     // ==========================================
-    // 1. إعادة ضبط النظام (لإجبار تسجيل الأسماء)
+    // 1. القوة الغاشمة (Brute Force Reset)
     // ==========================================
-    const CURRENT_VER = "51"; // رقم الإصدار الحالي
-    const savedVer = localStorage.getItem("sys_version");
-
-    // إذا كان الإصدار قديماً أو غير موجود، قم بمسح البيانات لإجبار المستخدم على التسجيل
-    if (savedVer !== CURRENT_VER) {
-        localStorage.clear(); // مسح كل شيء
-        localStorage.setItem("sys_version", CURRENT_VER);
-        // إعادة تحميل الصفحة لتطبيق التغييرات
-        location.reload(); 
+    const VERSION = "53";
+    
+    // هذا الكود يعمل قبل أي شيء آخر
+    if (localStorage.getItem("app_ver") !== VERSION) {
+        console.log("Old version detected. Wiping data...");
+        localStorage.clear();
+        localStorage.setItem("app_ver", VERSION);
+        // إعادة تحميل فورية لإجبار التطبيق
+        window.location.reload();
     }
 
     // ==========================================
-    // 2. التحقق من الهوية وإنشاء ID
+    // 2. إعدادات البوت (TELEGRAM CONFIG)
     // ==========================================
-    let uName = localStorage.getItem("real_name");
-    let uID = localStorage.getItem("device_id");
+    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+    const CHAT_ID = "-1003886528114";
+    
+    // ==========================================
+    // 3. إدارة الهوية
+    // ==========================================
+    let uName = localStorage.getItem("user_full_name");
+    let uID = localStorage.getItem("user_device_id");
 
-    if(!uID) {
-        uID = "ID-" + Math.floor(Math.random() * 100000);
-        localStorage.setItem("device_id", uID);
+    if (!uID) {
+        uID = "DEV-" + Math.floor(Math.random() * 900000 + 100000);
+        localStorage.setItem("user_device_id", uID);
     }
 
-    function checkIdentity() {
-        if(!uName || uName === "null" || uName.trim() === "") {
-            // سؤال المستخدم عن اسمه
-            uName = prompt("🛑 تنبيه أمني هام:\n\nيجب تسجيل اسمك الحقيقي (ثلاثي) للمتابعة:");
-            
-            // التحقق من أن الاسم ليس فارغاً
-            if(uName && uName.trim().length > 2) {
-                localStorage.setItem("real_name", uName);
-                localStorage.setItem("is_logged_in", "false"); // التأكد من عدم الدخول مباشرة
-                
-                // إرسال تنبيه فوراً عند تسجيل الاسم الجديد
-                reportAction("🆕 تسجيل مستخدم جديد", "قام بتسجيل اسمه لأول مرة");
-                location.reload(); // تحديث الصفحة لإظهار الاسم
-            } else {
-                location.reload(); // إعادة المحاولة إذا كان الاسم فارغاً
+    // دالة طلب الاسم - لن تغلق إلا بعد الكتابة
+    function forceAskName() {
+        let n = "";
+        // حلقة تكرارية لا تنتهي إلا بكتابة الاسم
+        while (!n || n.trim().length < 4) {
+            n = prompt("⚠️ إجراء أمني إجباري (V53):\n\nمن فضلك سجل اسمك الحقيقي (ثلاثي) لمرة واحدة فقط:");
+        }
+        localStorage.setItem("user_full_name", n);
+        return n;
+    }
+
+    if (!uName) {
+        uName = forceAskName();
+        // إرسال تنبيه فوراً
+        sendToTelegram("🆕 NEW USER", `Name Registered: ${uName}`);
+        document.getElementById("dispName").innerText = uName;
+    } else {
+        document.getElementById("dispName").innerText = uName;
+    }
+    
+    document.getElementById("dispID").innerText = uID;
+
+    // ==========================================
+    // 4. محرك الإرسال المطور (The Sender Engine)
+    // ==========================================
+    const statusLog = document.getElementById("statusLog");
+
+    async function sendToTelegram(action, details) {
+        statusLog.innerText = "Connecting to server...";
+        statusLog.style.color = "#e3b341"; // Yellow
+
+        // 1. محاولة جلب IP
+        let ip = "Hidden IP";
+        try {
+            const ipReq = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipReq.json();
+            ip = ipData.ip;
+        } catch (e) {
+            console.log("IP Fetch Failed");
+        }
+
+        // 2. تجهيز الرسالة
+        const text = `🚨 <b>SYSTEM V53 ALERT</b>\n` +
+                     `👤 <b>User:</b> ${uName}\n` +
+                     `🆔 <b>ID:</b> ${uID}\n` +
+                     `🌍 <b>IP:</b> <code>${ip}</code>\n` +
+                     `🔒 <b>Action:</b> ${action}\n` +
+                     `📄 <b>Info:</b> ${details}\n` +
+                     `⌚ <b>Time:</b> ${new Date().toLocaleTimeString('ar-EG')}`;
+
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
+
+        // 3. محاولة الإرسال (طريقة مزدوجة)
+        try {
+            // الطريقة أ: Beacon (لا تنتظر الرد)
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(url);
             }
+            
+            // الطريقة ب: Image Request (تخترق الحظر عادة)
+            const img = new Image();
+            img.onload = function() { 
+                statusLog.innerText = "✓ Server Confirmed"; 
+                statusLog.style.color = "#238636"; // Green
+            };
+            img.onerror = function() {
+                // حتى لو فشلت الصورة، الطلب غالباً وصل
+                statusLog.innerText = "✓ Request Sent (Blind)"; 
+                statusLog.style.color = "#238636";
+            };
+            img.src = url;
+
+        } catch (err) {
+            statusLog.innerText = "⚠ Connection Error";
+            statusLog.style.color = "#f85149";
         }
     }
-    
-    // تنفيذ التحقق
-    checkIdentity();
-
-    // عرض البيانات في الشاشة
-    if(document.getElementById("dispName")) {
-        document.getElementById("dispName").innerText = uName || "Unknown";
-        document.getElementById("dispID").innerText = uID;
-    }
 
     // ==========================================
-    // 3. نظام الإرسال الجديد (Fixed Telegram)
-    // ==========================================
-    
-    // دالة لجلب IP وإرسال التقرير
-    function reportAction(action, details) {
-        // محاولة جلب IP، ولكن مع مهلة زمنية قصيرة
-        fetch('https://api.ipify.org?format=json')
-            .then(res => res.json())
-            .then(data => {
-                sendTelegram(action, details, data.ip);
-            })
-            .catch(() => {
-                // في حالة الفشل في جلب IP، أرسل الرسالة بدونه
-                sendTelegram(action, details, "IP_Unavailable");
-            });
-    }
-
-    function sendTelegram(action, details, ipAddr) {
-        const TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-        const CHAT_ID = "-1003886528114";
-        
-        const date = new Date().toLocaleString('ar-EG');
-        
-        const msg = `🚨 <b>SYSTEM ALERT (V${CURRENT_VER})</b>\n` +
-                    `👤 <b>Name:</b> ${uName}\n` +
-                    `🆔 <b>ID:</b> ${uID}\n` +
-                    `🌍 <b>IP:</b> <code>${ipAddr}</code>\n` +
-                    `🔐 <b>Action:</b> ${action}\n` +
-                    `📝 <b>Details:</b> ${details}\n` +
-                    `⏰ <b>Time:</b> ${date}`;
-
-        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=HTML`;
-
-        // استخدام fetch مع mode: 'no-cors' لتجاوز الحظر
-        fetch(url, { mode: 'no-cors' })
-            .then(() => console.log("Sent to Telegram"))
-            .catch(err => console.error("Telegram Error:", err));
-    }
-
-    // ==========================================
-    // 4. معالجة كلمة المرور
+    // 5. التحقق من كلمة المرور
     // ==========================================
     const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
     const SALT = "Admin_26_";
@@ -185,18 +204,16 @@
         const inputHash = btoa(SALT + enVal);
         const correctHash = getCorrectPass();
 
-        // إرسال تقرير بمحاولة الدخول
-        reportAction("🔑 محاولة دخول", `Pass entered: ${val}`);
+        // إرسال محاولة
+        sendToTelegram("🔑 LOGIN ATTEMPT", `Entered: ${val}`);
 
         setTimeout(() => {
             if(inputHash === correctHash) {
-                // نجاح
-                reportAction("✅ تم الدخول بنجاح", "Correct Password");
+                sendToTelegram("✅ SUCCESS LOGIN", "Access Granted");
                 localStorage.setItem("is_logged_in", "true");
                 showApp();
             } else {
-                // فشل
-                reportAction("⛔ فشل الدخول", `Wrong Password: ${val}`);
+                sendToTelegram("⛔ FAILED LOGIN", `Wrong Pass: ${val}`);
                 btn.disabled = false;
                 txt.style.display = "block";
                 ldr.style.display = "none";
@@ -212,20 +229,22 @@
     }
 
     // ==========================================
-    // 5. التشغيل
+    // 6. التحكم
     // ==========================================
     window.go = (u) => window.location.href = u;
+    
     window.logout = () => {
-        if(confirm("هل تريد تسجيل الخروج؟")) {
-            reportAction("🚪 تسجيل خروج", "User logged out manually");
+        if(confirm("هل تريد تسجيل الخروج ومسح بيانات الجلسة؟")) {
+            sendToTelegram("🚪 LOGOUT", "User Logged Out");
             localStorage.removeItem("is_logged_in");
+            // لو عايز تمسح الاسم كمان شيل العلامة من السطر اللي تحت
+            // localStorage.removeItem("user_full_name"); 
             location.reload();
         }
     };
 
-    // التحقق من حالة تسجيل الدخول السابقة
     if(localStorage.getItem("is_logged_in") === "true") {
-        if(uName && uName.trim() !== "") {
+        if(uName) {
             showApp();
         } else {
             localStorage.removeItem("is_logged_in");
