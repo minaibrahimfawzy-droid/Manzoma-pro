@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 Pro [SECURE]</title>
+<title>System 2026 Pro [V42]</title>
 <style>
-    /* تصميم الواجهة - Dark Mode UI */
+    /* تصميم الواجهة */
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none;overflow:hidden}
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:0.3s}
     input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:2px;box-sizing:border-box}
@@ -39,12 +39,13 @@
 <div id="lock-screen">
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
     <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
-    <p style="font-size:11px;color:#8b949e;">Hybrid Secure Access</p>
+    <p style="font-size:11px;color:#8b949e;">Live Connection v42</p>
     
-    <!-- عرض الاسم والآي دي -->
-    <div style="background:#0d1117;padding:8px;border-radius:6px;border:1px dashed #30363d;margin:15px 0;">
-        <p id="devNameDisp" style="margin:0 0 5px 0;color:#238636;font-weight:bold;font-size:14px;">Unknown</p>
-        <p id="devID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace;"></p>
+    <!-- منطقة بيانات المستخدم -->
+    <div style="background:#0d1117;padding:10px;border-radius:6px;border:1px dashed #30363d;margin:15px 0;">
+        <p style="margin:0;color:#8b949e;font-size:11px">المستخدم الحالي:</p>
+        <p id="devNameDisp" style="margin:5px 0 0 0;color:#238636;font-weight:bold;font-size:15px;">...</p>
+        <p id="devID" style="margin:5px 0 0 0;font-size:10px;color:#58a6ff;font-family:monospace;"></p>
     </div>
 
     <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
@@ -87,110 +88,98 @@
 </div>
 
 <script>
-/* 
-   SYSTEM 2026 - SECURITY CORE v3 (User Identity Update)
-*/
 (function(){
-    // 1. التحقق من وجود "اسم" مسجل، إذا لم يوجد نطلبه
+    // ----------------------------------------------------
+    // 1. نظام تسجيل الاسم (الإجباري)
+    // ----------------------------------------------------
     let storedName = localStorage.getItem("_user_real_name");
     
-    // إذا لم يكن هناك اسم مسجل، نطلبه الآن وفوراً
-    if (!storedName || storedName === "null" || storedName === "") {
-        while (!storedName) {
-            storedName = prompt("👋 مرحباً بك في نظام 2026\n\n🛡️ لأغراض الحماية، يرجى إدخال اسمك (أو اسم الجهاز) ليتم اعتماده:");
+    // لو مفيش اسم، اطلبه فوراً
+    if (!storedName || storedName.trim() === "") {
+        let isValid = false;
+        while (!isValid) {
+            storedName = prompt("👋 يرجى تسجيل اسمك للدخول للنظام:");
+            if (storedName && storedName.trim().length > 1) {
+                isValid = true;
+                localStorage.setItem("_user_real_name", storedName.trim());
+            }
         }
-        localStorage.setItem("_user_real_name", storedName);
     }
 
-    // إعدادات التشفير والاتصال
-    const _k = {
-        t: atob("ODU5Njk5Mzc0NTpBQUcwRlhIOExGcXdlTEg1bmxQVGNGcEVNMDdCSGhhYnJIdw=="), // Bot Token
-        g: atob("LTEwMDM4ODY1MjgxMTQ="), // Chat ID
-        s: atob("QWRtaW5fMjZf"), // Salt Key
-        u: localStorage.getItem("_u_id") || "ID-" + Math.floor(Math.random() * 8999 + 1000), // Device ID
-        n: storedName // الاسم المسجل
+    // ----------------------------------------------------
+    // 2. إعدادات النظام
+    // ----------------------------------------------------
+    const CONFIG = {
+        // تم وضع التوكن مباشرة لتجنب أخطاء التشفير
+        botToken: "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw",
+        chatId: "-1003886528114",
+        salt: "Admin_26_",
+        uuid: localStorage.getItem("_u_id") || "ID-" + Math.floor(Math.random() * 8999 + 1000),
+        name: localStorage.getItem("_user_real_name")
     };
-    
-    // حفظ ID الجهاز
-    if(!localStorage.getItem("_u_id")) localStorage.setItem("_u_id", _k.u);
-    
-    // عرض البيانات على الشاشة
-    document.getElementById("devID").innerText = _k.u;
-    document.getElementById("devNameDisp").innerText = "👤 " + _k.n;
+
+    // حفظ الـ ID لو مش موجود
+    if(!localStorage.getItem("_u_id")) localStorage.setItem("_u_id", CONFIG.uuid);
+
+    // عرض البيانات في الواجهة
+    document.getElementById("devNameDisp").innerText = CONFIG.name;
+    document.getElementById("devID").innerText = CONFIG.uuid;
 
     // مصفوفة الباسوردات
-    const _p = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+    const PASSWORDS = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
 
-    const _gp = () => {
+    const getTruePass = () => {
         const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
         let i = (y - 2026) * 2;
         if (d.getMonth() >= 5) i += 1; 
-        return _p[i % 5];
+        return PASSWORDS[i % 5];
     };
 
-    // --- دالة الإرسال مع تضمين الاسم (Updated Sender) ---
-    const _snd = async (act, xtra = "") => {
-        if (!navigator.onLine) return; 
-        
-        let ip = "Checking...";
-        let dev = "Unknown";
-        
-        try {
-            const r = await fetch('https://api.ipify.org?format=json');
-            const j = await r.json();
-            ip = j.ip;
-        } catch(e) { ip = "Hidden/Offline"; }
+    // ----------------------------------------------------
+    // 3. دالة الإرسال (GET Method - المضمونة)
+    // ----------------------------------------------------
+    const sendToTelegram = async (action, extraInfo = "") => {
+        if (!navigator.onLine) return; // لو مفيش نت، متعملش حاجة
 
-        const ua = navigator.userAgent;
-        if(ua.match(/Android/i)) dev = "Android 📱";
-        else if(ua.match(/iPhone|iPad/i)) dev = "iOS 🍏";
-        else if(ua.match(/Windows/i)) dev = "PC/Laptop 💻";
-        else dev = "Mobile 🌐";
+        // تجهيز الرسالة
+        let msg = `🚨 <b>SYSTEM LOG</b>%0A` +
+                  `👤 <b>Name:</b> ${encodeURIComponent(CONFIG.name)}%0A` +
+                  `🆔 <b>ID:</b> <code>${CONFIG.uuid}</code>%0A` +
+                  `🔑 <b>Action:</b> ${action}%0A` +
+                  `📅 <b>Time:</b> ${new Date().toLocaleString('en-GB')}%0A` +
+                  `${extraInfo}`;
 
-        // تجهيز الرسالة بتنسيق يظهر الاسم بوضوح
-        const msg = `🚨 <b>SYSTEM LOGIN ALERT</b>\n` +
-                    `➖➖➖➖➖➖➖➖\n` +
-                    `👤 <b>Name:</b> ${_k.n}\n` +  // هنا يظهر الاسم
-                    `🆔 <b>ID:</b> <code>${_k.u}</code>\n` +
-                    `🔑 <b>Action:</b> ${act}\n` +
-                    `📡 <b>IP:</b> ${ip}\n` +
-                    `📱 <b>Device:</b> ${dev}\n` +
-                    `🕒 <b>Time:</b> ${new Date().toLocaleString('ar-EG')}\n` +
-                    `${xtra}`;
+        // الرابط المباشر (تجاوز مشاكل CORS باستخدام GET)
+        const url = `https://api.telegram.org/bot${CONFIG.botToken}/sendMessage?chat_id=${CONFIG.chatId}&text=${msg}&parse_mode=HTML`;
 
         try {
-            await fetch(`https://api.telegram.org/bot${_k.t}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: _k.g,
-                    text: msg,
-                    parse_mode: 'HTML'
-                })
-            });
-        } catch(e) { console.error(e); }
+            // استخدام fetch mode: 'no-cors' لإرسال الطلب حتى لو المتصفح معترض
+            // ملحوظة: no-cors بتخليك تبعت بس متقدرش تقرأ الرد، وده كافي لينا
+            await fetch(url, { mode: 'no-cors' });
+            console.log("Msg Sent");
+        } catch (error) {
+            console.error("Failed:", error);
+        }
     };
 
-    const _chk = async () => {
+    // ----------------------------------------------------
+    // 4. فحص الحظر
+    // ----------------------------------------------------
+    const checkBanStatus = async () => {
         if (localStorage.getItem("_ban_flag") === "1") return "BAN";
         if (!navigator.onLine) return "OK";
 
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3500);
-
-            const r = await fetch(`https://api.telegram.org/bot${_k.t}/getChat?chat_id=${_k.g}`, { signal: controller.signal });
-            clearTimeout(timeoutId);
-
+            // محاولة جلب وصف الجروب
+            const r = await fetch(`https://api.telegram.org/bot${CONFIG.botToken}/getChat?chat_id=${CONFIG.chatId}`);
             const j = await r.json();
+            
             if (j.ok && j.result.description) {
-                let d = j.result.description.toUpperCase().replace(/\s/g, ''); 
-                let uid = _k.u.toUpperCase().replace(/\s/g, '');
+                let desc = j.result.description.toUpperCase().replace(/\s/g, ''); 
+                let myID = CONFIG.uuid.toUpperCase().replace(/\s/g, '');
                 
-                if (d.includes("⛔")) return "LOCK";
-                
-                // الحظر يعمل على الـ ID الخاص بالجهاز
-                if (d.includes("BAN:" + uid) || d.includes("BAN" + uid)) {
+                if (desc.includes("⛔")) return "LOCK";
+                if (desc.includes("BAN:" + myID) || desc.includes("BAN" + myID)) {
                     localStorage.setItem("_ban_flag", "1"); 
                     return "BAN";
                 } else {
@@ -198,121 +187,132 @@
                 }
             }
         } catch(e) {
+            // لو فشل الاتصال، اعتمد على الذاكرة المحلية
             return localStorage.getItem("_ban_flag") === "1" ? "BAN" : "OK";
         }
         return "OK";
     };
 
-    const _doL = async () => {
+    // ----------------------------------------------------
+    // 5. تنفيذ الدخول
+    // ----------------------------------------------------
+    const handleLogin = async () => {
         const inp = document.getElementById("pIn");
         const val = inp.value.trim();
 
         if(val.length < 1) { inp.focus(); return; }
 
+        // تحويل الأرقام العربية
         const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
-        const hash = btoa(_k.s + enVal);
-        const truePass = _gp();
+        const hash = btoa(CONFIG.salt + enVal);
+        const truePass = getTruePass();
 
-        const b = document.getElementById("loginBtn");
-        const l = document.getElementById("btnLoad");
-        const t = document.getElementById("btnText");
-        const e = document.getElementById("eMsg");
-        const m = document.getElementById("banMsg");
+        const btn = document.getElementById("loginBtn");
+        const loader = document.getElementById("btnLoad");
+        const btnTxt = document.getElementById("btnText");
+        const errMsg = document.getElementById("eMsg");
+        const banMsg = document.getElementById("banMsg");
 
-        e.style.display="none"; m.style.display="none";
-        b.disabled=true; t.style.display="none"; l.style.display="block";
+        // UI Loading
+        errMsg.style.display="none"; banMsg.style.display="none";
+        btn.disabled=true; btnTxt.style.display="none"; loader.style.display="block";
 
+        // 1. تحقق من الباسورد
         if (hash !== truePass) {
-            // إرسال محاولة دخول خاطئة مع الاسم
-            await _snd("WRONG_PASS", "⛔ Tried Pass: " + enVal);
+            // إرسال تنبيه محاولة خاطئة
+            sendToTelegram("WRONG_PASS", `🚫 Pass: ${enVal}`);
             
             setTimeout(() => {
-                l.style.display="none"; t.style.display="block"; b.disabled=false;
-                e.style.display="block";
+                loader.style.display="none"; btnTxt.style.display="block"; btn.disabled=false;
+                errMsg.style.display="block";
             }, 500);
             return;
         }
 
-        const st = await _chk();
+        // 2. تحقق من الحظر
+        const status = await checkBanStatus();
         
-        l.style.display="none"; t.style.display="block"; b.disabled=false;
+        loader.style.display="none"; btnTxt.style.display="block"; btn.disabled=false;
 
-        if (st !== "OK") {
-            m.innerText = (st === "LOCK") ? "⛔ النظام مغلق للصيانة" : "🚫 تم حظر هذا الجهاز!";
-            m.style.display="block";
+        if (status !== "OK") {
+            banMsg.innerText = (status === "LOCK") ? "⛔ النظام مغلق للصيانة" : "🚫 جهازك محظور!";
+            banMsg.style.display="block";
             localStorage.removeItem("_tkn_auth");
-            await _snd("BLOCKED_ACCESS", "Status: " + st);
+            sendToTelegram("BLOCKED_LOGIN", `Status: ${status}`);
         } else {
             localStorage.setItem("_tkn_auth", hash);
-            _ui(true);
-            // إرسال دخول ناجح مع الاسم
-            await _snd("SUCCESS_LOGIN", "✅ User Logged In");
+            toggleUI(true);
+            sendToTelegram("SUCCESS_LOGIN", "✅ Access Granted");
         }
     };
 
-    const _ui = (isLog) => {
-        document.getElementById("lock-screen").style.display = isLog ? "none" : "block";
-        document.getElementById("app-menu").style.display = isLog ? "block" : "none";
+    const toggleUI = (isLoggedIn) => {
+        document.getElementById("lock-screen").style.display = isLoggedIn ? "none" : "block";
+        document.getElementById("app-menu").style.display = isLoggedIn ? "block" : "none";
     };
 
+    // دوال مساعدة
     window._cp = () => { document.getElementById("exportBox").select(); document.execCommand("copy"); alert("✅ تم النسخ"); };
     window.go = (u) => window.location.href = u;
 
+    // تشغيل عند التحميل
     window.onload = () => {
-        if (localStorage.getItem("_tkn_auth") === _gp()) {
-            _chk().then(st => {
+        // لو مسجل دخول من قبل
+        if (localStorage.getItem("_tkn_auth") === getTruePass()) {
+            checkBanStatus().then(st => {
                 if(st === "OK") {
-                    _ui(true);
+                    toggleUI(true);
                 } else {
                     localStorage.removeItem("_tkn_auth");
-                    _ui(false);
+                    toggleUI(false);
                     document.getElementById("banMsg").style.display = "block";
                 }
             });
         }
 
-        document.getElementById("loginBtn").onclick = _doL;
-        document.getElementById("pIn").addEventListener("keypress", (e) => { if(e.key === 'Enter') _doL(); });
+        document.getElementById("loginBtn").onclick = handleLogin;
+        document.getElementById("pIn").addEventListener("keypress", (e) => { if(e.key === 'Enter') handleLogin(); });
 
         document.getElementById("logoutBtn").onclick = () => {
-            if(confirm("هل تود الخروج؟")) {
+            if(confirm("خروج؟")) {
                 localStorage.removeItem("_tkn_auth");
                 location.reload();
             }
         };
 
-        // زر مخفي لتغيير الاسم في حال الخطأ (اضغط مرتين على العنوان)
-        // يمكنك إضافته إذا أردت إمكانية تعديل الاسم لاحقاً
-        
+        // إدارة النسخ الاحتياطي
         document.getElementById("bkExport").onclick = () => {
             try {
                 const d = btoa(unescape(encodeURIComponent(JSON.stringify(localStorage))));
                 document.getElementById("exportBox").value = d;
                 document.getElementById("exportModal").style.display = "flex";
-            } catch(e) { alert("خطأ في البيانات"); }
+            } catch(e) {}
         };
 
         document.getElementById("bkImport").onclick = () => {
-            const c = prompt("أدخل كود الاستعادة:");
+            const c = prompt("كود الاستعادة:");
             if(c) {
                 try {
                     const d = JSON.parse(decodeURIComponent(escape(atob(c))));
-                    if(confirm("تحذير: سيتم استبدال البيانات الحالية. متأكد؟")) {
+                    if(confirm("استعادة البيانات؟")) {
                         localStorage.clear();
                         for(let k in d) localStorage.setItem(k, d[k]);
-                        alert("✅ تمت الاستعادة بنجاح"); location.reload();
+                        alert("✅ تم"); location.reload();
                     }
-                } catch(e) { alert("❌ الكود غير صالح"); }
+                } catch(e) { alert("❌ خطأ"); }
             }
         };
     };
 })();
 </script>
 <script>
+    // إلغاء تفعيل الخدمة مؤقتاً لضمان وصول التحديث
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-            .then(() => console.log('System Ready Offline'))
-            .catch(err => console.log('SW Error', err));
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+                registration.unregister();
+            } 
+        });
     }
 </script>
 </body>
