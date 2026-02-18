@@ -3,244 +3,308 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 Loader</title>
+<title>System 2026 Pro [SECURE]</title>
 <style>
-    body {
-        background-color: #0d1117;
-        color: #c9d1d9;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        margin: 0;
-        user-select: none;
-    }
-    .loader-container {
-        text-align: center;
-        padding: 20px;
-        background: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        width: 85%;
-        max-width: 320px;
-    }
-    .loader {
-        border: 4px solid #30363d;
-        border-top: 4px solid #238636;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 15px auto;
-    }
-    .status-text {
-        font-size: 13px;
-        color: #8b949e;
-        margin-bottom: 10px;
-    }
-    .progress-bar {
-        width: 100%;
-        background-color: #30363d;
-        border-radius: 4px;
-        height: 6px;
-        overflow: hidden;
-        margin-top: 10px;
-        display: none;
-    }
-    .progress-fill {
-        height: 100%;
-        background-color: #238636;
-        width: 0%;
-        transition: width 0.3s;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    /* تصميم الواجهة - Dark Mode UI */
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none;overflow:hidden}
+    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:0.3s}
+    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:2px;box-sizing:border-box}
+    input:focus{border-color:#58a6ff;box-shadow:0 0 5px rgba(88,166,255,0.3)}
+    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;transition:0.2s;position:relative;overflow:hidden}
+    button.main-btn:active{transform:scale(0.98)}
+    button.main-btn:disabled{background:#30363d;cursor:not-allowed;color:#8b949e}
+    .logout-btn{background:#da3633;color:white;border:none;padding:6px 12px;font-size:12px;font-weight:bold;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px}
+    .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px;animation:shake 0.3s;background:rgba(218,54,51,0.1);padding:5px;border-radius:4px;border:1px solid rgba(218,54,51,0.3)}
+    #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
+    .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;border-bottom:1px solid #30363d;padding-bottom:15px}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
+    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;text-decoration:none;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;transition:0.2s;text-align:center;-webkit-tap-highlight-color:transparent}
+    .app-btn:active{background:#30363d;transform:scale(0.95)}
+    .icon{font-size:28px;margin-bottom:8px}
+    .backup-area{margin-top:20px;padding-top:15px;border-top:1px dashed #30363d;display:flex;flex-direction:column;gap:10px}
+    .bk-btn{width:100%;padding:12px;border-radius:6px;border:none;color:white;font-weight:bold;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-export{background:#1f6feb}
+    .btn-import{background:#8b949e}
+    .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+    .modal-box{background:#161b22;border:1px solid #30363d;padding:20px;border-radius:10px;width:100%;max-width:350px;text-align:center}
+    textarea.code-box{width:100%;height:120px;background:#0d1117;color:#58a6ff;border:1px solid #30363d;border-radius:5px;padding:10px;font-size:10px;resize:none;margin:10px 0;box-sizing:border-box}
+    .loader{border:3px solid #f3f3f3;border-top:3px solid #238636;border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;display:none;margin:0 auto}
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
 </style>
 </head>
 <body oncontextmenu="return false">
 
-    <div class="loader-container">
-        <div class="loader" id="spinner"></div>
-        <h3 style="margin:0 0 10px 0; color:#fff">نظام 2026</h3>
-        <div class="status-text" id="status">جاري الاتصال...</div>
-        <div class="progress-bar" id="pBar"><div class="progress-fill" id="pFill"></div></div>
+<!-- شاشة القفل -->
+<div id="lock-screen">
+    <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
+    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
+    <p style="font-size:11px;color:#8b949e;">Hybrid Secure Access</p>
+    <p id="devID" style="font-size:12px;color:#58a6ff;font-family:monospace;margin:10px 0;background:#0d1117;padding:5px;border-radius:4px;border:1px dashed #30363d"></p>
+    <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
+    <button class="main-btn" id="loginBtn">
+        <span id="btnText">تحقق ودخول</span>
+        <div class="loader" id="btnLoad"></div>
+    </button>
+    <p id="eMsg" class="error">⛔ الكود غير صحيح!</p>
+    <p id="banMsg" class="error" style="color:#da3633;">🚫 تم حظر هذا الجهاز!</p>
+</div>
+
+<!-- القائمة -->
+<div id="app-menu">
+    <div class="menu-header">
+        <h2 style="margin:0; font-size:18px; color:#fff;">الرئيسية</h2>
+        <button id="logoutBtn" class="logout-btn"><span>خروج</span> 🚪</button>
     </div>
+    <div class="grid">
+        <div class="app-btn" onclick="go('Nabatshia.html')"><span class="icon">📅</span>النبطشية</div>
+        <div class="app-btn" onclick="go('2.html')"><span class="icon">🌙</span>الورديات</div>
+        <div class="app-btn" onclick="go('3.html')"><span class="icon">⚖️</span>التصفيات</div>
+        <div class="app-btn" onclick="go('4.html')"><span class="icon">📝</span>اللمات</div>
+        <div class="app-btn" onclick="go('5.html')"><span class="icon">🌊</span>التدفق</div>
+        <div class="app-btn" onclick="go('6.html')"><span class="icon">🏗️</span>المهيئ والمواسير</div>
+    </div>
+    <div class="backup-area">
+        <button class="bk-btn btn-export" id="bkExport">📤 حفظ نسخة من البيانات</button>
+        <button class="bk-btn btn-import" id="bkImport">📥 استرجاع البيانات</button>
+    </div>
+</div>
+
+<!-- نافذة النسخ -->
+<div id="exportModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 style="margin:0 0 10px 0;color:#fff">📦 كود النسخ الاحتياطي</h3>
+        <textarea class="code-box" id="exportBox" readonly></textarea>
+        <button class="main-btn" onclick="_cp()" style="margin-bottom:10px">نسخ الكود 📋</button>
+        <button class="bk-btn" onclick="document.getElementById('exportModal').style.display='none'" style="background:transparent;border:1px solid #da3633;color:#da3633">إغلاق</button>
+    </div>
+</div>
 
 <script>
-    // ============================================================
-    // الإعدادات
-    // ============================================================
-    const REPO_URL = "https://raw.githubusercontent.com/minaibrahimfawzy-droid/Manzoma-pro/main/";
+/* 
+   SYSTEM 2026 - SECURITY CORE v2
+   Features: Password Rotation, Telegram Logs, Persistent Banning
+*/
+(function(){
+    // إعدادات التشفير والاتصال
+    const _k = {
+        t: atob("ODU5Njk5Mzc0NTpBQUcwRlhIOExGcXdlTEg1bmxQVGNGcEVNMDdCSGhhYnJIdw=="), // Bot Token
+        g: atob("LTEwMDM4ODY1MjgxMTQ="), // Chat ID
+        s: atob("QWRtaW5fMjZf"), // Salt Key
+        u: localStorage.getItem("_u_id") || "ID-" + Math.floor(Math.random() * 8999 + 1000) // Device ID
+    };
     
-    // أسماء ملفاتك
-    const APP_FILES = [
-        "home.html", 
-        "Nabatshia.html", 
-        "2.html", 
-        "3.html", 
-        "4.html", 
-        "5.html", 
-        "6.html"
-    ];
+    // مصفوفة الباسوردات المتغيرة زمنياً
+    const _p = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
 
-    // ============================================================
-    // 1. كود إصلاح الشاشة (عشان الكلام ميكبرش)
-    // ============================================================
-    const FIX_LAYOUT = '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">';
+    // حفظ ID الجهاز لثباته
+    if(!localStorage.getItem("_u_id")) localStorage.setItem("_u_id", _k.u);
+    document.getElementById("devID").innerText = _k.u;
 
-    // ============================================================
-    // 2. كود زر الرجوع (HTML ثابت)
-    // ============================================================
-    // الزر ده هيتحط في كل الصفحات ما عدا home.html
-    const HOME_BTN = `
-        <div id="sys-home-floater" onclick="window.go('home.html')" 
-             style="position:fixed; bottom:20px; left:20px; width:55px; height:55px; 
-             background:#238636; color:white; border-radius:50%; 
-             text-align:center; line-height:55px; font-size:28px; 
-             box-shadow: 0 5px 15px rgba(0,0,0,0.6); z-index:2147483647 !important; 
-             cursor:pointer; border: 2px solid #fff; display:block;">
-             🏠
-        </div>
-    `;
+    // دالة تحديد الباسورد بناءً على السنة
+    const _gp = () => {
+        const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
+        let i = (y - 2026) * 2;
+        if (d.getMonth() >= 5) i += 1; 
+        return _p[i % 5];
+    };
 
-    // ============================================================
-    // 3. سكربت التشغيل والتنقل
-    // ============================================================
-    const LOGIC_SCRIPT = `
-    <script>
-        window.go = function(pageName) {
-            // توجيه index لـ home
-            if(pageName === "index.html" || pageName === "home.html") {
-                pageName = "home.html";
-                // مسح الهيستوري عشان لو داس رجوع وهو في الرئيسية يخرج أو يقف مكانه
-                history.replaceState(null, null, " ");
-            } else {
-                // لو صفحة فرعية، سجلها في التاريخ
-                history.pushState({p: pageName}, null, "#"+pageName);
-            }
-
-            const storedPage = localStorage.getItem("sys_file_" + pageName);
-            if(storedPage) {
-                document.open();
-                document.write(storedPage);
-                document.close();
-            } else {
-                window.go("home.html");
-            }
-        };
-
-        // منع الخروج عند الضغط على زر الرجوع في الموبايل
-        window.onpopstate = function(event) {
-            window.go("home.html");
-        };
-
-        document.oncontextmenu = function(){return false;};
-    <\/script>
-    `;
-
-    // ============================================================
-    // دالة التحميل
-    // ============================================================
-    const uiStatus = document.getElementById("status");
-    const uiPBar = document.getElementById("pBar");
-    const uiPFill = document.getElementById("pFill");
-
-    async function bootSystem() {
+    // دالة إرسال التقارير للتليجرام
+    const _snd = async (act, xtra = "") => {
+        if (!navigator.onLine) return; // لا ترسل في وضع الأوفلاين
         
-        // خطوة مهمة: مسح النسخة القديمة لإجبار التحديث وحل المشاكل
-        // السطر ده هيشتغل مرة واحدة بس عشان نضمن إن الملفات اتصلحت
-        if(!sessionStorage.getItem("repair_done")) {
-            localStorage.removeItem("sys_version");
-            sessionStorage.setItem("repair_done", "true");
-        }
+        let ip = "N/A";
+        let dev = "Unknown";
+        
+        // محاولة جلب IP (مع مهلة 2 ثانية)
+        try {
+            const c = new AbortController();
+            setTimeout(() => c.abort(), 2000);
+            const r = await fetch('https://api.ipify.org?format=json', {signal: c.signal});
+            const j = await r.json();
+            ip = j.ip;
+        } catch(e) { ip = "Hidden/Offline"; }
 
-        let localVer = parseFloat(localStorage.getItem("sys_version")) || 0;
+        // تحديد نوع الجهاز
+        const ua = navigator.userAgent;
+        if(ua.match(/Android/i)) dev = "Android 📱";
+        else if(ua.match(/iPhone|iPad/i)) dev = "iOS 🍏";
+        else if(ua.match(/Windows/i)) dev = "PC/Laptop 💻";
+        else dev = "Mobile 🌐";
 
-        if (navigator.onLine) {
-            try {
-                // طلب ملف الإصدار
-                const vResponse = await fetch(REPO_URL + "version.json?t=" + Date.now());
-                if (vResponse.ok) {
-                    const vData = await vResponse.json();
-                    const remoteVer = parseFloat(vData.version);
+        // تنسيق الرسالة
+        const txt = encodeURIComponent(
+            "🚨 <b>SYSTEM LOGIN LOG</b>\n" +
+            "➖➖➖➖➖➖➖➖\n" +
+            "👤 <b>ID:</b> <code>" + _k.u + "</code>\n" +
+            "🔑 <b>Action:</b> " + act + "\n" +
+            "📡 <b>IP:</b> " + ip + "\n" +
+            "📱 <b>Device:</b> " + dev + "\n" +
+            "🕒 <b>Time:</b> " + new Date().toLocaleString('ar-EG') + "\n" +
+            xtra
+        );
 
-                    // لو فيه تحديث أو لو دي أول مرة بعد المسح
-                    if (remoteVer > localVer || localVer === 0) {
-                        uiStatus.innerText = `جاري إصلاح الملفات وتحديث النظام...`;
-                        uiPBar.style.display = "block";
-                        
-                        let count = 0;
-                        for (const fileName of APP_FILES) {
-                            count++;
-                            uiStatus.innerText = `معالجة: ${fileName}`;
-                            uiPFill.style.width = Math.round((count / APP_FILES.length) * 100) + "%";
-                            
-                            const fResponse = await fetch(REPO_URL + fileName + "?t=" + Date.now());
-                            if (!fResponse.ok) throw new Error("فشل: " + fileName);
-                            
-                            let content = await fResponse.text();
+        // إرسال للبوت
+        try {
+            fetch("https://api.telegram.org/bot" + _k.t + "/sendMessage?chat_id=" + _k.g + "&text=" + txt + "&parse_mode=HTML");
+        } catch(e) {}
+    };
 
-                            // ----------------------------------------------------
-                            // 1. إصلاح مشكلة الحجم الكبير (نضيف Viewport غصب عن الملف)
-                            // ----------------------------------------------------
-                            if (!content.includes("viewport")) {
-                                // بنحطه في أول الملف عشان المتصفح يشوفه فوراً
-                                content = FIX_LAYOUT + content;
-                            }
+    // دالة فحص الحظر (محلي + تليجرام)
+    const _chk = async () => {
+        // 1. الفحص المحلي أولاً (للحماية من قطع النت)
+        if (localStorage.getItem("_ban_flag") === "1") return "BAN";
 
-                            // ----------------------------------------------------
-                            // 2. إضافة السكربت الأساسي لكل الملفات
-                            // ----------------------------------------------------
-                            if(content.includes("</body>")) {
-                                content = content.replace("</body>", LOGIC_SCRIPT + "</body>");
-                            } else {
-                                content += LOGIC_SCRIPT;
-                            }
+        // 2. إذا لا يوجد نت، اسمح بالدخول طالما لا يوجد حظر محلي
+        if (!navigator.onLine) return "OK";
 
-                            // ----------------------------------------------------
-                            // 3. إضافة زر الرجوع (لكل الملفات ما عدا الرئيسية)
-                            // ----------------------------------------------------
-                            if (fileName !== "home.html") {
-                                // بنضيف الزر كـ HTML مباشر
-                                if(content.includes("</body>")) {
-                                    content = content.replace("</body>", HOME_BTN + "</body>");
-                                } else {
-                                    content += HOME_BTN;
-                                }
-                            }
+        try {
+            // مهلة 3 ثواني للاتصال بالسيرفر
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-                            localStorage.setItem("sys_file_" + fileName, content);
-                        }
-                        
-                        localStorage.setItem("sys_version", remoteVer);
-                        uiStatus.innerText = "✅ تم الإصلاح والتحديث!";
-                        await new Promise(r => setTimeout(r, 800));
-                    }
+            // جلب وصف المجموعة من تليجرام
+            const r = await fetch("https://api.telegram.org/bot" + _k.t + "/getChat?chat_id=" + _k.g + "&v=" + Date.now(), { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            const j = await r.json();
+            if (j.ok && j.result.description) {
+                let d = j.result.description.toUpperCase().replace(/\s/g, ''); // تنظيف النص
+                let uid = _k.u.toUpperCase().replace(/\s/g, '');
+                
+                // فحص القفل العام
+                if (d.includes("⛔")) return "LOCK";
+                
+                // فحص حظر الـ ID الخاص بالجهاز
+                if (d.includes("BAN:" + uid) || d.includes("BAN" + uid)) {
+                    localStorage.setItem("_ban_flag", "1"); // تسجيل الحظر محلياً للأبد
+                    return "BAN";
+                } else {
+                    // إذا لم يعد محظوراً، قم بفك الحظر المحلي
+                    localStorage.removeItem("_ban_flag");
                 }
-            } catch (err) {
-                console.log("Error", err);
-                uiStatus.innerText = "فشل الاتصال، جاري المحاولة...";
             }
+        } catch(e) {
+            // في حالة فشل الاتصال، اعتمد على الحالة المحلية
+            return localStorage.getItem("_ban_flag") === "1" ? "BAN" : "OK";
+        }
+        return "OK";
+    };
+
+    // دالة تنفيذ الدخول
+    const _doL = async () => {
+        const inp = document.getElementById("pIn");
+        const val = inp.value.trim();
+
+        if(val.length < 1) { inp.focus(); return; }
+
+        // تحويل الأرقام العربية وقفل التشفير
+        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        const hash = btoa(_k.s + enVal);
+        const truePass = _gp();
+
+        const b = document.getElementById("loginBtn");
+        const l = document.getElementById("btnLoad");
+        const t = document.getElementById("btnText");
+        const e = document.getElementById("eMsg");
+        const m = document.getElementById("banMsg");
+
+        e.style.display="none"; m.style.display="none";
+        b.disabled=true; t.style.display="none"; l.style.display="block";
+
+        // 1. التحقق من صحة الباسورد
+        if (hash !== truePass) {
+            setTimeout(() => {
+                _snd("WRONG_PASS", "⛔ Tried Pass: " + enVal);
+                l.style.display="none"; t.style.display="block"; b.disabled=false;
+                e.style.display="block";
+            }, 800);
+            return;
         }
 
-        // تشغيل الصفحة الرئيسية
-        setTimeout(() => {
-            const startPage = localStorage.getItem("sys_file_home.html");
-            if (startPage) {
-                document.open();
-                document.write(startPage);
-                document.close();
-            } else {
-                // لو مفيش نت والملفات مش موجودة
-                uiPBar.style.display = "none";
-                uiStatus.innerHTML = "<span style='color:#da3633; font-weight:bold;'>⚠️ خطأ: يجب توصيل الإنترنت لإصلاح الملفات</span>";
-            }
-        }, 1000);
-    }
+        // 2. التحقق من الحظر
+        const st = await _chk();
+        
+        l.style.display="none"; t.style.display="block"; b.disabled=false;
 
-    bootSystem();
+        if (st !== "OK") {
+            m.innerText = (st === "LOCK") ? "⛔ النظام مغلق للصيانة" : "🚫 تم حظر جهازك نهائياً!";
+            m.style.display="block";
+            localStorage.removeItem("_tkn_auth");
+            _snd("BLOCKED_ACCESS", "Status: " + st); // إبلاغ بمحاولة دخول المحظور
+        } else {
+            localStorage.setItem("_tkn_auth", hash);
+            _ui(true);
+            _snd("SUCCESS_LOGIN", "✅ User Logged In");
+        }
+    };
+
+    const _ui = (isLog) => {
+        document.getElementById("lock-screen").style.display = isLog ? "none" : "block";
+        document.getElementById("app-menu").style.display = isLog ? "block" : "none";
+    };
+
+    // دوال النسخ والتنقل
+    window._cp = () => { document.getElementById("exportBox").select(); document.execCommand("copy"); alert("✅ تم النسخ"); };
+    window.go = (u) => window.location.href = u;
+
+    // تشغيل عند التحميل
+    window.onload = () => {
+        // إذا كان مسجل دخول سابقاً
+        if (localStorage.getItem("_tkn_auth") === _gp()) {
+            _chk().then(st => {
+                if(st === "OK") {
+                    _ui(true);
+                } else {
+                    localStorage.removeItem("_tkn_auth");
+                    _ui(false);
+                    document.getElementById("banMsg").style.display = "block";
+                }
+            });
+        }
+
+        document.getElementById("loginBtn").onclick = _doL;
+        document.getElementById("pIn").addEventListener("keypress", (e) => { if(e.key === 'Enter') _doL(); });
+
+        document.getElementById("logoutBtn").onclick = () => {
+            if(confirm("هل تود الخروج؟")) {
+                localStorage.removeItem("_tkn_auth");
+                location.reload();
+            }
+        };
+
+        // أكواد النسخ الاحتياطي
+        document.getElementById("bkExport").onclick = () => {
+            try {
+                const d = btoa(unescape(encodeURIComponent(JSON.stringify(localStorage))));
+                document.getElementById("exportBox").value = d;
+                document.getElementById("exportModal").style.display = "flex";
+            } catch(e) { alert("خطأ في البيانات"); }
+        };
+
+        document.getElementById("bkImport").onclick = () => {
+            const c = prompt("أدخل كود الاستعادة:");
+            if(c) {
+                try {
+                    const d = JSON.parse(decodeURIComponent(escape(atob(c))));
+                    if(confirm("تحذير: سيتم استبدال البيانات الحالية. متأكد؟")) {
+                        localStorage.clear();
+                        for(let k in d) localStorage.setItem(k, d[k]);
+                        alert("✅ تمت الاستعادة بنجاح"); location.reload();
+                    }
+                } catch(e) { alert("❌ الكود غير صالح"); }
+            }
+        };
+    };
+})();
+</script>
+<script>
+    // تسجيل Service Worker ليعمل التطبيق Offline
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('System Ready Offline'))
+            .catch(err => console.log('SW Error', err));
+    }
 </script>
 </body>
 </html>
