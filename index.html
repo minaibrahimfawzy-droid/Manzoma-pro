@@ -3,34 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 Pro [V42]</title>
+<title>System 2026 Pro [FINAL]</title>
 <style>
-    /* تصميم الواجهة */
-    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none;overflow:hidden}
-    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:0.3s}
-    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:2px;box-sizing:border-box}
-    input:focus{border-color:#58a6ff;box-shadow:0 0 5px rgba(88,166,255,0.3)}
-    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;transition:0.2s;position:relative;overflow:hidden}
+    /* UI Design */
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
+    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:1px}
+    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px;transition:0.2s}
     button.main-btn:active{transform:scale(0.98)}
-    button.main-btn:disabled{background:#30363d;cursor:not-allowed;color:#8b949e}
-    .logout-btn{background:#da3633;color:white;border:none;padding:6px 12px;font-size:12px;font-weight:bold;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px}
-    .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px;animation:shake 0.3s;background:rgba(218,54,51,0.1);padding:5px;border-radius:4px;border:1px solid rgba(218,54,51,0.3)}
+    button.main-btn:disabled{background:#30363d;color:#8b949e;cursor:not-allowed}
+    .info-box {background:#0d1117; padding:10px; border-radius:8px; border:1px dashed #30363d; margin: 15px 0; text-align:center;}
+    .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px}
     #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
-    .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;border-bottom:1px solid #30363d;padding-bottom:15px}
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
-    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;text-decoration:none;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;transition:0.2s;text-align:center;-webkit-tap-highlight-color:transparent}
-    .app-btn:active{background:#30363d;transform:scale(0.95)}
-    .icon{font-size:28px;margin-bottom:8px}
-    .backup-area{margin-top:20px;padding-top:15px;border-top:1px dashed #30363d;display:flex;flex-direction:column;gap:10px}
-    .bk-btn{width:100%;padding:12px;border-radius:6px;border:none;color:white;font-weight:bold;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
-    .btn-export{background:#1f6feb}
-    .btn-import{background:#8b949e}
-    .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
-    .modal-box{background:#161b22;border:1px solid #30363d;padding:20px;border-radius:10px;width:100%;max-width:350px;text-align:center}
-    textarea.code-box{width:100%;height:120px;background:#0d1117;color:#58a6ff;border:1px solid #30363d;border-radius:5px;padding:10px;font-size:10px;resize:none;margin:10px 0;box-sizing:border-box}
-    .loader{border:3px solid #f3f3f3;border-top:3px solid #238636;border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;display:none;margin:0 auto}
-    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-    @keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-decoration:none}
+    /* Loader */
+    .loader {border: 3px solid #f3f3f3; border-top: 3px solid #238636; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display:none; margin:0 auto;}
+    @keyframes spin {0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}
 </style>
 </head>
 <body oncontextmenu="return false">
@@ -38,282 +27,177 @@
 <!-- شاشة القفل -->
 <div id="lock-screen">
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
-    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
-    <p style="font-size:11px;color:#8b949e;">Live Connection v42</p>
+    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026</h2>
+    <p style="font-size:11px;color:#8b949e;">Secure Access V44</p>
     
-    <!-- منطقة بيانات المستخدم -->
-    <div style="background:#0d1117;padding:10px;border-radius:6px;border:1px dashed #30363d;margin:15px 0;">
-        <p style="margin:0;color:#8b949e;font-size:11px">المستخدم الحالي:</p>
-        <p id="devNameDisp" style="margin:5px 0 0 0;color:#238636;font-weight:bold;font-size:15px;">...</p>
-        <p id="devID" style="margin:5px 0 0 0;font-size:10px;color:#58a6ff;font-family:monospace;"></p>
+    <!-- عرض بيانات المستخدم -->
+    <div class="info-box">
+        <p style="margin:0;font-size:10px;color:#8b949e">User Identity:</p>
+        <p id="dispName" style="margin:5px 0;color:#238636;font-weight:bold;font-size:15px">...</p>
+        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace"></p>
     </div>
 
     <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
+    
     <button class="main-btn" id="loginBtn">
-        <span id="btnText">تحقق ودخول</span>
-        <div class="loader" id="btnLoad"></div>
+        <span id="btnTxt">تسجيل الدخول</span>
+        <div class="loader" id="ldr"></div>
     </button>
-    <p id="eMsg" class="error">⛔ الكود غير صحيح!</p>
-    <p id="banMsg" class="error" style="color:#da3633;">🚫 تم حظر هذا الجهاز!</p>
+    
+    <p id="errMsg" class="error">⛔ الكود غير صحيح!</p>
 </div>
 
-<!-- القائمة -->
+<!-- القائمة الرئيسية -->
 <div id="app-menu">
-    <div class="menu-header">
-        <h2 style="margin:0; font-size:18px; color:#fff;">الرئيسية</h2>
-        <button id="logoutBtn" class="logout-btn"><span>خروج</span> 🚪</button>
-    </div>
+    <h2 style="color:#fff;border-bottom:1px solid #30363d;padding-bottom:15px;margin-top:0">الرئيسية</h2>
     <div class="grid">
-        <div class="app-btn" onclick="go('Nabatshia.html')"><span class="icon">📅</span>النبطشية</div>
-        <div class="app-btn" onclick="go('2.html')"><span class="icon">🌙</span>الورديات</div>
-        <div class="app-btn" onclick="go('3.html')"><span class="icon">⚖️</span>التصفيات</div>
-        <div class="app-btn" onclick="go('4.html')"><span class="icon">📝</span>اللمات</div>
-        <div class="app-btn" onclick="go('5.html')"><span class="icon">🌊</span>التدفق</div>
-        <div class="app-btn" onclick="go('6.html')"><span class="icon">🏗️</span>المهيئ والمواسير</div>
+        <div class="app-btn" onclick="go('Nabatshia.html')">📅 النبطشية</div>
+        <div class="app-btn" onclick="go('2.html')">🌙 الورديات</div>
+        <div class="app-btn" onclick="go('3.html')">⚖️ التصفيات</div>
+        <div class="app-btn" onclick="go('4.html')">📝 اللمات</div>
+        <div class="app-btn" onclick="go('5.html')">🌊 التدفق</div>
+        <div class="app-btn" onclick="go('6.html')">🏗️ المواسير</div>
     </div>
-    <div class="backup-area">
-        <button class="bk-btn btn-export" id="bkExport">📤 حفظ نسخة من البيانات</button>
-        <button class="bk-btn btn-import" id="bkImport">📥 استرجاع البيانات</button>
-    </div>
-</div>
-
-<!-- نافذة النسخ -->
-<div id="exportModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3 style="margin:0 0 10px 0;color:#fff">📦 كود النسخ الاحتياطي</h3>
-        <textarea class="code-box" id="exportBox" readonly></textarea>
-        <button class="main-btn" onclick="_cp()" style="margin-bottom:10px">نسخ الكود 📋</button>
-        <button class="bk-btn" onclick="document.getElementById('exportModal').style.display='none'" style="background:transparent;border:1px solid #da3633;color:#da3633">إغلاق</button>
-    </div>
+    <button class="main-btn" style="background:#da3633" onclick="logout()">تسجيل خروج 🚪</button>
 </div>
 
 <script>
-(function(){
-    // ----------------------------------------------------
-    // 1. نظام تسجيل الاسم (الإجباري)
-    // ----------------------------------------------------
-    let storedName = localStorage.getItem("_user_real_name");
-    
-    // لو مفيش اسم، اطلبه فوراً
-    if (!storedName || storedName.trim() === "") {
-        let isValid = false;
-        while (!isValid) {
-            storedName = prompt("👋 يرجى تسجيل اسمك للدخول للنظام:");
-            if (storedName && storedName.trim().length > 1) {
-                isValid = true;
-                localStorage.setItem("_user_real_name", storedName.trim());
-            }
-        }
+    // ==========================================
+    // 1. تنظيف الذاكرة القديمة (Service Worker Cleaner)
+    // ==========================================
+    if(window.navigator && navigator.serviceWorker) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) { registration.unregister(); }
+        });
     }
 
-    // ----------------------------------------------------
-    // 2. إعدادات النظام
-    // ----------------------------------------------------
-    const CONFIG = {
-        // تم وضع التوكن مباشرة لتجنب أخطاء التشفير
-        botToken: "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw",
-        chatId: "-1003886528114",
-        salt: "Admin_26_",
-        uuid: localStorage.getItem("_u_id") || "ID-" + Math.floor(Math.random() * 8999 + 1000),
-        name: localStorage.getItem("_user_real_name")
-    };
+    // ==========================================
+    // 2. إعدادات المستخدم والاسم
+    // ==========================================
+    let uName = localStorage.getItem("real_name");
+    let uID = localStorage.getItem("device_id");
 
-    // حفظ الـ ID لو مش موجود
-    if(!localStorage.getItem("_u_id")) localStorage.setItem("_u_id", CONFIG.uuid);
+    // لو مفيش ID، اعمل واحد جديد
+    if(!uID) {
+        uID = "ID-" + Math.floor(Math.random() * 9000 + 1000);
+        localStorage.setItem("device_id", uID);
+    }
 
-    // عرض البيانات في الواجهة
-    document.getElementById("devNameDisp").innerText = CONFIG.name;
-    document.getElementById("devID").innerText = CONFIG.uuid;
+    // لو مفيش اسم، اطلبه فوراً ولا تغلق النافذة إلا لما يكتبه
+    if(!uName || uName === "null" || uName.trim() === "") {
+        while(!uName) {
+            uName = prompt("👋 مرحباً بك في نظام 2026\n\nيرجى كتابة اسمك الحقيقي لتفعيل الدخول:");
+        }
+        localStorage.setItem("real_name", uName);
+    }
 
-    // مصفوفة الباسوردات
-    const PASSWORDS = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+    // عرض البيانات
+    document.getElementById("dispName").innerText = uName;
+    document.getElementById("dispID").innerText = uID;
 
-    const getTruePass = () => {
+    // ==========================================
+    // 3. نظام الإرسال "المخفي" (The Magic Trick)
+    // ==========================================
+    function sendTelegramLog(action, details) {
+        const TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+        const CHAT_ID = "-1003886528114";
+        
+        // تجهيز الرسالة
+        const text = `🚨 <b>SYSTEM LOGIN</b>\n` +
+                     `👤 <b>Name:</b> ${uName}\n` +
+                     `🆔 <b>ID:</b> ${uID}\n` +
+                     `🔑 <b>Action:</b> ${action}\n` +
+                     `📝 <b>Details:</b> ${details}\n` +
+                     `⏰ <b>Time:</b> ${new Date().toLocaleTimeString('ar-EG')}`;
+
+        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
+
+        // الخدعة: استخدام صورة لإرسال الطلب (لا يتأثر بحظر المتصفح CORS)
+        const img = new Image();
+        img.src = url;
+        
+        // مش محتاجين نستنى الرد، الرسالة هتوصل أكيد
+    }
+
+    // ==========================================
+    // 4. نظام الباسورد والدخول
+    // ==========================================
+    const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+    const SALT = "Admin_26_";
+
+    function getCorrectPass() {
         const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
         let i = (y - 2026) * 2;
         if (d.getMonth() >= 5) i += 1; 
-        return PASSWORDS[i % 5];
-    };
+        return passList[i % 5]; // الباسورد المتغير
+    }
 
-    // ----------------------------------------------------
-    // 3. دالة الإرسال (GET Method - المضمونة)
-    // ----------------------------------------------------
-    const sendToTelegram = async (action, extraInfo = "") => {
-        if (!navigator.onLine) return; // لو مفيش نت، متعملش حاجة
-
-        // تجهيز الرسالة
-        let msg = `🚨 <b>SYSTEM LOG</b>%0A` +
-                  `👤 <b>Name:</b> ${encodeURIComponent(CONFIG.name)}%0A` +
-                  `🆔 <b>ID:</b> <code>${CONFIG.uuid}</code>%0A` +
-                  `🔑 <b>Action:</b> ${action}%0A` +
-                  `📅 <b>Time:</b> ${new Date().toLocaleString('en-GB')}%0A` +
-                  `${extraInfo}`;
-
-        // الرابط المباشر (تجاوز مشاكل CORS باستخدام GET)
-        const url = `https://api.telegram.org/bot${CONFIG.botToken}/sendMessage?chat_id=${CONFIG.chatId}&text=${msg}&parse_mode=HTML`;
-
-        try {
-            // استخدام fetch mode: 'no-cors' لإرسال الطلب حتى لو المتصفح معترض
-            // ملحوظة: no-cors بتخليك تبعت بس متقدرش تقرأ الرد، وده كافي لينا
-            await fetch(url, { mode: 'no-cors' });
-            console.log("Msg Sent");
-        } catch (error) {
-            console.error("Failed:", error);
-        }
-    };
-
-    // ----------------------------------------------------
-    // 4. فحص الحظر
-    // ----------------------------------------------------
-    const checkBanStatus = async () => {
-        if (localStorage.getItem("_ban_flag") === "1") return "BAN";
-        if (!navigator.onLine) return "OK";
-
-        try {
-            // محاولة جلب وصف الجروب
-            const r = await fetch(`https://api.telegram.org/bot${CONFIG.botToken}/getChat?chat_id=${CONFIG.chatId}`);
-            const j = await r.json();
-            
-            if (j.ok && j.result.description) {
-                let desc = j.result.description.toUpperCase().replace(/\s/g, ''); 
-                let myID = CONFIG.uuid.toUpperCase().replace(/\s/g, '');
-                
-                if (desc.includes("⛔")) return "LOCK";
-                if (desc.includes("BAN:" + myID) || desc.includes("BAN" + myID)) {
-                    localStorage.setItem("_ban_flag", "1"); 
-                    return "BAN";
-                } else {
-                    localStorage.removeItem("_ban_flag");
-                }
-            }
-        } catch(e) {
-            // لو فشل الاتصال، اعتمد على الذاكرة المحلية
-            return localStorage.getItem("_ban_flag") === "1" ? "BAN" : "OK";
-        }
-        return "OK";
-    };
-
-    // ----------------------------------------------------
-    // 5. تنفيذ الدخول
-    // ----------------------------------------------------
-    const handleLogin = async () => {
+    document.getElementById("loginBtn").onclick = function() {
         const inp = document.getElementById("pIn");
         const val = inp.value.trim();
-
-        if(val.length < 1) { inp.focus(); return; }
-
-        // تحويل الأرقام العربية
-        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
-        const hash = btoa(CONFIG.salt + enVal);
-        const truePass = getTruePass();
-
         const btn = document.getElementById("loginBtn");
-        const loader = document.getElementById("btnLoad");
-        const btnTxt = document.getElementById("btnText");
-        const errMsg = document.getElementById("eMsg");
-        const banMsg = document.getElementById("banMsg");
+        const txt = document.getElementById("btnTxt");
+        const ldr = document.getElementById("ldr");
+        const err = document.getElementById("errMsg");
 
-        // UI Loading
-        errMsg.style.display="none"; banMsg.style.display="none";
-        btn.disabled=true; btnTxt.style.display="none"; loader.style.display="block";
+        if(val.length < 1) return;
 
-        // 1. تحقق من الباسورد
-        if (hash !== truePass) {
-            // إرسال تنبيه محاولة خاطئة
-            sendToTelegram("WRONG_PASS", `🚫 Pass: ${enVal}`);
-            
-            setTimeout(() => {
-                loader.style.display="none"; btnTxt.style.display="block"; btn.disabled=false;
-                errMsg.style.display="block";
-            }, 500);
-            return;
-        }
+        // تشغيل التحميل
+        btn.disabled = true;
+        txt.style.display = "none";
+        ldr.style.display = "block";
+        err.style.display = "none";
 
-        // 2. تحقق من الحظر
-        const status = await checkBanStatus();
-        
-        loader.style.display="none"; btnTxt.style.display="block"; btn.disabled=false;
+        // تشفير المدخل للمقارنة
+        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)); // تحويل أرقام عربي
+        const inputHash = btoa(SALT + enVal);
+        const correctHash = getCorrectPass();
 
-        if (status !== "OK") {
-            banMsg.innerText = (status === "LOCK") ? "⛔ النظام مغلق للصيانة" : "🚫 جهازك محظور!";
-            banMsg.style.display="block";
-            localStorage.removeItem("_tkn_auth");
-            sendToTelegram("BLOCKED_LOGIN", `Status: ${status}`);
-        } else {
-            localStorage.setItem("_tkn_auth", hash);
-            toggleUI(true);
-            sendToTelegram("SUCCESS_LOGIN", "✅ Access Granted");
-        }
-    };
-
-    const toggleUI = (isLoggedIn) => {
-        document.getElementById("lock-screen").style.display = isLoggedIn ? "none" : "block";
-        document.getElementById("app-menu").style.display = isLoggedIn ? "block" : "none";
-    };
-
-    // دوال مساعدة
-    window._cp = () => { document.getElementById("exportBox").select(); document.execCommand("copy"); alert("✅ تم النسخ"); };
-    window.go = (u) => window.location.href = u;
-
-    // تشغيل عند التحميل
-    window.onload = () => {
-        // لو مسجل دخول من قبل
-        if (localStorage.getItem("_tkn_auth") === getTruePass()) {
-            checkBanStatus().then(st => {
-                if(st === "OK") {
-                    toggleUI(true);
-                } else {
-                    localStorage.removeItem("_tkn_auth");
-                    toggleUI(false);
-                    document.getElementById("banMsg").style.display = "block";
-                }
-            });
-        }
-
-        document.getElementById("loginBtn").onclick = handleLogin;
-        document.getElementById("pIn").addEventListener("keypress", (e) => { if(e.key === 'Enter') handleLogin(); });
-
-        document.getElementById("logoutBtn").onclick = () => {
-            if(confirm("خروج؟")) {
-                localStorage.removeItem("_tkn_auth");
-                location.reload();
+        // تأخير بسيط لمحاكاة الاتصال
+        setTimeout(() => {
+            if(inputHash === correctHash) {
+                // 1. إرسال اللوج للتليجرام
+                sendTelegramLog("✅ SUCCESS", "Login Successful");
+                
+                // 2. فتح النظام
+                localStorage.setItem("is_logged_in", "true");
+                showApp();
+            } else {
+                // 1. إرسال محاولة فاشلة
+                sendTelegramLog("⛔ FAILED", "Wrong Pass: " + enVal);
+                
+                // 2. إظهار الخطأ
+                btn.disabled = false;
+                txt.style.display = "block";
+                ldr.style.display = "none";
+                err.style.display = "block";
+                inp.value = "";
             }
-        };
-
-        // إدارة النسخ الاحتياطي
-        document.getElementById("bkExport").onclick = () => {
-            try {
-                const d = btoa(unescape(encodeURIComponent(JSON.stringify(localStorage))));
-                document.getElementById("exportBox").value = d;
-                document.getElementById("exportModal").style.display = "flex";
-            } catch(e) {}
-        };
-
-        document.getElementById("bkImport").onclick = () => {
-            const c = prompt("كود الاستعادة:");
-            if(c) {
-                try {
-                    const d = JSON.parse(decodeURIComponent(escape(atob(c))));
-                    if(confirm("استعادة البيانات؟")) {
-                        localStorage.clear();
-                        for(let k in d) localStorage.setItem(k, d[k]);
-                        alert("✅ تم"); location.reload();
-                    }
-                } catch(e) { alert("❌ خطأ"); }
-            }
-        };
+        }, 1500);
     };
-})();
-</script>
-<script>
-    // إلغاء تفعيل الخدمة مؤقتاً لضمان وصول التحديث
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
-                registration.unregister();
-            } 
-        });
+
+    function showApp() {
+        document.getElementById("lock-screen").style.display = "none";
+        document.getElementById("app-menu").style.display = "block";
     }
+
+    // ==========================================
+    // 5. التشغيل التلقائي
+    // ==========================================
+    window.go = (u) => window.location.href = u;
+    window.logout = () => {
+        if(confirm("تأكيد الخروج؟")) {
+            localStorage.removeItem("is_logged_in");
+            location.reload();
+        }
+    };
+
+    // لو كان مسجل دخول، افتح علطول (بس ابعت تنبيه صامت للتليجرام)
+    if(localStorage.getItem("is_logged_in") === "true") {
+        showApp();
+        sendTelegramLog("🔄 AUTO-LOGIN", "User returned via Cache");
+    }
+
 </script>
 </body>
 </html>
