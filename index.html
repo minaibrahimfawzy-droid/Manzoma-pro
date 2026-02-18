@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 [V70 FINAL]</title>
+<title>System 2026 [SECURE V71]</title>
 <style>
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
@@ -27,17 +27,17 @@
 <div id="lock-screen">
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
     <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026</h2>
-    <p style="font-size:11px;color:#8b949e;">V70 Mandatory Update</p>
+    <p style="font-size:11px;color:#8b949e;">V71 Google Secure Link</p>
     
     <!-- عرض بيانات المستخدم -->
     <div class="info-box">
-        <p style="margin:0;font-size:10px;color:#8b949e">بيانات الجلسة:</p>
+        <p style="margin:0;font-size:10px;color:#8b949e">HOYEIT EL MOSTA5DEM:</p>
         <p id="dispName" style="margin:5px 0;color:#238636;font-weight:bold;font-size:15px">...</p>
         <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace"></p>
-        <p id="dispIP" style="margin:0;font-size:9px;color:#8b949e;margin-top:3px">IP: Checking...</p>
+        <p id="dispIP" style="margin:0;font-size:9px;color:#8b949e;margin-top:5px;">Connecting...</p>
     </div>
 
-    <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
+    <input type="tel" id="pIn" placeholder="Enter Pass Code" maxlength="10">
     
     <button class="main-btn" id="loginBtn">
         <span id="btnTxt">تسجيل الدخول</span>
@@ -63,90 +63,98 @@
 
 <script>
     // =========================================================
-    // 1. الفرمتة الإجبارية (V70 NUCLEAR RESET)
-    // الكود ده هيمسح كل حاجة عشان يجبر القديم والجديد يسجل
+    // ⚠⚠⚠ رابط جوجل سكربت (تم التحديث) ⚠⚠⚠
     // =========================================================
-    const VERSION_KEY = "SYS_V70_RESET";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-bohmfEpKmUd5ZRrVGypb2zt_-0nftppB_UgACU_Oh5zZwbYjeOXYUkEuHOecHV8-vw/exec"; 
     
-    // لو النسخة دي مش متسجلة، امسح كل حاجة واعمل ريلود
-    if(localStorage.getItem(VERSION_KEY) !== "DONE") {
-        console.log("Performing Hard Reset...");
-        localStorage.clear(); // مسح كامل
-        
-        // إلغاء تخزين الملفات (Service Worker)
-        if(window.navigator && navigator.serviceWorker) {
-            navigator.serviceWorker.getRegistrations().then(function(regs) {
-                for(let reg of regs) { reg.unregister(); }
-            });
-        }
-        
-        localStorage.setItem(VERSION_KEY, "DONE");
-        location.reload(); // إعادة تحميل عشان يبدأ من الصفر
+    // =========================================================
+    // 1. الفرمتة الإجبارية (Radical Reset)
+    // =========================================================
+    const STORAGE_KEY_NAME = "sys_v71_realname"; 
+    const STORAGE_KEY_ID = "sys_v71_deviceid";   
+    
+    if(!localStorage.getItem(STORAGE_KEY_NAME)) {
+        localStorage.removeItem("real_name"); 
+        localStorage.removeItem("device_id"); 
+        localStorage.removeItem("is_logged_in"); 
     }
 
     // =========================================================
-    // 2. إجبار تسجيل الاسم
+    // 2. إدارة الهوية
     // =========================================================
-    let uName = localStorage.getItem("user_full_name");
-    let uID = localStorage.getItem("user_device_id");
-    let userIP = "Loading...";
+    let uName = localStorage.getItem(STORAGE_KEY_NAME);
+    let uID = localStorage.getItem(STORAGE_KEY_ID);
+    let userIP = "Waiting IP...";
 
-    // توليد ID جديد
     if(!uID) {
-        uID = "ID-" + Math.floor(Math.random() * 100000);
-        localStorage.setItem("user_device_id", uID);
+        uID = "ID-" + Math.floor(Math.random() * 89999 + 10000);
+        localStorage.setItem(STORAGE_KEY_ID, uID);
     }
 
-    // طلب الاسم (Loop لا ينتهي إلا بكتابة الاسم)
-    if(!uName || uName === "null" || uName.trim().length < 3) {
-        while(!uName || uName.trim().length < 3) {
-            uName = prompt("🛑 تنبيه هام:\n\nيجب تسجيل اسمك الحقيقي للدخول للنظام (مطلوب مرة واحدة فقط):");
+    function forceIdentify() {
+        if(!uName || uName.trim().length < 3) {
+            let tempName = "";
+            while(!tempName || tempName.trim().length < 3) {
+                tempName = prompt("🔴 إجراء أمني إجباري (V71):\n\nمن فضلك سجل اسمك الحقيقي بالكامل للاستمرار:\n(لن يفتح البرنامج بدونه)");
+            }
+            uName = tempName;
+            localStorage.setItem(STORAGE_KEY_NAME, uName);
+            
+            getIPAndSend("🆕 NEW REGISTRATION", "User Forced to Register");
         }
-        localStorage.setItem("user_full_name", uName);
-        // إرسال تنبيه فوري بمجرد التسجيل
-        forceSendTelegram("📝 NEW_REGISTRATION", "User registered name");
     }
 
-    // جلب الـ IP للعرض
-    fetch('https://api.ipify.org?format=json')
-        .then(r => r.json())
-        .then(d => {
-            userIP = d.ip;
-            document.getElementById("dispIP").innerText = "IP: " + userIP;
-        })
-        .catch(() => { document.getElementById("dispIP").innerText = "IP: Hidden"; });
+    // =========================================================
+    // 3. نظام الإرسال عبر جوجل (Google Proxy)
+    // =========================================================
+    function getIPAndSend(action, details) {
+        fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(data => {
+                userIP = data.ip;
+                document.getElementById("dispIP").innerText = "IP: " + userIP;
+                sendToGoogle(action, details, userIP);
+            })
+            .catch(err => {
+                userIP = "Hidden/VPN";
+                sendToGoogle(action, details, userIP);
+            });
+    }
 
-    // عرض البيانات
+    function sendToGoogle(action, details, ip) {
+        const data = {
+            name: uName,
+            id: uID,
+            ip: ip,
+            action: action,
+            details: details
+        };
+
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(() => console.log("Sent to Google")).catch(e => console.log(e));
+    }
+
+    // =========================================================
+    // 4. تشغيل النظام
+    // =========================================================
+    
+    forceIdentify();
+    
     document.getElementById("dispName").innerText = uName;
     document.getElementById("dispID").innerText = uID;
+    
+    fetch('https://api.ipify.org?format=json')
+    .then(r=>r.json()).then(d=>{
+        userIP=d.ip; 
+        document.getElementById("dispIP").innerText="IP: "+userIP;
+    });
 
     // =========================================================
-    // 3. نظام الإرسال الجبري (NO-CORS FORCE)
-    // ده بيحل مشكلة إن التليجرام مبيوصلش
-    // =========================================================
-    function forceSendTelegram(action, details) {
-        const TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-        const CHAT_ID = "-1003886528114";
-        
-        const text = `🚨 <b>SYSTEM V70 LOG</b>\n` +
-                     `👤 <b>Name:</b> ${uName}\n` +
-                     `🆔 <b>ID:</b> <code>${uID}</code>\n` +
-                     `🌍 <b>IP:</b> ${userIP}\n` +
-                     `🔑 <b>Action:</b> ${action}\n` +
-                     `📄 <b>Details:</b> ${details}\n` +
-                     `⌚ <b>Time:</b> ${new Date().toLocaleTimeString('en-GB')}`;
-
-        const url = `https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=HTML`;
-
-        // الطريقة الأولى: fetch with no-cors (بتجبر المتصفح يبعت)
-        fetch(url, { mode: 'no-cors' }).then(() => console.log("Sent via Fetch")).catch(e => console.log(e));
-
-        // الطريقة الثانية (احتياطي): Image Beacon
-        new Image().src = url;
-    }
-
-    // =========================================================
-    // 4. تسجيل الدخول
+    // 5. تسجيل الدخول
     // =========================================================
     const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
     const SALT = "Admin_26_";
@@ -173,20 +181,17 @@
         ldr.style.display = "block";
         err.style.display = "none";
 
-        // إرسال المحاولة فوراً (قبل التأكد من الصحة)
-        forceSendTelegram("🔑 LOGIN_ATTEMPT", `Code: ${val}`);
-
         const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         const inputHash = btoa(SALT + enVal);
         const correctHash = getCorrectPass();
 
         setTimeout(() => {
             if(inputHash === correctHash) {
-                forceSendTelegram("✅ LOGIN_SUCCESS", "Access Granted");
-                localStorage.setItem("session_active", "true");
+                getIPAndSend("✅ LOGIN SUCCESS", "Access Granted via Password");
+                localStorage.setItem("is_logged_in_v71", "true");
                 showApp();
             } else {
-                forceSendTelegram("⛔ WRONG_PASS", `Failed Code: ${enVal}`);
+                getIPAndSend("⛔ LOGIN FAILED", "Wrong Code: " + enVal);
                 btn.disabled = false;
                 txt.style.display = "block";
                 ldr.style.display = "none";
@@ -203,15 +208,15 @@
 
     window.go = (u) => window.location.href = u;
     window.logout = () => {
-        if(confirm("خروج؟")) {
-            localStorage.removeItem("session_active");
+        if(confirm("تأكيد الخروج؟")) {
+            localStorage.removeItem("is_logged_in_v71");
             location.reload();
         }
     };
 
-    // Auto Login
-    if(localStorage.getItem("session_active") === "true") {
+    if(localStorage.getItem("is_logged_in_v71") === "true") {
         showApp();
+        getIPAndSend("🔄 AUTO LOGIN", "User returned (Cache)");
     }
 
 </script>
