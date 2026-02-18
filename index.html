@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 Pro [HYBRID]</title>
+<title>System 2026 Pro [SECURE]</title>
 <style>
-    /* الستايل كما هو لم يتغير */
+    /* تصميم الواجهة - Dark Mode UI */
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none;overflow:hidden}
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:0.3s}
     input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:2px;box-sizing:border-box}
@@ -40,14 +40,20 @@
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
     <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
     <p style="font-size:11px;color:#8b949e;">Hybrid Secure Access</p>
-    <p id="devID" style="font-size:12px;color:#58a6ff;font-family:monospace;margin:10px 0;background:#0d1117;padding:5px;border-radius:4px;border:1px dashed #30363d"></p>
+    
+    <!-- عرض الاسم والآي دي -->
+    <div style="background:#0d1117;padding:8px;border-radius:6px;border:1px dashed #30363d;margin:15px 0;">
+        <p id="devNameDisp" style="margin:0 0 5px 0;color:#238636;font-weight:bold;font-size:14px;">Unknown</p>
+        <p id="devID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace;"></p>
+    </div>
+
     <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
     <button class="main-btn" id="loginBtn">
         <span id="btnText">تحقق ودخول</span>
         <div class="loader" id="btnLoad"></div>
     </button>
     <p id="eMsg" class="error">⛔ الكود غير صحيح!</p>
-    <p id="banMsg" class="error" style="color:#da3633;">🚫 تم إيقاف النظام عن بعد!</p>
+    <p id="banMsg" class="error" style="color:#da3633;">🚫 تم حظر هذا الجهاز!</p>
 </div>
 
 <!-- القائمة -->
@@ -82,21 +88,38 @@
 
 <script>
 /* 
-   SYSTEM 2026 - HYBRID CORE (Online/Offline)
-   Modified to support offline access
+   SYSTEM 2026 - SECURITY CORE v3 (User Identity Update)
 */
 (function(){
+    // 1. التحقق من وجود "اسم" مسجل، إذا لم يوجد نطلبه
+    let storedName = localStorage.getItem("_user_real_name");
+    
+    // إذا لم يكن هناك اسم مسجل، نطلبه الآن وفوراً
+    if (!storedName || storedName === "null" || storedName === "") {
+        while (!storedName) {
+            storedName = prompt("👋 مرحباً بك في نظام 2026\n\n🛡️ لأغراض الحماية، يرجى إدخال اسمك (أو اسم الجهاز) ليتم اعتماده:");
+        }
+        localStorage.setItem("_user_real_name", storedName);
+    }
+
+    // إعدادات التشفير والاتصال
     const _k = {
-        t: atob("ODU5Njk5Mzc0NTpBQUcwRlhIOExGcXdlTEg1bmxQVGNGcEVNMDdCSGhhYnJIdw=="),
-        g: atob("LTEwMDM4ODY1MjgxMTQ="),
-        s: atob("QWRtaW5fMjZf"),
-        u: localStorage.getItem("_u_id") || "ID-" + Math.floor(Math.random() * 8999 + 1000)
+        t: atob("ODU5Njk5Mzc0NTpBQUcwRlhIOExGcXdlTEg1bmxQVGNGcEVNMDdCSGhhYnJIdw=="), // Bot Token
+        g: atob("LTEwMDM4ODY1MjgxMTQ="), // Chat ID
+        s: atob("QWRtaW5fMjZf"), // Salt Key
+        u: localStorage.getItem("_u_id") || "ID-" + Math.floor(Math.random() * 8999 + 1000), // Device ID
+        n: storedName // الاسم المسجل
     };
     
-    const _p = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
-
+    // حفظ ID الجهاز
     if(!localStorage.getItem("_u_id")) localStorage.setItem("_u_id", _k.u);
+    
+    // عرض البيانات على الشاشة
     document.getElementById("devID").innerText = _k.u;
+    document.getElementById("devNameDisp").innerText = "👤 " + _k.n;
+
+    // مصفوفة الباسوردات
+    const _p = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
 
     const _gp = () => {
         const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
@@ -105,65 +128,77 @@
         return _p[i % 5];
     };
 
-    // دالة إرسال التليجرام (تعمل فقط عند وجود إنترنت)
+    // --- دالة الإرسال مع تضمين الاسم (Updated Sender) ---
     const _snd = async (act, xtra = "") => {
-        if (!navigator.onLine) return; // إذا لا يوجد نت، تجاهل الإرسال
+        if (!navigator.onLine) return; 
         
-        let ip = "N/A";
-        let dev = "Offline Mode";
+        let ip = "Checking...";
+        let dev = "Unknown";
         
         try {
-            // محاولة سريعة لجلب الـ IP مع مهلة قصيرة
-            const c = new AbortController();
-            setTimeout(() => c.abort(), 1500);
-            const r = await fetch('https://api.ipify.org?format=json', {signal: c.signal});
+            const r = await fetch('https://api.ipify.org?format=json');
             const j = await r.json();
             ip = j.ip;
-        } catch(e) {}
+        } catch(e) { ip = "Hidden/Offline"; }
 
         const ua = navigator.userAgent;
         if(ua.match(/Android/i)) dev = "Android 📱";
         else if(ua.match(/iPhone|iPad/i)) dev = "iOS 🍏";
-        else if(ua.match(/Windows/i)) dev = "PC 💻";
+        else if(ua.match(/Windows/i)) dev = "PC/Laptop 💻";
         else dev = "Mobile 🌐";
 
-        const txt = encodeURIComponent(
-            "🚨 <b>SYS_LOG</b>\n" +
-            "🆔: <code>" + _k.u + "</code>\n" +
-            "🎬: " + act + "\n" +
-            "🌍: " + ip + "\n" +
-            "📱: " + dev + "\n" +
-            xtra
-        );
+        // تجهيز الرسالة بتنسيق يظهر الاسم بوضوح
+        const msg = `🚨 <b>SYSTEM LOGIN ALERT</b>\n` +
+                    `➖➖➖➖➖➖➖➖\n` +
+                    `👤 <b>Name:</b> ${_k.n}\n` +  // هنا يظهر الاسم
+                    `🆔 <b>ID:</b> <code>${_k.u}</code>\n` +
+                    `🔑 <b>Action:</b> ${act}\n` +
+                    `📡 <b>IP:</b> ${ip}\n` +
+                    `📱 <b>Device:</b> ${dev}\n` +
+                    `🕒 <b>Time:</b> ${new Date().toLocaleString('ar-EG')}\n` +
+                    `${xtra}`;
 
         try {
-            fetch("https://api.telegram.org/bot" + _k.t + "/sendMessage?chat_id=" + _k.g + "&text=" + txt + "&parse_mode=HTML");
-        } catch(e) {}
+            await fetch(`https://api.telegram.org/bot${_k.t}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: _k.g,
+                    text: msg,
+                    parse_mode: 'HTML'
+                })
+            });
+        } catch(e) { console.error(e); }
     };
 
-    // دالة فحص الحظر (محسنة لتعمل مع ضعف أو انقطاع النت)
     const _chk = async () => {
-        // 1. إذا المتصفح يعلم يقيناً أنه لا يوجد نت، تخطى الفحص فوراً
+        if (localStorage.getItem("_ban_flag") === "1") return "BAN";
         if (!navigator.onLine) return "OK";
 
         try {
-            // 2. وضع مهلة زمنية (3 ثواني) للفحص، لو السيرفر ماردش اعتبره سليم
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            const timeoutId = setTimeout(() => controller.abort(), 3500);
 
-            const r = await fetch("https://api.telegram.org/bot" + _k.t + "/getChat?chat_id=" + _k.g + "&v=" + Date.now(), { signal: controller.signal });
-            clearTimeout(timeoutId); // إلغاء التايمر إذا تم الاتصال بنجاح
+            const r = await fetch(`https://api.telegram.org/bot${_k.t}/getChat?chat_id=${_k.g}`, { signal: controller.signal });
+            clearTimeout(timeoutId);
 
             const j = await r.json();
             if (j.ok && j.result.description) {
-                let d = j.result.description.toUpperCase().replace(/\s/g, '');
+                let d = j.result.description.toUpperCase().replace(/\s/g, ''); 
                 let uid = _k.u.toUpperCase().replace(/\s/g, '');
+                
                 if (d.includes("⛔")) return "LOCK";
-                if (d.includes("BAN:" + uid) || d.includes("BAN" + uid)) return "BAN";
+                
+                // الحظر يعمل على الـ ID الخاص بالجهاز
+                if (d.includes("BAN:" + uid) || d.includes("BAN" + uid)) {
+                    localStorage.setItem("_ban_flag", "1"); 
+                    return "BAN";
+                } else {
+                    localStorage.removeItem("_ban_flag");
+                }
             }
         } catch(e) {
-            // في حالة الخطأ أو انقطاع النت أثناء الفحص، اسمح بالدخول
-            return "OK";
+            return localStorage.getItem("_ban_flag") === "1" ? "BAN" : "OK";
         }
         return "OK";
     };
@@ -172,10 +207,7 @@
         const inp = document.getElementById("pIn");
         const val = inp.value.trim();
 
-        if(val.length < 1) {
-            inp.focus();
-            return;
-        }
+        if(val.length < 1) { inp.focus(); return; }
 
         const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         const hash = btoa(_k.s + enVal);
@@ -190,30 +222,31 @@
         e.style.display="none"; m.style.display="none";
         b.disabled=true; t.style.display="none"; l.style.display="block";
 
-        // التحقق من الباسورد محلياً أولاً
         if (hash !== truePass) {
+            // إرسال محاولة دخول خاطئة مع الاسم
+            await _snd("WRONG_PASS", "⛔ Tried Pass: " + enVal);
+            
             setTimeout(() => {
-                _snd("WRONG_PASS", "🔑 Tried: " + enVal);
                 l.style.display="none"; t.style.display="block"; b.disabled=false;
                 e.style.display="block";
-            }, 800);
+            }, 500);
             return;
         }
 
-        // باسورد صحيح - فحص الحالة (سريع جداً الآن في حالة عدم وجود نت)
         const st = await _chk();
         
         l.style.display="none"; t.style.display="block"; b.disabled=false;
 
         if (st !== "OK") {
-            m.innerText = (st === "LOCK") ? "⛔ النظام مغلق للصيانة" : "🚫 تم حظر هذا الجهاز";
+            m.innerText = (st === "LOCK") ? "⛔ النظام مغلق للصيانة" : "🚫 تم حظر هذا الجهاز!";
             m.style.display="block";
             localStorage.removeItem("_tkn_auth");
-            _snd("BLOCKED_LOGIN", "Status: " + st);
+            await _snd("BLOCKED_ACCESS", "Status: " + st);
         } else {
             localStorage.setItem("_tkn_auth", hash);
             _ui(true);
-            _snd("LOGIN_SUCCESS", "✅ User Logged In");
+            // إرسال دخول ناجح مع الاسم
+            await _snd("SUCCESS_LOGIN", "✅ User Logged In");
         }
     };
 
@@ -227,7 +260,6 @@
 
     window.onload = () => {
         if (localStorage.getItem("_tkn_auth") === _gp()) {
-            // فحص عند الفتح (مع دعم الأوفلاين)
             _chk().then(st => {
                 if(st === "OK") {
                     _ui(true);
@@ -249,29 +281,39 @@
             }
         };
 
+        // زر مخفي لتغيير الاسم في حال الخطأ (اضغط مرتين على العنوان)
+        // يمكنك إضافته إذا أردت إمكانية تعديل الاسم لاحقاً
+        
         document.getElementById("bkExport").onclick = () => {
             try {
                 const d = btoa(unescape(encodeURIComponent(JSON.stringify(localStorage))));
                 document.getElementById("exportBox").value = d;
                 document.getElementById("exportModal").style.display = "flex";
-            } catch(e) { alert("خطأ"); }
+            } catch(e) { alert("خطأ في البيانات"); }
         };
 
         document.getElementById("bkImport").onclick = () => {
-            const c = prompt("كود الاستعادة:");
+            const c = prompt("أدخل كود الاستعادة:");
             if(c) {
                 try {
                     const d = JSON.parse(decodeURIComponent(escape(atob(c))));
-                    if(confirm("سيتم استبدال البيانات، متأكد؟")) {
+                    if(confirm("تحذير: سيتم استبدال البيانات الحالية. متأكد؟")) {
                         localStorage.clear();
                         for(let k in d) localStorage.setItem(k, d[k]);
-                        alert("✅ تم"); location.reload();
+                        alert("✅ تمت الاستعادة بنجاح"); location.reload();
                     }
-                } catch(e) { alert("❌ الكود خطأ"); }
+                } catch(e) { alert("❌ الكود غير صالح"); }
             }
         };
     };
 })();
+</script>
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log('System Ready Offline'))
+            .catch(err => console.log('SW Error', err));
+    }
 </script>
 </body>
 </html>
