@@ -9,134 +9,174 @@
         .container { border: 2px solid #00ff00; padding: 15px; border-radius: 10px; max-width: 400px; margin: 0 auto; background: #1a1a1a; }
         input, button { width: 90%; padding: 10px; margin: 10px 0; font-size: 16px; border-radius: 5px; border: none; }
         input { background: #333; color: white; text-align: center; }
-        button { background: #00ff00; color: black; font-weight: bold; cursor: pointer; }
-        button:disabled { background: gray; }
-        
-        /* شاشة رد السيرفر - دي اللي هتعرفنا الحقيقة */
-        iframe {
-            width: 100%;
-            height: 80px;
-            background: white;
-            color: black;
-            border: 2px solid red;
-            margin-top: 10px;
-            display: none; /* مخفية في البداية */
-        }
-        .server-label { color: yellow; font-size: 12px; margin-top: 5px; display: none; }
+        button { background: #00ff00; color: black; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:disabled { background: gray; cursor: not-allowed; }
+        .status { margin-top: 10px; font-size: 14px; color: yellow; display: none; }
     </style>
 </head>
 <body>
 
-    <!-- 1. الفورم السحري (مخفي بس هو اللي بيبعت) -->
-    <!-- بنبعت للآيدي اللي في الصور بتاعتك -1003886528114 -->
-    <form id="telegramForm" action="https://api.telegram.org/bot8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw/sendMessage" method="POST" target="responseFrame">
-        <input type="hidden" name="chat_id" value="-1003886528114">
-        <input type="hidden" name="parse_mode" value="HTML">
-        <input type="hidden" name="text" id="msgContent">
-    </form>
-
     <div class="container">
-        <h2>🚀 النظام الإداري V85</h2>
+        <h2>🚀 النظام الإداري Mangoma</h2>
         
         <!-- قسم التسجيل -->
         <div id="regSection">
-            <p>🔴 مطلوب: تسجيل الاسم الحقيقي</p>
+            <p>🔴 مطلوب: تسجيل الاسم الحقيقي لفتح البرنامج</p>
             <input type="text" id="myName" placeholder="اكتب اسمك ثلاثي هنا...">
-            <button onclick="registerUser()" id="regBtn">تسجيل وإرسال</button>
+            <button onclick="handleRegister()" id="regBtn">تسجيل ودخول</button>
+            <p class="status" id="statusMsg">جاري الاتصال بالسيرفر...</p>
         </div>
 
         <!-- قسم التطبيق -->
         <div id="appSection" style="display:none;">
-            <h3>✅ تم الدخول</h3>
+            <h3>✅ تم الدخول بنجاح</h3>
             <p>الاسم: <span id="dispName" style="color:white"></span></p>
             <p>ID: <span id="dispID"></span></p>
+            <p>IP: <span id="dispIP" style="font-size:12px; color:gray;"></span></p>
             <hr>
             <input type="password" id="pass" placeholder="كود الدخول">
-            <button onclick="login()">فتح</button>
+            <button onclick="login()">فتح القفل</button>
         </div>
-
-        <!-- شاشة النتيجة -->
-        <p class="server-label" id="lbl">👇 رد سيرفر تليجرام (لو ظهر true يبقى وصل) 👇</p>
-        <iframe name="responseFrame" id="responseFrame"></iframe>
     </div>
 
 <script>
     // ============================================
-    // إعدادات النظام
+    // إعدادات البوت والجروب (تم وضع بياناتك هنا)
     // ============================================
+    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+    const CHAT_ID = "-1003886528114";
+    
+    // مفاتيح التخزين
     const KEY_NAME = "USER_NAME_V85";
     const KEY_ID = "DEVICE_ID_V85";
 
-    // 1. الآيدي
+    // 1. توليد أو جلب الآيدي
     let devID = localStorage.getItem(KEY_ID);
     if (!devID) {
         devID = "ID-" + Math.floor(Math.random() * 900000 + 100000);
         localStorage.setItem(KEY_ID, devID);
     }
 
-    // 2. التحقق من الاسم القديم
+    // 2. التحقق من المستخدم القديم عند فتح البرنامج
     let savedName = localStorage.getItem(KEY_NAME);
     if (savedName && savedName.length > 2) {
-        document.getElementById("regSection").style.display = "none";
-        document.getElementById("appSection").style.display = "block";
-        document.getElementById("dispName").innerText = savedName;
-        document.getElementById("dispID").innerText = devID;
-        
-        // إرسال تنبيه في الخلفية
-        sendToTg(savedName, "♻️ فتح البرنامج (مستخدم عائد)");
+        // مستخدم قديم - نظهر شاشة الدخول مباشرة ونبعت تنبيه في الخلفية
+        showAppScreen(savedName);
+        fetchIPAndSend(savedName, "♻️ <b>مستخدم عائد (فتح التطبيق)</b>");
     }
 
-    // 3. دالة التسجيل (الزر)
-    function registerUser() {
+    // 3. دالة زر التسجيل
+    function handleRegister() {
         const nameVal = document.getElementById("myName").value;
         if (nameVal.length < 3) {
-            alert("اكتب الاسم بشكل صحيح");
+            alert("يرجى كتابة الاسم بشكل صحيح");
             return;
         }
 
-        document.getElementById("regBtn").disabled = true;
-        document.getElementById("regBtn").innerText = "جاري الإرسال...";
+        const btn = document.getElementById("regBtn");
+        const status = document.getElementById("statusMsg");
         
+        btn.disabled = true;
+        btn.innerText = "جاري التحقق...";
+        status.style.display = "block";
+        status.innerText = "جاري سحب الـ IP وإرسال البيانات...";
+
+        // حفظ الاسم
         localStorage.setItem(KEY_NAME, nameVal);
-        
-        // إرسال البيانات
-        sendToTg(nameVal, "🆕 <b>تسجيل جديد</b>");
 
-        // إظهار النتيجة للمستخدم
-        document.getElementById("lbl").style.display = "block";
-        document.getElementById("responseFrame").style.display = "block";
-
-        setTimeout(() => {
-            alert("تم إرسال البيانات! انظر للمربع الأبيض أسفل الشاشة للتأكد.");
-            location.reload(); // إعادة تحميل عشان يدخل علطول
-        }, 3000);
+        // بدء عملية الإرسال
+        fetchIPAndSend(nameVal, "🆕 <b>تسجيل دخول جديد</b>", true);
     }
 
-    // 4. دالة الإرسال عبر الفورم
-    function sendToTg(uName, action) {
-        const txt = `
-🚨 <b>SYSTEM ALERT V85</b>
+    // 4. الدالة الرئيسية: جلب IP ثم الإرسال لتليجرام
+    function fetchIPAndSend(uName, actionType, isNewRegistration = false) {
+        // أولاً: نجيب الـ IP من خدمة خارجية
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                const userIP = data.ip;
+                
+                // تحديث الواجهة بالـ IP
+                if(document.getElementById("dispIP")) {
+                    document.getElementById("dispIP").innerText = userIP;
+                }
+
+                // ثانياً: نبعت لتليجرام
+                sendToTelegram(uName, userIP, actionType, isNewRegistration);
+            })
+            .catch(error => {
+                console.error("Error fetching IP:", error);
+                // لو فشل سحب الاي بي، نبعت بدونه
+                sendToTelegram(uName, "غير معروف", actionType, isNewRegistration);
+            });
+    }
+
+    // 5. الإرسال الفعلي لتليجرام
+    function sendToTelegram(name, ip, action, isNewRegistration) {
+        const messageText = `
+🚨 <b>تقرير دخول النظام</b>
 ━━━━━━━━━━━━
-👤 <b>Name:</b> ${uName}
+👤 <b>الاسم:</b> ${name}
 🆔 <b>ID:</b> <code>${devID}</code>
-📝 <b>Action:</b> ${action}
+🌐 <b>IP:</b> <code>${ip}</code>
+📝 <b>الحالة:</b> ${action}
 ━━━━━━━━━━━━
         `;
+
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
         
-        document.getElementById("msgContent").value = txt;
-        document.getElementById("telegramForm").submit();
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: messageText,
+                parse_mode: 'HTML'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok) {
+                if (isNewRegistration) {
+                    document.getElementById("statusMsg").innerText = "✅ تم الإرسال بنجاح!";
+                    setTimeout(() => {
+                        showAppScreen(name);
+                    }, 1000);
+                }
+            } else {
+                alert("حدث خطأ في البوت: " + data.description);
+                document.getElementById("regBtn").disabled = false;
+            }
+        })
+        .catch(err => {
+            alert("فشل الاتصال بتليجرام. تأكد من الإنترنت.");
+            document.getElementById("regBtn").disabled = false;
+        });
     }
 
-    // 5. دالة الدخول (باسورد)
+    // 6. عرض شاشة التطبيق
+    function showAppScreen(name) {
+        document.getElementById("regSection").style.display = "none";
+        document.getElementById("appSection").style.display = "block";
+        document.getElementById("dispName").innerText = name;
+        document.getElementById("dispID").innerText = devID;
+    }
+
+    // 7. زر فتح القفل (داخلي)
     function login() {
         const p = document.getElementById("pass").value;
+        const n = document.getElementById("dispName").innerText;
+        const ip = document.getElementById("dispIP").innerText || "Unknown";
+        
         if(p.length > 0) {
-            sendToTg(document.getElementById("dispName").innerText, "🔐 محاولة دخول بكود: " + p);
-            document.getElementById("lbl").style.display = "block";
-            document.getElementById("responseFrame").style.display = "block";
+            // نبعت محاولة الدخول دي كمان
+            sendToTelegram(n, ip, "🔐 محاولة فك تشفير بكود: " + p, false);
+            alert("تم إرسال الكود للتحقق");
         }
     }
 
 </script>
 </body>
-</html>
+                                                                         </html>
