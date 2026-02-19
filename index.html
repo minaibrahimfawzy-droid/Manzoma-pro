@@ -6,13 +6,9 @@
 <title>System 2026 Pro [HYBRID]</title>
 <style>
     body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none;overflow:hidden}
-    
-    /* --- ستايل إشعار التحديث الجديد --- */
     #update-banner { display:none; position:fixed; top:0; left:0; width:100%; background:#1f6feb; color:white; text-align:center; padding:15px; z-index:99999; box-shadow:0 4px 15px rgba(0,0,0,0.5); font-weight:bold; font-size:14px; }
     #update-btn { background:white; color:#1f6feb; border:none; padding:5px 15px; margin-right:10px; border-radius:20px; font-weight:bold; cursor:pointer; font-size:12px; }
     #update-btn:active { transform:scale(0.95); }
-    /* --------------------------------- */
-
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:0.3s}
     input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:16px;border-radius:6px;margin:10px 0;outline:none;letter-spacing:1px;box-sizing:border-box}
     input:focus{border-color:#58a6ff;box-shadow:0 0 5px rgba(88,166,255,0.3)}
@@ -42,13 +38,11 @@
 </head>
 <body oncontextmenu="return false">
 
-<!-- شريط إشعار التحديث -->
 <div id="update-banner">
     🚀 يوجد تحديث جديد للتطبيق! 
     <button id="update-btn" onclick="applyUpdate()">تحديث الآن</button>
 </div>
 
-<!-- شاشة القفل -->
 <div id="lock-screen">
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
     <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
@@ -67,7 +61,6 @@
     <p id="banMsg" class="error" style="color:#da3633;">🚫 تم إيقاف وحظر هذا الجهاز!</p>
 </div>
 
-<!-- القائمة الرئيسية -->
 <div id="app-menu">
     <div class="menu-header">
         <div>
@@ -102,69 +95,42 @@
 </div>
 
 <script>
-// ==========================================
-// 1. نظام التحديثات الذكي (Smart Update System)
-// ==========================================
+// --- نظام التحديث ---
 let newVersionNumber = 0;
-
 async function checkForUpdates() {
-    if (!navigator.onLine) return; // لا تفحص إذا لم يكن هناك إنترنت
-
     try {
-        // إضافة ?t= للرابط تمنع المتصفح من قراءة نسخة قديمة
         const res = await fetch('version.json?t=' + new Date().getTime());
         const data = await res.json();
-        
-        // جلب رقم الإصدار المحفوظ في هاتف المستخدم (أو 0 إذا كانت أول مرة)
         const currentVersion = parseInt(localStorage.getItem('app_version') || 0);
-
         if (data.version > currentVersion) {
-            // يوجد تحديث! أظهر الشريط
             document.getElementById('update-banner').style.display = 'block';
-            newVersionNumber = data.version; // احفظ الرقم الجديد مؤقتاً
+            newVersionNumber = data.version;
         } else if (currentVersion === 0) {
-            // أول مرة يفتح التطبيق، احفظ الإصدار الحالي
             localStorage.setItem('app_version', data.version);
         }
-    } catch (e) { console.log("خطأ في فحص التحديثات", e); }
+    } catch (e) {}
 }
 
-// دالة تنفيذ التحديث عند الضغط على الزر
 function applyUpdate() {
-    // 1. احفظ رقم الإصدار الجديد
     localStorage.setItem('app_version', newVersionNumber);
-    
-    // 2. امسح ملفات Service Worker القديمة
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(registrations) {
-            for(let registration of registrations) {
-                registration.unregister();
-            }
+            for(let registration of registrations) registration.unregister();
         });
     }
-    
-    // 3. امسح الكاش الخاص بالمتصفح
     caches.keys().then((keyList) => {
-      return Promise.all(keyList.map((key) => {
-        return caches.delete(key);
-      }));
-    }).then(() => {
-      // 4. أعد تحميل الصفحة بالقوة من السيرفر لجلب الجديد
-      window.location.reload(true);
-    });
+      return Promise.all(keyList.map((key) => caches.delete(key)));
+    }).then(() => { window.location.reload(true); });
 }
 
-// تسجيل الـ Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('sw.js');
-    checkForUpdates(); // افحص التحديثات بمجرد تحميل الصفحة
+    checkForUpdates();
   });
 }
 
-// ==========================================
-// 2. الكود الأساسي للحماية والدخول
-// ==========================================
+// --- نظام التطبيق ---
 (function(){
     const _k = {
         t: atob("ODU5Njk5Mzc0NTpBQUcwRlhIOExGcXdlTEg1bmxQVGNGcEVNMDdCSGhhYnJIdw=="),
@@ -185,23 +151,18 @@ if ('serviceWorker' in navigator) {
         return _p[i % 5];
     };
 
+    // --- التعديل السحري للإرسال عبر الـ APK ---
     const _snd = async (act, xtra = "") => {
-        if (!navigator.onLine) return; 
-        
-        let ip = "N/A", dev = "Offline Mode";
+        // شلنا شرط الـ onLine عشان الـ APK ميكدبش علينا
+        let ip = "N/A";
+        let dev = "تطبيق الموبايل (APK) 📱";
+
+        // محاولة جلب الـ IP، لو فشلت هيكمل عادي مش هيقف
         try {
-            const c = new AbortController();
-            setTimeout(() => c.abort(), 1500);
-            const r = await fetch('https://api.ipify.org?format=json', {signal: c.signal});
+            const r = await fetch('https://api.ipify.org?format=json');
             const j = await r.json();
             ip = j.ip;
         } catch(e) {}
-
-        const ua = navigator.userAgent;
-        if(ua.match(/Android/i)) dev = "Android 📱";
-        else if(ua.match(/iPhone|iPad/i)) dev = "iOS 🍏";
-        else if(ua.match(/Windows/i)) dev = "PC 💻";
-        else dev = "Mobile 🌐";
 
         const savedName = localStorage.getItem("_u_name") || "غير معروف";
 
@@ -215,16 +176,19 @@ if ('serviceWorker' in navigator) {
             xtra
         );
 
-        try { fetch("https://api.telegram.org/bot" + _k.t + "/sendMessage?chat_id=" + _k.g + "&text=" + txt + "&parse_mode=Markdown"); } catch(e) {}
+        const url = "https://api.telegram.org/bot" + _k.t + "/sendMessage?chat_id=" + _k.g + "&text=" + txt + "&parse_mode=Markdown";
+
+        // الطريقة الأولى للإرسال
+        fetch(url).catch(() => {
+            // الطريقة التانية (الخطة ب): لو الـ APK عمل حظر للـ fetch، نبعت عن طريق Image سريعة (مستحيل تتعملها حظر)
+            new Image().src = url;
+        });
     };
 
     const _chk = async () => {
-        if (!navigator.onLine) return "OK";
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000);
-            const r = await fetch("https://api.telegram.org/bot" + _k.t + "/getChat?chat_id=" + _k.g + "&v=" + Date.now(), { signal: controller.signal });
-            clearTimeout(timeoutId); 
+            // شلنا شرط الـ onLine هنا كمان
+            const r = await fetch("https://api.telegram.org/bot" + _k.t + "/getChat?chat_id=" + _k.g + "&v=" + Date.now());
             const j = await r.json();
             if (j.ok && j.result.description) {
                 let d = j.result.description.toUpperCase().replace(/\s/g, '');
@@ -232,7 +196,7 @@ if ('serviceWorker' in navigator) {
                 if (d.includes("⛔")) return "LOCK";
                 if (d.includes("BAN:" + uid) || d.includes("BAN" + uid)) return "BAN";
             }
-        } catch(e) { return "OK"; }
+        } catch(e) { return "OK"; } // لو مفيش نت أو الـ APK حظر، هيدخله كنوع من حماية الأوفلاين
         return "OK";
     };
 
@@ -322,7 +286,6 @@ if ('serviceWorker' in navigator) {
                 try {
                     const d = JSON.parse(decodeURIComponent(escape(atob(c))));
                     if(confirm("سيتم استبدال البيانات، متأكد؟")) {
-                        // لا تمسح رقم الإصدار عند الاسترجاع
                         const v = localStorage.getItem('app_version'); 
                         localStorage.clear();
                         for(let k in d) localStorage.setItem(k, d[k]);
