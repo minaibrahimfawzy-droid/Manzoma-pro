@@ -1,72 +1,339 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manzoma Activation</title>
-    <style>
-        body { background-color: #000; color: #0f0; font-family: sans-serif; text-align: center; padding: 20px; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; text-align: center; }
-        button { width: 100%; padding: 12px; background: #0f0; font-weight: bold; border: none; cursor: pointer; margin-top: 10px; }
-    </style>
-</head>
-<body>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>System 2026 Pro [HYBRID]</title>
+<style>
+    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none;overflow:hidden}
+    
+    /* --- ستايل إشعار التحديث الجديد --- */
+    #update-banner { display:none; position:fixed; top:0; left:0; width:100%; background:#1f6feb; color:white; text-align:center; padding:15px; z-index:99999; box-shadow:0 4px 15px rgba(0,0,0,0.5); font-weight:bold; font-size:14px; }
+    #update-btn { background:white; color:#1f6feb; border:none; padding:5px 15px; margin-right:10px; border-radius:20px; font-weight:bold; cursor:pointer; font-size:12px; }
+    #update-btn:active { transform:scale(0.95); }
+    /* --------------------------------- */
 
-    <div id="mainBox">
-        <h2>🔐 تفعيل المنظومة 2026</h2>
-        <p>سجل اسمك لفتح التطبيق</p>
-        <input type="text" id="username" placeholder="اكتب اسمك هنا...">
-        <button onclick="sendData()" id="btn">تفعيل ودخول</button>
-        <p id="status" style="color:yellow; margin-top:10px;"></p>
+    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5);transition:0.3s}
+    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:16px;border-radius:6px;margin:10px 0;outline:none;letter-spacing:1px;box-sizing:border-box}
+    input:focus{border-color:#58a6ff;box-shadow:0 0 5px rgba(88,166,255,0.3)}
+    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;transition:0.2s;position:relative;overflow:hidden;margin-top:10px;}
+    button.main-btn:active{transform:scale(0.98)}
+    button.main-btn:disabled{background:#30363d;cursor:not-allowed;color:#8b949e}
+    .logout-btn{background:#da3633;color:white;border:none;padding:6px 12px;font-size:12px;font-weight:bold;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px}
+    .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px;background:rgba(218,54,51,0.1);padding:5px;border-radius:4px;border:1px solid rgba(218,54,51,0.3)}
+    #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
+    .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;border-bottom:1px solid #30363d;padding-bottom:15px}
+    .user-info{text-align:right; font-size:14px; color:#8b949e;}
+    .user-info span {color:#58a6ff; font-weight:bold;}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
+    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;text-decoration:none;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;transition:0.2s;text-align:center;-webkit-tap-highlight-color:transparent}
+    .app-btn:active{background:#30363d;transform:scale(0.95)}
+    .icon{font-size:28px;margin-bottom:8px}
+    .backup-area{margin-top:20px;padding-top:15px;border-top:1px dashed #30363d;display:flex;flex-direction:column;gap:10px}
+    .bk-btn{width:100%;padding:12px;border-radius:6px;border:none;color:white;font-weight:bold;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn-export{background:#1f6feb}
+    .btn-import{background:#8b949e}
+    .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
+    .modal-box{background:#161b22;border:1px solid #30363d;padding:20px;border-radius:10px;width:100%;max-width:350px;text-align:center}
+    textarea.code-box{width:100%;height:120px;background:#0d1117;color:#58a6ff;border:1px solid #30363d;border-radius:5px;padding:10px;font-size:10px;resize:none;margin:10px 0;box-sizing:border-box}
+    .loader{border:3px solid #f3f3f3;border-top:3px solid #238636;border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;display:none;margin:0 auto}
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+</style>
+</head>
+<body oncontextmenu="return false">
+
+<!-- شريط إشعار التحديث -->
+<div id="update-banner">
+    🚀 يوجد تحديث جديد للتطبيق! 
+    <button id="update-btn" onclick="applyUpdate()">تحديث الآن</button>
+</div>
+
+<!-- شاشة القفل -->
+<div id="lock-screen">
+    <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
+    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
+    
+    <input type="text" id="userName" placeholder="سجل اسمك ثلاثي هنا...">
+    <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
+    
+    <button class="main-btn" id="loginBtn">
+        <span id="btnText">تفعيل ودخول</span>
+        <div class="loader" id="btnLoad"></div>
+    </button>
+    
+    <p id="devID" style="font-size:12px;color:#58a6ff;font-family:monospace;margin-top:15px;background:#0d1117;padding:5px;border-radius:4px;border:1px dashed #30363d"></p>
+    
+    <p id="eMsg" class="error">⛔ الكود غير صحيح!</p>
+    <p id="banMsg" class="error" style="color:#da3633;">🚫 تم إيقاف وحظر هذا الجهاز!</p>
+</div>
+
+<!-- القائمة الرئيسية -->
+<div id="app-menu">
+    <div class="menu-header">
+        <div>
+            <h2 style="margin:0; font-size:18px; color:#fff; text-align:right;">الرئيسية</h2>
+            <div class="user-info" id="displayUserName">مرحباً: <span></span></div>
+        </div>
+        <button id="logoutBtn" class="logout-btn"><span>خروج</span> 🚪</button>
     </div>
+    
+    <div class="grid">
+        <div class="app-btn" onclick="go('Nabatshia.html')"><span class="icon">📅</span>النبطشية</div>
+        <div class="app-btn" onclick="go('2.html')"><span class="icon">🌙</span>الورديات</div>
+        <div class="app-btn" onclick="go('3.html')"><span class="icon">⚖️</span>التصفيات</div>
+        <div class="app-btn" onclick="go('4.html')"><span class="icon">📝</span>اللمات</div>
+        <div class="app-btn" onclick="go('5.html')"><span class="icon">🌊</span>التدفق</div>
+        <div class="app-btn" onclick="go('6.html')"><span class="icon">🏗️</span>المهيئ والمواسير</div>
+    </div>
+    
+    <div class="backup-area">
+        <button class="bk-btn btn-export" id="bkExport">📤 حفظ نسخة من البيانات</button>
+        <button class="bk-btn btn-import" id="bkImport">📥 استرجاع البيانات</button>
+    </div>
+</div>
+
+<div id="exportModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 style="margin:0 0 10px 0;color:#fff">📦 كود النسخ الاحتياطي</h3>
+        <textarea class="code-box" id="exportBox" readonly></textarea>
+        <button class="main-btn" onclick="_cp()" style="margin-bottom:10px">نسخ الكود 📋</button>
+        <button class="bk-btn" onclick="document.getElementById('exportModal').style.display='none'" style="background:transparent;border:1px solid #da3633;color:#da3633">إغلاق</button>
+    </div>
+</div>
 
 <script>
-    // بيانات البوت والجروب بتوعك
-    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-    const CHAT_ID = "-1003886528114";
+// ==========================================
+// 1. نظام التحديثات الذكي (Smart Update System)
+// ==========================================
+let newVersionNumber = 0;
 
-    function sendData() {
-        const name = document.getElementById("username").value;
-        const btn = document.getElementById("btn");
-        const status = document.getElementById("status");
+async function checkForUpdates() {
+    if (!navigator.onLine) return; // لا تفحص إذا لم يكن هناك إنترنت
 
-        if (name.length < 3) {
-            alert("اكتب الاسم بشكل صحيح");
+    try {
+        // إضافة ?t= للرابط تمنع المتصفح من قراءة نسخة قديمة
+        const res = await fetch('version.json?t=' + new Date().getTime());
+        const data = await res.json();
+        
+        // جلب رقم الإصدار المحفوظ في هاتف المستخدم (أو 0 إذا كانت أول مرة)
+        const currentVersion = parseInt(localStorage.getItem('app_version') || 0);
+
+        if (data.version > currentVersion) {
+            // يوجد تحديث! أظهر الشريط
+            document.getElementById('update-banner').style.display = 'block';
+            newVersionNumber = data.version; // احفظ الرقم الجديد مؤقتاً
+        } else if (currentVersion === 0) {
+            // أول مرة يفتح التطبيق، احفظ الإصدار الحالي
+            localStorage.setItem('app_version', data.version);
+        }
+    } catch (e) { console.log("خطأ في فحص التحديثات", e); }
+}
+
+// دالة تنفيذ التحديث عند الضغط على الزر
+function applyUpdate() {
+    // 1. احفظ رقم الإصدار الجديد
+    localStorage.setItem('app_version', newVersionNumber);
+    
+    // 2. امسح ملفات Service Worker القديمة
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for(let registration of registrations) {
+                registration.unregister();
+            }
+        });
+    }
+    
+    // 3. امسح الكاش الخاص بالمتصفح
+    caches.keys().then((keyList) => {
+      return Promise.all(keyList.map((key) => {
+        return caches.delete(key);
+      }));
+    }).then(() => {
+      // 4. أعد تحميل الصفحة بالقوة من السيرفر لجلب الجديد
+      window.location.reload(true);
+    });
+}
+
+// تسجيل الـ Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js');
+    checkForUpdates(); // افحص التحديثات بمجرد تحميل الصفحة
+  });
+}
+
+// ==========================================
+// 2. الكود الأساسي للحماية والدخول
+// ==========================================
+(function(){
+    const _k = {
+        t: atob("ODU5Njk5Mzc0NTpBQUcwRlhIOExGcXdlTEg1bmxQVGNGcEVNMDdCSGhhYnJIdw=="),
+        g: atob("LTEwMDM4ODY1MjgxMTQ="),
+        s: atob("QWRtaW5fMjZf"),
+        u: localStorage.getItem("_u_id") || "ID-" + Math.floor(Math.random() * 89999 + 10000)
+    };
+    
+    const _p = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+
+    if(!localStorage.getItem("_u_id")) localStorage.setItem("_u_id", _k.u);
+    document.getElementById("devID").innerText = "معرف جهازك: " + _k.u;
+
+    const _gp = () => {
+        const d = new Date(), y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
+        let i = (y - 2026) * 2;
+        if (d.getMonth() >= 5) i += 1; 
+        return _p[i % 5];
+    };
+
+    const _snd = async (act, xtra = "") => {
+        if (!navigator.onLine) return; 
+        
+        let ip = "N/A", dev = "Offline Mode";
+        try {
+            const c = new AbortController();
+            setTimeout(() => c.abort(), 1500);
+            const r = await fetch('https://api.ipify.org?format=json', {signal: c.signal});
+            const j = await r.json();
+            ip = j.ip;
+        } catch(e) {}
+
+        const ua = navigator.userAgent;
+        if(ua.match(/Android/i)) dev = "Android 📱";
+        else if(ua.match(/iPhone|iPad/i)) dev = "iOS 🍏";
+        else if(ua.match(/Windows/i)) dev = "PC 💻";
+        else dev = "Mobile 🌐";
+
+        const savedName = localStorage.getItem("_u_name") || "غير معروف";
+
+        const txt = encodeURIComponent(
+            "🚨 *SYS_LOG*\n" +
+            "👤 الاسم: *" + savedName + "*\n" +
+            "🆔 الـ ID: `" + _k.u + "`\n" +
+            "🎬 الإجراء: " + act + "\n" +
+            "🌍 الـ IP: " + ip + "\n" +
+            "📱 الجهاز: " + dev + "\n" +
+            xtra
+        );
+
+        try { fetch("https://api.telegram.org/bot" + _k.t + "/sendMessage?chat_id=" + _k.g + "&text=" + txt + "&parse_mode=Markdown"); } catch(e) {}
+    };
+
+    const _chk = async () => {
+        if (!navigator.onLine) return "OK";
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000);
+            const r = await fetch("https://api.telegram.org/bot" + _k.t + "/getChat?chat_id=" + _k.g + "&v=" + Date.now(), { signal: controller.signal });
+            clearTimeout(timeoutId); 
+            const j = await r.json();
+            if (j.ok && j.result.description) {
+                let d = j.result.description.toUpperCase().replace(/\s/g, '');
+                let uid = _k.u.toUpperCase().replace(/\s/g, '');
+                if (d.includes("⛔")) return "LOCK";
+                if (d.includes("BAN:" + uid) || d.includes("BAN" + uid)) return "BAN";
+            }
+        } catch(e) { return "OK"; }
+        return "OK";
+    };
+
+    const _doL = async () => {
+        const nameInp = document.getElementById("userName");
+        const pinInp = document.getElementById("pIn");
+        const nameVal = nameInp.value.trim();
+        const pinVal = pinInp.value.trim();
+
+        if(nameVal.length < 3) { alert("يرجى كتابة اسمك بشكل صحيح!"); nameInp.focus(); return; }
+        if(pinVal.length < 1) { pinInp.focus(); return; }
+
+        const enVal = pinVal.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        const hash = btoa(_k.s + enVal);
+        const truePass = _gp();
+
+        const b = document.getElementById("loginBtn");
+        const l = document.getElementById("btnLoad");
+        const t = document.getElementById("btnText");
+        const e = document.getElementById("eMsg");
+        const m = document.getElementById("banMsg");
+
+        e.style.display="none"; m.style.display="none";
+        b.disabled=true; t.style.display="none"; l.style.display="block";
+
+        if (hash !== truePass) {
+            setTimeout(() => {
+                _snd("WRONG_PASS", "🔑 الكود الخطأ: " + enVal);
+                l.style.display="none"; t.style.display="block"; b.disabled=false;
+                e.style.display="block";
+            }, 800);
             return;
         }
 
-        btn.disabled = true;
-        btn.innerText = "جاري التفعيل...";
-        status.innerText = "جاري الاتصال بالسيرفر...";
-
-        // 1. نجيب الـ IP
-        fetch("https://api.ipify.org?format=json")
-        .then(res => res.json())
-        .then(data => {
-            sendMessage(name, data.ip);
-        })
-        .catch(err => {
-            sendMessage(name, "IP غير معروف");
-        });
-    }
-
-    function sendMessage(name, ip) {
-        // تجهيز الرسالة
-        const text = `🚀 *تفعيل جديد (Manzoma)*\n👤 الاسم: ${name}\n🌐 IP: ${ip}`;
+        const st = await _chk();
         
-        // رابط الإرسال المباشر
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+        l.style.display="none"; t.style.display="block"; b.disabled=false;
 
-        // تنفيذ الإرسال
-        fetch(url).then(response => {
-            status.innerText = "✅ تم التفعيل بنجاح!";
-            alert("تم إرسال البيانات بنجاح! سيفتح التطبيق الآن.");
-            // هنا ممكن تضيف كود يفتح الشاشة التالية
-        }).catch(error => {
-            status.innerText = "تم الإرسال (Offline Mode)";
-        });
-    }
+        if (st !== "OK") {
+            m.innerText = (st === "LOCK") ? "⛔ النظام مغلق للصيانة" : "🚫 تم حظر هذا الجهاز";
+            m.style.display="block";
+            localStorage.removeItem("_tkn_auth");
+            _snd("BLOCKED_LOGIN", "Status: " + st);
+        } else {
+            localStorage.setItem("_tkn_auth", hash);
+            localStorage.setItem("_u_name", nameVal);
+            _ui(true);
+            _snd("LOGIN_SUCCESS", "✅ تم دخول التطبيق بنجاح");
+        }
+    };
+
+    const _ui = (isLog) => {
+        document.getElementById("lock-screen").style.display = isLog ? "none" : "block";
+        document.getElementById("app-menu").style.display = isLog ? "block" : "none";
+        if(isLog) { document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name"); }
+    };
+
+    window._cp = () => { document.getElementById("exportBox").select(); document.execCommand("copy"); alert("✅ تم النسخ"); };
+    window.go = (u) => window.location.href = u;
+
+    window.onload = () => {
+        if (localStorage.getItem("_tkn_auth") === _gp()) {
+            _chk().then(st => {
+                if(st === "OK") { _ui(true); } 
+                else {
+                    localStorage.removeItem("_tkn_auth");
+                    _ui(false);
+                    document.getElementById("banMsg").style.display = "block";
+                }
+            });
+        }
+        document.getElementById("loginBtn").onclick = _doL;
+        document.getElementById("pIn").addEventListener("keypress", (e) => { if(e.key === 'Enter') _doL(); });
+        document.getElementById("logoutBtn").onclick = () => {
+            if(confirm("هل تود الخروج؟")) { localStorage.removeItem("_tkn_auth"); location.reload(); }
+        };
+        document.getElementById("bkExport").onclick = () => {
+            try {
+                const d = btoa(unescape(encodeURIComponent(JSON.stringify(localStorage))));
+                document.getElementById("exportBox").value = d;
+                document.getElementById("exportModal").style.display = "flex";
+            } catch(e) { alert("خطأ"); }
+        };
+        document.getElementById("bkImport").onclick = () => {
+            const c = prompt("كود الاستعادة:");
+            if(c) {
+                try {
+                    const d = JSON.parse(decodeURIComponent(escape(atob(c))));
+                    if(confirm("سيتم استبدال البيانات، متأكد؟")) {
+                        // لا تمسح رقم الإصدار عند الاسترجاع
+                        const v = localStorage.getItem('app_version'); 
+                        localStorage.clear();
+                        for(let k in d) localStorage.setItem(k, d[k]);
+                        if(v) localStorage.setItem('app_version', v);
+                        alert("✅ تم الاسترجاع"); location.reload();
+                    }
+                } catch(e) { alert("❌ الكود خطأ"); }
+            }
+        };
+    };
+})();
 </script>
-
 </body>
 </html>
