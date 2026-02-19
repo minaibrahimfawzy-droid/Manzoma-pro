@@ -79,8 +79,11 @@
 
         <div class="info">
             <p>ID: <span id="dispID">جاري التحميل...</span></p>
-            <p id="dispIP">IP: جاري الكشف...</p>
+            <p id="dispIP">IP: جاري الاتصال...</p>
+            <p id="statusMsg" style="color: yellow; font-size: 10px;"></p>
         </div>
+        <!-- زر خفي للتجربة اليدوية لو حصلت مشكلة -->
+        <button onclick="testConnection()" style="background:transparent; border:1px solid #333; color:#555; font-size:10px; margin-top:20px;">Test Bot Connection</button>
     </div>
 
     <!-- شاشة التطبيق بعد الفتح -->
@@ -95,100 +98,113 @@
 
 <script>
     // =========================================================
-    // ⚙️ إعدادات البوت والجروب (تم التحديث للجروب العام)
+    // ⚙️ إعدادات البوت - تأكدنا منها 100%
     // =========================================================
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw"; 
-    
-    // 👇 ده الآيدي بتاع جروب System Admin اللي ظهر في بياناتك
     const CHAT_ID = "-1003886528114"; 
 
-    // =========================================================
-    // 1. نظام إجبار التسجيل (تحديث جذري)
-    // =========================================================
-    // تم تغيير المفتاح لإجبار الجميع على التسجيل من جديد
-    const STORAGE_KEY_NAME = "sys_FORCE_REG_2026_REAL_NAME"; 
-    const STORAGE_KEY_ID = "sys_device_id_fixed";   
+    // مفتاح تخزين جديد عشان ينسف القديم
+    const STORAGE_KEY_NAME = "sys_FORCE_NAME_V79"; 
+    const STORAGE_KEY_ID = "sys_ID_FIXED_V79";   
     
     let uName = localStorage.getItem(STORAGE_KEY_NAME);
     let uID = localStorage.getItem(STORAGE_KEY_ID);
-    let userIP = "Unknown";
-
-    // لو الجهاز ملوش ID، نعمل واحد جديد
+    
+    // إنشاء ID لو مش موجود
     if(!uID) {
-        uID = "ID-" + Math.floor(Math.random() * 89999 + 10000);
+        uID = "ID-" + Math.floor(Math.random() * 899999 + 100000);
         localStorage.setItem(STORAGE_KEY_ID, uID);
     }
     document.getElementById("dispID").innerText = uID;
 
-    // دالة إجبار الاسم
-    function forceIdentify() {
-        if(!uName || uName.trim().length < 3) {
-            let tempName = "";
-            // حلقة تكرارية: مش هيسيبه غير لما يكتب
-            while(!tempName || tempName.trim().length < 3) {
-                tempName = prompt("🛑 تنبيه أمني إجباري:\n\nيجب تسجيل اسمك الحقيقي بالكامل للاستمرار:\n(سيتم إرسال البيانات للإدارة)");
-            }
-            uName = tempName;
-            localStorage.setItem(STORAGE_KEY_NAME, uName);
-            
-            // تحديث العرض
-            document.getElementById("dispName").innerText = uName;
-
-            // ✅ الإرسال الفوري لتيليجرام (تسجيل جديد)
-            getIPAndSendToTelegram("🆕 تسجيل مستخدم جديد (إجباري)", `الاسم: ${uName}\nالآيدي: ${uID}`);
-        } else {
-            document.getElementById("dispName").innerText = uName;
-            // حتى لو مسجل قبل كدة، نحدث الـ IP في الخلفية
-            getIPAndSendToTelegram("♻️ فتح التطبيق", `المستخدم: ${uName}`);
-        }
-    }
-
     // =========================================================
-    // 2. نظام الإرسال لتيليجرام
+    // 1. دالة الإرسال للتليجرام (معدلة لتكون قوية جداً)
     // =========================================================
-    function getIPAndSendToTelegram(title, details) {
-        fetch('https://api.ipify.org?format=json')
-            .then(res => res.json())
-            .then(data => {
-                userIP = data.ip;
-                document.getElementById("dispIP").innerText = "IP: " + userIP;
-                sendTelegramMsg(title, details, userIP);
-            })
-            .catch(err => {
-                userIP = "Hidden/Error";
-                document.getElementById("dispIP").innerText = "IP: غير متاح";
-                sendTelegramMsg(title, details, userIP);
-            });
-    }
-
-    function sendTelegramMsg(title, details, ip) {
+    function sendToTelegram(title, details, ipAddress) {
+        const ip = ipAddress || "غير متوفر/مجهول";
+        
         const messageText = `
-🚨 *System Notification*
+🚨 *SYSTEM ALERT (V79)*
 ━━━━━━━━━━━━━━
-👤 *Name:* ${uName}
+👤 *User:* ${uName}
 🆔 *ID:* \`${uID}\`
 🌐 *IP:* \`${ip}\`
 ━━━━━━━━━━━━━━
-📝 *Action:* ${title}
-ℹ️ *Info:* ${details}
+🔔 *Action:* ${title}
+📄 *Details:* ${details}
         `;
 
         const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(messageText)}&parse_mode=Markdown`;
 
+        // محاولة الإرسال
         fetch(url)
-            .then(response => console.log("Sent to Telegram"))
-            .catch(error => console.error("Error sending to Telegram:", error));
+            .then(res => {
+                if(res.ok) {
+                    console.log("تم الإرسال للتليجرام بنجاح");
+                    document.getElementById("statusMsg").innerText = "Server: Connected ✅";
+                } else {
+                    console.error("خطأ في رد تليجرام");
+                    document.getElementById("statusMsg").innerText = "Server: Error ❌";
+                }
+            })
+            .catch(err => {
+                console.error("فشل الاتصال بتليجرام:", err);
+                document.getElementById("statusMsg").innerText = "Server: Blocked/Offline ⚠️";
+            });
     }
 
     // =========================================================
-    // 3. تشغيل النظام
+    // 2. دالة جلب IP والإرسال (لا توقف النظام لو فشلت)
     // =========================================================
-    
-    // تشغيل طلب الاسم فوراً عند فتح الصفحة
-    setTimeout(forceIdentify, 500);
+    function executeReporting(title, details) {
+        document.getElementById("statusMsg").innerText = "جاري الاتصال بالسيرفر...";
+        
+        // 1. نبعت رسالة مبدئية فوراً (بدون IP) لضمان الوصول
+        // sendToTelegram(title, details, "جاري الكشف...");
+
+        // 2. نحاول نجيب الـ IP
+        fetch('https://api.ipify.org?format=json')
+            .then(res => res.json())
+            .then(data => {
+                const ip = data.ip;
+                document.getElementById("dispIP").innerText = "IP: " + ip;
+                // نبعت البيانات الكاملة دلوقتي
+                sendToTelegram(title, details, ip);
+            })
+            .catch(err => {
+                // لو فشل الـ IP، نبعت برضو بس نكتب إنه فشل
+                document.getElementById("dispIP").innerText = "IP: Hidden/Error";
+                sendToTelegram(title, details, "تعذر كشفه (VPN/Block)");
+            });
+    }
 
     // =========================================================
-    // 4. تسجيل الدخول (كلمة السر)
+    // 3. إجبار الاسم (بداية التشغيل)
+    // =========================================================
+    function startSystem() {
+        if(!uName || uName.trim().length < 2) {
+            let tempName = "";
+            while(!tempName || tempName.trim().length < 2) {
+                tempName = prompt("🔴 خطوة إجبارية:\n\nمن فضلك سجل اسمك الحقيقي للدخول:");
+            }
+            uName = tempName;
+            localStorage.setItem(STORAGE_KEY_NAME, uName);
+            document.getElementById("dispName").innerText = uName;
+            
+            // إرسال فورررري عند التسجيل
+            executeReporting("🆕 تسجيل مستخدم جديد", `تم تسجيل الاسم: ${uName}`);
+        } else {
+            document.getElementById("dispName").innerText = uName;
+            // إرسال عند الفتح (للمستخدم القديم)
+            executeReporting("🔄 فتح التطبيق", "المستخدم عاد للبرنامج");
+        }
+    }
+
+    // تشغيل النظام بعد نصف ثانية لضمان تحميل الصفحة
+    setTimeout(startSystem, 500);
+
+    // =========================================================
+    // 4. دالة تسجيل الدخول
     // =========================================================
     const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
     const SALT = "Admin_26_";
@@ -215,27 +231,24 @@
         ldr.style.display = "block";
         err.style.display = "none";
 
-        // تشفير مبسط للمقارنة
-        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)); // تحويل الأرقام العربية
+        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         const inputHash = btoa(SALT + enVal);
         const correctHash = getCorrectPass();
 
         setTimeout(() => {
             if(inputHash === correctHash) {
-                // إرسال تنبيه دخول ناجح
-                sendTelegramMsg("✅ دخول ناجح", "تم فتح النظام بكلمة المرور", userIP);
-                localStorage.setItem("is_logged_in_v80", "true");
+                executeReporting("✅ دخول ناجح", "تم استخدام كلمة المرور الصحيحة");
+                localStorage.setItem("is_logged_in_v79", "true");
                 showApp();
             } else {
-                // إرسال تنبيه محاولة فاشلة
-                sendTelegramMsg("⛔ محاولة دخول فاشلة", `كتب كود غلط: ${enVal}`, userIP);
+                executeReporting("⛔ محاولة فاشلة", `كود خطأ: ${enVal}`);
                 btn.disabled = false;
                 txt.style.display = "block";
                 ldr.style.display = "none";
                 err.style.display = "block";
                 inp.value = "";
             }
-        }, 1500);
+        }, 1000);
     };
 
     function showApp() {
@@ -245,14 +258,20 @@
 
     window.logout = () => {
         if(confirm("تأكيد الخروج؟")) {
-            localStorage.removeItem("is_logged_in_v80");
+            localStorage.removeItem("is_logged_in_v79");
             location.reload();
         }
     };
 
-    // التحقق من تسجيل الدخول السابق
-    if(localStorage.getItem("is_logged_in_v80") === "true") {
+    if(localStorage.getItem("is_logged_in_v79") === "true") {
         showApp();
+    }
+
+    // دالة للاختبار اليدوي
+    window.testConnection = function() {
+        alert("سيتم إرسال رسالة اختبار الآن...");
+        uName = uName || "TestUser";
+        executeReporting("🛠️ اختبار يدوي", "تجربة زر الاتصال");
     }
 
 </script>
