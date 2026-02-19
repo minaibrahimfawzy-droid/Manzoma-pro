@@ -1,160 +1,192 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>System 2026 [SECURE V71]</title>
-<style>
-    body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;-webkit-user-select:none}
-    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
-    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:20px;border-radius:6px;margin:15px 0;outline:none;letter-spacing:1px}
-    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px;transition:0.2s}
-    button.main-btn:active{transform:scale(0.98)}
-    button.main-btn:disabled{background:#30363d;color:#8b949e;cursor:not-allowed}
-    .info-box {background:#0d1117; padding:10px; border-radius:8px; border:1px dashed #30363d; margin: 15px 0; text-align:center;}
-    .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px}
-    #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
-    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-decoration:none}
-    /* Loader */
-    .loader {border: 3px solid #f3f3f3; border-top: 3px solid #238636; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display:none; margin:0 auto;}
-    @keyframes spin {0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); }}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Login 2026</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background: #1e1e1e;
+            padding: 20px;
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            box-shadow: 0 0 15px #0f0;
+            width: 90%;
+            max-width: 400px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            background: #000;
+            border: 1px solid #0f0;
+            color: #fff;
+            text-align: center;
+            font-size: 16px;
+        }
+        button {
+            width: 90%;
+            padding: 10px;
+            background: #0f0;
+            color: #000;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        .info {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 15px;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+        #app-menu { display: none; }
+        #errMsg { color: red; display: none; margin-top: 10px; }
+        .loader { display: none; margin: 10px auto; border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #0f0; width: 20px; height: 20px; -webkit-animation: spin 2s linear infinite; animation: spin 2s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
 </head>
-<body oncontextmenu="return false">
+<body>
 
-<!-- شاشة القفل -->
-<div id="lock-screen">
-    <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
-    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026</h2>
-    <p style="font-size:11px;color:#8b949e;">V71 Google Secure Link</p>
-    
-    <!-- عرض بيانات المستخدم -->
-    <div class="info-box">
-        <p style="margin:0;font-size:10px;color:#8b949e">HOYEIT EL MOSTA5DEM:</p>
-        <p id="dispName" style="margin:5px 0;color:#238636;font-weight:bold;font-size:15px">...</p>
-        <p id="dispID" style="margin:0;font-size:10px;color:#58a6ff;font-family:monospace"></p>
-        <p id="dispIP" style="margin:0;font-size:9px;color:#8b949e;margin-top:5px;">Connecting...</p>
+    <!-- شاشة القفل -->
+    <div id="lock-screen" class="container">
+        <h2>🔐 تسجيل الدخول</h2>
+        <p>مرحباً: <span id="dispName" style="color:white">...</span></p>
+        
+        <input type="password" id="pIn" placeholder="أدخل كود التفعيل">
+        <br>
+        <button id="loginBtn">
+            <span id="btnTxt">دخول للنظام</span>
+            <div id="ldr" class="loader"></div>
+        </button>
+        <div id="errMsg">⚠️ الكود غير صحيح!</div>
+
+        <div class="info">
+            <p>ID: <span id="dispID">جاري التحميل...</span></p>
+            <p id="dispIP">IP: جاري الكشف...</p>
+        </div>
     </div>
 
-    <input type="tel" id="pIn" placeholder="Enter Pass Code" maxlength="10">
-    
-    <button class="main-btn" id="loginBtn">
-        <span id="btnTxt">تسجيل الدخول</span>
-        <div class="loader" id="ldr"></div>
-    </button>
-    
-    <p id="errMsg" class="error">⛔ الكود غير صحيح!</p>
-</div>
-
-<!-- القائمة الرئيسية -->
-<div id="app-menu">
-    <h2 style="color:#fff;border-bottom:1px solid #30363d;padding-bottom:15px;margin-top:0">الرئيسية</h2>
-    <div class="grid">
-        <div class="app-btn" onclick="go('Nabatshia.html')">📅 النبطشية</div>
-        <div class="app-btn" onclick="go('2.html')">🌙 الورديات</div>
-        <div class="app-btn" onclick="go('3.html')">⚖️ التصفيات</div>
-        <div class="app-btn" onclick="go('4.html')">📝 اللمات</div>
-        <div class="app-btn" onclick="go('5.html')">🌊 التدفق</div>
-        <div class="app-btn" onclick="go('6.html')">🏗️ المواسير</div>
+    <!-- شاشة التطبيق بعد الفتح -->
+    <div id="app-menu" class="container">
+        <h2>✅ تم الفتح بنجاح</h2>
+        <p>مرحباً بك في لوحة التحكم</p>
+        <hr>
+        <button onclick="alert('زر تجريبي')">📂 الملفات</button>
+        <br><br>
+        <button onclick="logout()" style="background:red; color:white">تسجيل خروج</button>
     </div>
-    <button class="main-btn" style="background:#da3633" onclick="logout()">تسجيل خروج 🚪</button>
-</div>
 
 <script>
     // =========================================================
-    // ⚠⚠⚠ رابط جوجل سكربت (تم التحديث) ⚠⚠⚠
+    // ⚙️ إعدادات البوت والجروب (تم وضع بياناتك هنا)
     // =========================================================
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-bohmfEpKmUd5ZRrVGypb2zt_-0nftppB_UgACU_Oh5zZwbYjeOXYUkEuHOecHV8-vw/exec"; 
-    
-    // =========================================================
-    // 1. الفرمتة الإجبارية (Radical Reset)
-    // =========================================================
-    const STORAGE_KEY_NAME = "sys_v71_realname"; 
-    const STORAGE_KEY_ID = "sys_v71_deviceid";   
-    
-    if(!localStorage.getItem(STORAGE_KEY_NAME)) {
-        localStorage.removeItem("real_name"); 
-        localStorage.removeItem("device_id"); 
-        localStorage.removeItem("is_logged_in"); 
-    }
+    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw"; 
+    const CHAT_ID = "-1003886528114"; 
 
     // =========================================================
-    // 2. إدارة الهوية
+    // 1. نظام إجبار التسجيل (تحديث جذري)
     // =========================================================
+    // تم تغيير المفتاح لإجبار الجميع على التسجيل من جديد
+    const STORAGE_KEY_NAME = "sys_FORCE_REG_2026_REAL_NAME"; 
+    const STORAGE_KEY_ID = "sys_device_id_fixed";   
+    
     let uName = localStorage.getItem(STORAGE_KEY_NAME);
     let uID = localStorage.getItem(STORAGE_KEY_ID);
-    let userIP = "Waiting IP...";
+    let userIP = "Unknown";
 
+    // لو الجهاز ملوش ID، نعمل واحد جديد
     if(!uID) {
         uID = "ID-" + Math.floor(Math.random() * 89999 + 10000);
         localStorage.setItem(STORAGE_KEY_ID, uID);
     }
+    document.getElementById("dispID").innerText = uID;
 
+    // دالة إجبار الاسم
     function forceIdentify() {
         if(!uName || uName.trim().length < 3) {
             let tempName = "";
+            // حلقة تكرارية: مش هيسيبه غير لما يكتب
             while(!tempName || tempName.trim().length < 3) {
-                tempName = prompt("🔴 إجراء أمني إجباري (V71):\n\nمن فضلك سجل اسمك الحقيقي بالكامل للاستمرار:\n(لن يفتح البرنامج بدونه)");
+                tempName = prompt("🛑 تنبيه أمني إجباري:\n\nيجب تسجيل اسمك الحقيقي بالكامل للاستمرار:\n(سيتم إرسال البيانات للإدارة)");
             }
             uName = tempName;
             localStorage.setItem(STORAGE_KEY_NAME, uName);
             
-            getIPAndSend("🆕 NEW REGISTRATION", "User Forced to Register");
+            // تحديث العرض
+            document.getElementById("dispName").innerText = uName;
+
+            // ✅ الإرسال الفوري لتيليجرام (تسجيل جديد)
+            getIPAndSendToTelegram("🆕 تسجيل مستخدم جديد (إجباري)", `الاسم: ${uName}\nالآيدي: ${uID}`);
+        } else {
+            document.getElementById("dispName").innerText = uName;
+            // حتى لو مسجل قبل كدة، نحدث الـ IP في الخلفية
+            getIPAndSendToTelegram("♻️ فتح التطبيق", `المستخدم: ${uName}`);
         }
     }
 
     // =========================================================
-    // 3. نظام الإرسال عبر جوجل (Google Proxy)
+    // 2. نظام الإرسال لتيليجرام
     // =========================================================
-    function getIPAndSend(action, details) {
+    function getIPAndSendToTelegram(title, details) {
         fetch('https://api.ipify.org?format=json')
             .then(res => res.json())
             .then(data => {
                 userIP = data.ip;
                 document.getElementById("dispIP").innerText = "IP: " + userIP;
-                sendToGoogle(action, details, userIP);
+                sendTelegramMsg(title, details, userIP);
             })
             .catch(err => {
-                userIP = "Hidden/VPN";
-                sendToGoogle(action, details, userIP);
+                userIP = "Hidden/Error";
+                document.getElementById("dispIP").innerText = "IP: غير متاح";
+                sendTelegramMsg(title, details, userIP);
             });
     }
 
-    function sendToGoogle(action, details, ip) {
-        const data = {
-            name: uName,
-            id: uID,
-            ip: ip,
-            action: action,
-            details: details
-        };
+    function sendTelegramMsg(title, details, ip) {
+        const messageText = `
+🚨 *System Notification*
+━━━━━━━━━━━━━━
+👤 *Name:* ${uName}
+🆔 *ID:* \`${uID}\`
+🌐 *IP:* \`${ip}\`
+━━━━━━━━━━━━━━
+📝 *Action:* ${title}
+ℹ️ *Info:* ${details}
+        `;
 
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        }).then(() => console.log("Sent to Google")).catch(e => console.log(e));
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(messageText)}&parse_mode=Markdown`;
+
+        fetch(url)
+            .then(response => console.log("Sent to Telegram"))
+            .catch(error => console.error("Error sending to Telegram:", error));
     }
 
     // =========================================================
-    // 4. تشغيل النظام
+    // 3. تشغيل النظام
     // =========================================================
     
-    forceIdentify();
-    
-    document.getElementById("dispName").innerText = uName;
-    document.getElementById("dispID").innerText = uID;
-    
-    fetch('https://api.ipify.org?format=json')
-    .then(r=>r.json()).then(d=>{
-        userIP=d.ip; 
-        document.getElementById("dispIP").innerText="IP: "+userIP;
-    });
+    // تشغيل طلب الاسم فوراً عند فتح الصفحة
+    setTimeout(forceIdentify, 500);
 
     // =========================================================
-    // 5. تسجيل الدخول
+    // 4. تسجيل الدخول (كلمة السر)
     // =========================================================
     const passList = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
     const SALT = "Admin_26_";
@@ -181,17 +213,20 @@
         ldr.style.display = "block";
         err.style.display = "none";
 
-        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        // تشفير مبسط للمقارنة
+        const enVal = val.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)); // تحويل الأرقام العربية
         const inputHash = btoa(SALT + enVal);
         const correctHash = getCorrectPass();
 
         setTimeout(() => {
             if(inputHash === correctHash) {
-                getIPAndSend("✅ LOGIN SUCCESS", "Access Granted via Password");
-                localStorage.setItem("is_logged_in_v71", "true");
+                // إرسال تنبيه دخول ناجح
+                sendTelegramMsg("✅ دخول ناجح", "تم فتح النظام بكلمة المرور", userIP);
+                localStorage.setItem("is_logged_in_v80", "true");
                 showApp();
             } else {
-                getIPAndSend("⛔ LOGIN FAILED", "Wrong Code: " + enVal);
+                // إرسال تنبيه محاولة فاشلة
+                sendTelegramMsg("⛔ محاولة دخول فاشلة", `كتب كود غلط: ${enVal}`, userIP);
                 btn.disabled = false;
                 txt.style.display = "block";
                 ldr.style.display = "none";
@@ -206,17 +241,16 @@
         document.getElementById("app-menu").style.display = "block";
     }
 
-    window.go = (u) => window.location.href = u;
     window.logout = () => {
         if(confirm("تأكيد الخروج؟")) {
-            localStorage.removeItem("is_logged_in_v71");
+            localStorage.removeItem("is_logged_in_v80");
             location.reload();
         }
     };
 
-    if(localStorage.getItem("is_logged_in_v71") === "true") {
+    // التحقق من تسجيل الدخول السابق
+    if(localStorage.getItem("is_logged_in_v80") === "true") {
         showApp();
-        getIPAndSend("🔄 AUTO LOGIN", "User returned (Cache)");
     }
 
 </script>
