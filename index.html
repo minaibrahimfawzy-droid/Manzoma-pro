@@ -6,28 +6,52 @@
 <title>System 2026 Pro</title>
 <style>
     body{font-family:'Segoe UI',Tahoma,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;overflow:hidden}
-    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5);}
+    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5); position:relative; z-index:10;}
     input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:16px;border-radius:6px;margin:10px 0;outline:none;box-sizing:border-box}
     input:focus{border-color:#58a6ff;}
     button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px;}
     .logout-btn{background:#da3633;color:white;border:none;padding:6px 12px;font-size:12px;font-weight:bold;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px}
     .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px;background:rgba(218,54,51,0.1);padding:5px;border-radius:4px;border:1px solid rgba(218,54,51,0.3)}
+    
     #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
-    .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;border-bottom:1px solid #30363d;padding-bottom:15px}
+    .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;border-bottom:1px solid #30363d;padding-bottom:15px}
     .user-info{text-align:right; font-size:14px; color:#8b949e;}
     .user-info span {color:#58a6ff; font-weight:bold;}
+    
+    .datetime{text-align:center; font-size:13px; color:#238636; margin-bottom:20px; font-weight:bold; background:#161b22; padding:10px; border-radius:8px; border:1px solid #30363d;}
+    
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
-    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;text-decoration:none;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-align:center;}
+    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;text-decoration:none;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-align:center; cursor:pointer; transition:0.2s}
+    .app-btn:active{transform:scale(0.95)}
     .icon{font-size:28px;margin-bottom:8px}
+    
+    .tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;border-top:1px solid #30363d;padding-top:20px;}
+    .tool-btn{background:#1f6feb;color:#fff;border:none;padding:10px;border-radius:6px;font-size:14px;cursor:pointer;font-weight:bold;}
+    .tool-btn.restore{background:#9e6a03;}
+    
+    /* شاشة التحديث الإجباري */
+    #update-screen{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(13,17,23,0.95); z-index:999; flex-direction:column; align-items:center; justify-content:center;}
+    #update-screen .box{background:#161b22; padding:30px; border-radius:12px; text-align:center; border:1px solid #f85149; box-shadow:0 0 30px rgba(248,81,73,0.3); width:80%;}
+    #update-screen button{background:#f85149; color:#fff; border:none; padding:12px 20px; font-size:16px; border-radius:6px; cursor:pointer; margin-top:20px; font-weight:bold;}
 </style>
 </head>
 <body oncontextmenu="return false">
+
+<!-- شاشة التحديث -->
+<div id="update-screen">
+    <div class="box">
+        <div style="font-size:50px; margin-bottom:10px;">⚠️</div>
+        <h2 style="color:#fff;">تحديث هام مطلوب!</h2>
+        <p style="color:#8b949e;">يوجد إصدار جديد، يجب التحديث للمتابعة.</p>
+        <button id="updateBtn">تحميل التحديث الآن</button>
+    </div>
+</div>
 
 <div id="lock-screen">
     <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
     <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
     
-    <input type="text" id="userName" placeholder="سجل اسمك ثلاثي هنا...">
+    <input type="text" id="userName" placeholder="الاسم ثلاثي (عربي فقط)...">
     <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
     
     <button class="main-btn" id="loginBtn" onclick="login()">تفعيل ودخول</button>
@@ -45,21 +69,33 @@
         <button id="logoutBtn" class="logout-btn" onclick="logout()"><span>خروج</span> 🚪</button>
     </div>
     
-    <div class="grid">
-        <div class="app-btn" onclick="go('Nabatshia.html')"><span class="icon">📅</span>النبطشية</div>
-        <div class="app-btn" onclick="go('2.html')"><span class="icon">🌙</span>الورديات</div>
-        <div class="app-btn" onclick="go('3.html')"><span class="icon">⚖️</span>التصفيات</div>
-        <div class="app-btn" onclick="go('4.html')"><span class="icon">📝</span>اللمات</div>
-        <div class="app-btn" onclick="go('5.html')"><span class="icon">🌊</span>التدفق</div>
-        <div class="app-btn" onclick="go('6.html')"><span class="icon">🏗️</span>المهيئ والمواسير</div>
+    <div class="datetime" id="clock">جاري تحميل الوقت...</div>
+    
+    <div class="grid" id="apps-container"></div>
+    
+    <div class="tools-grid">
+        <button class="tool-btn" onclick="backupData()">📥 نسخة احتياطية</button>
+        <button class="tool-btn restore" onclick="document.getElementById('fileInp').click()">📤 استعادة</button>
+        <input type="file" id="fileInp" style="display:none;" accept=".txt" onchange="restoreData(event)">
     </div>
 </div>
 
 <script>
+    const CURRENT_VERSION = "1.0"; // إصدار التطبيق (لا تغيره من هنا أبداً)
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
     const CHAT_ID = "-1003886528114";
     const SECRET_KEY = "QWRtaW5fMjZf";
     const PASS_ARRAY = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+
+    let failAttempts = 0;
+    let systemApps = [
+        {name: "النبطشية", icon: "📅", url: "Nabatshia.html"},
+        {name: "الورديات", icon: "🌙", url: "2.html"},
+        {name: "التصفيات", icon: "⚖️", url: "3.html"},
+        {name: "اللمات", icon: "📝", url: "4.html"},
+        {name: "التدفق", icon: "🌊", url: "5.html"},
+        {name: "المهيئ والمواسير", icon: "🏗️", url: "6.html"}
+    ];
 
     let deviceID = localStorage.getItem("_u_id");
     if(!deviceID) {
@@ -67,6 +103,24 @@
         localStorage.setItem("_u_id", deviceID);
     }
     document.getElementById("devID").innerText = "معرف جهازك: " + deviceID;
+
+    setInterval(() => {
+        const d = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: true };
+        document.getElementById("clock").innerText = d.toLocaleDateString('ar-EG', options);
+    }, 1000);
+
+    function renderApps(appsArray) {
+        const container = document.getElementById("apps-container");
+        container.innerHTML = "";
+        appsArray.forEach(app => {
+            let div = document.createElement("div");
+            div.className = "app-btn";
+            div.onclick = () => window.location.href = app.url;
+            div.innerHTML = `<span class="icon">${app.icon}</span>${app.name}`;
+            container.appendChild(div);
+        });
+    }
 
     function getTruePass() {
         const d = new Date();
@@ -76,42 +130,68 @@
         return PASS_ARRAY[i % 5];
     }
 
-    // الطريقة السحرية اللي مستحيل الـ APK يمنعها
-    function sendToTelegram(name) {
-        const text = `🚨 *دخول من الـ APK*\n👤 الاسم: *${name}*\n🆔 الـ ID: \`${deviceID}\``;
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
-        
-        // الطريقة الأولى (الأساسية)
-        fetch(url).catch(function() {
-            // الطريقة التانية (لو الـ APK قفل الأولى، هيبعت عن طريق طلب صورة وهمية)
-            var img = new Image();
-            img.src = url;
-        });
+    async function getIP() {
+        if(!navigator.onLine) return "أوفلاين";
+        try {
+            let res = await fetch("https://api.ipify.org?format=json", { cache: "no-store" });
+            let data = await res.json();
+            return data.ip;
+        } catch(e) { return "فشل جلب الأيبي"; }
     }
 
-    function login() {
+    function isValidArabicName(name) {
+        const regex = /^[\u0600-\u06FF\s]+$/; 
+        const words = name.trim().split(/\s+/);
+        return regex.test(name) && words.length >= 3;
+    }
+
+    async function sendToTelegram(name, type="login") {
+        if(!navigator.onLine) return; 
+        let ip = await getIP();
+        let text = type === "login" 
+            ? `✅ *دخول ناجح*\n👤 الاسم: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``
+            : `🚨 *محاولة اختراق (3 مرات خطأ)*\n👤 الاسم: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+        fetch(url).catch(() => { new Image().src = url; });
+    }
+
+    async function login() {
         const nameInp = document.getElementById("userName").value.trim();
         const pinInp = document.getElementById("pIn").value.trim();
         const errorMsg = document.getElementById("eMsg");
 
-        if(nameInp.length < 3) { alert("اكتب اسمك صح"); return; }
-        if(pinInp.length < 1) { return; }
+        if(!isValidArabicName(nameInp)) { 
+            alert("⚠️ يجب كتابة اسمك الثلاثي باللغة العربية فقط (يمنع استخدام الأرقام)."); 
+            return; 
+        }
+        if(pinInp.length < 1) return;
+
+        const btn = document.getElementById("loginBtn");
+        btn.disabled = true;
+        btn.innerText = "جاري الدخول...";
 
         const enVal = pinInp.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         const hash = btoa(atob(SECRET_KEY) + enVal);
 
         if (hash === getTruePass()) {
+            failAttempts = 0;
             localStorage.setItem("_tkn_auth", hash);
             localStorage.setItem("_u_name", nameInp);
-            
-            // إرسال للتليجرام
-            sendToTelegram(nameInp);
-            
-            // فتح التطبيق
+            sendToTelegram(nameInp, "login"); 
             showApp(true);
         } else {
+            failAttempts++;
             errorMsg.style.display = "block";
+            errorMsg.innerText = `⛔ الكود غير صحيح! (محاولة ${failAttempts}/3)`;
+            if(failAttempts >= 3) {
+                sendToTelegram(nameInp, "alert");
+                alert("🚨 تم حظر المحاولة وتنبيه الإدارة بأنك تدخل كود خاطئ.");
+                failAttempts = 0;
+            }
         }
+        btn.disabled = false;
+        btn.innerText = "تفعيل ودخول";
     }
 
     function showApp(isLoggedIn) {
@@ -119,24 +199,56 @@
             document.getElementById("lock-screen").style.display = "none";
             document.getElementById("app-menu").style.display = "block";
             document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name");
+            
+            let cached = localStorage.getItem("_cached_apps");
+            renderApps(cached ? JSON.parse(cached) : systemApps);
         } else {
             document.getElementById("lock-screen").style.display = "block";
             document.getElementById("app-menu").style.display = "none";
         }
     }
 
+    // --- السحر هنا: استدعاء ملف الـ GitHub بتاعك ---
+    function loadRemoteControl() {
+        if(!navigator.onLine) return; 
+        let script = document.createElement("script");
+        // ربطتلك الملف برابطك المباشر
+        script.src = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/control.js?v=" + new Date().getTime(); 
+        document.body.appendChild(script);
+    }
+
+    function backupData() {
+        const data = JSON.stringify(localStorage);
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([data], {type: "text/plain"}));
+        a.download = `backup_2026_${new Date().getTime()}.txt`;
+        a.click();
+    }
+
+    function restoreData(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                for(let key in data) localStorage.setItem(key, data[key]);
+                alert("✅ تمت الاستعادة بنجاح!");
+                location.reload();
+            } catch(err) { alert("❌ فشلت الاستعادة، الملف غير صالح."); }
+        };
+        reader.readAsText(file);
+    }
+
     window.onload = function() {
-        if (localStorage.getItem("_tkn_auth") === getTruePass()) {
-            showApp(true);
-        }
+        loadRemoteControl(); 
+        showApp(localStorage.getItem("_tkn_auth") === getTruePass());
     };
 
     function logout() {
         localStorage.removeItem("_tkn_auth");
         location.reload();
     }
-
-    window.go = function(u) { window.location.href = u; };
 </script>
 </body>
 </html>

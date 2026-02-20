@@ -4,104 +4,312 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>مهيئات ومواسير</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
 <style>
-body{margin:0;padding:0;font-family:'Cairo',sans-serif;background:#000;color:gold;text-align:center;padding-bottom:50px;}
-h1{margin:20px 0;font-size:2.2em;font-weight:900;color:gold;text-shadow:0 0 15px #ffd700;}
-h2{color:#fff; border-bottom: 2px solid gold; display:inline-block; padding-bottom:5px; margin-bottom: 20px;}
-#datetime{font-weight:900;color:#ffd700;margin-bottom:20px;font-size:1em;}
+    /* الإعدادات الأساسية */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Cairo', sans-serif;
+    }
 
-/* الحقول */
-input{padding:12px;margin:8px 0;width:85%;font-size:1.1em;border-radius:12px;border:2px solid gold;background:#111;color:gold;text-align:center;font-weight:900;}
+    body {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: #f8fafc;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 10px 50px;
+    }
 
-/* الأزرار العامة */
-button{padding:14px 15px;margin:8px 4px;border:none;border-radius:12px;font-weight:900;cursor:pointer;font-size:1.1em; transition:0.3s; min-width: 60px;}
-button:active{transform:scale(0.95);}
+    /* العناوين والوقت */
+    h1 {
+        margin: 10px 0;
+        font-size: 2.2em;
+        font-weight: 900;
+        color: #38bdf8;
+        text-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+        letter-spacing: 1px;
+    }
 
-/* ألوان الأزرار */
-.btn-gold{background:gold;color:black;}
-.btn-reset{background:#b8860b;color:white;}
-.btn-add{background:#00c853;color:white; box-shadow: 0 0 10px #00c853;} /* زر الجمع الأخضر */
-.btn-clear-all{background:#d50000;color:white; width:85%; margin-top:15px;} /* زر تصفير العداد */
-.btn-menu{background: linear-gradient(45deg, #ffd700, #b8860b); color: black; width: 85%; margin: 10px auto; display: block; padding: 20px; font-size: 1.5em; box-shadow: 0 0 15px gold;}
-.btn-back{background: #333; color: #fff; border: 1px solid gold; font-size: 0.9em; padding: 10px 15px;}
+    #datetime {
+        font-weight: 600;
+        color: #94a3b8;
+        margin-bottom: 30px;
+        font-size: 1.1em;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 8px 20px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-/* النتائج */
-.result-box{border:2px solid gold;border-radius:14px;padding:15px;width:85%;margin:15px auto;font-size:1.4em;font-weight:900;background:linear-gradient(180deg,#222,#000);color:white;box-shadow:0 0 25px rgba(255,215,0,0.6);}
-.shine{animation:shine 1.5s linear infinite;color:gold;}
-@keyframes shine{0%{box-shadow:0 0 15px gold;}50%{box-shadow:0 0 35px gold;}100%{box-shadow:0 0 15px gold;}}
+    /* الحاويات (تأثير الزجاج) */
+    .app-container {
+        width: 100%;
+        max-width: 450px;
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 30px 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        text-align: center;
+    }
 
-.total-box{border:3px dashed #00c853; border-radius:14px; padding:15px; width:85%; margin:20px auto; font-size:1.6em; font-weight:900; background:#0a200a; color:#00e676;}
+    h2 {
+        color: #f1f5f9;
+        font-size: 1.5em;
+        margin-bottom: 25px;
+        position: relative;
+        display: inline-block;
+    }
 
-.hidden {display: none;}
+    h2::after {
+        content: "";
+        position: absolute;
+        width: 50%;
+        height: 3px;
+        background: #38bdf8;
+        bottom: -8px;
+        left: 25%;
+        border-radius: 5px;
+    }
+
+    /* الحقول */
+    input {
+        width: 100%;
+        padding: 15px;
+        margin: 10px 0;
+        font-size: 1.1em;
+        border-radius: 12px;
+        border: 2px solid #334155;
+        background: #0f172a;
+        color: #f8fafc;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #38bdf8;
+        box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+        background: #1e293b;
+    }
+
+    input::placeholder {
+        color: #64748b;
+        font-weight: 400;
+    }
+
+    /* الأزرار العامة */
+    .btn-group {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin: 15px 0;
+    }
+
+    button {
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: all 0.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    button:active {
+        transform: scale(0.95);
+    }
+
+    /* ألوان الأزرار الحديثة */
+    .btn-gold {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: white;
+        flex: 2;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    }
+    
+    .btn-add {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        flex: 1;
+        font-size: 1.5em;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-reset {
+        background: #475569;
+        color: white;
+        flex: 1;
+    }
+
+    .btn-gold:hover { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
+    .btn-add:hover { background: linear-gradient(135deg, #34d399, #10b981); }
+    .btn-reset:hover { background: #64748b; }
+
+    /* أزرار القائمة */
+    .btn-menu {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        color: #f8fafc;
+        width: 100%;
+        margin: 15px 0;
+        padding: 25px;
+        font-size: 1.4em;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .btn-menu:hover {
+        background: linear-gradient(135deg, #2dd4bf, #0d9488);
+        border-color: transparent;
+        transform: translateY(-3px);
+    }
+
+    .btn-back {
+        background: transparent;
+        color: #94a3b8;
+        border: 1px solid #475569;
+        width: 100%;
+        margin-top: 15px;
+    }
+    .btn-back:hover {
+        background: #334155;
+        color: white;
+    }
+
+    .btn-clear-all {
+        background: rgba(225, 29, 72, 0.1);
+        color: #fb7185;
+        border: 1px solid #e11d48;
+        width: 100%;
+        margin-top: 15px;
+    }
+    .btn-clear-all:hover {
+        background: #e11d48;
+        color: white;
+    }
+
+    /* النتائج */
+    #resultsBox, #resultsPipe {
+        margin-top: 20px;
+    }
+
+    .result-box {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border: 1px solid #475569;
+        border-radius: 12px;
+        padding: 15px;
+        margin: 10px 0;
+        font-size: 1.2em;
+        font-weight: 800;
+        color: #f1f5f9;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    .shine {
+        animation: pulse-glow 2s infinite;
+        border-color: #38bdf8;
+        color: #38bdf8;
+    }
+
+    @keyframes pulse-glow {
+        0% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2); }
+        50% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.6); }
+        100% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2); }
+    }
+
+    .total-box {
+        border: 2px dashed #10b981;
+        border-radius: 16px;
+        padding: 20px;
+        margin: 25px 0 10px;
+        font-size: 1.5em;
+        font-weight: 900;
+        background: rgba(16, 185, 129, 0.05);
+        color: #34d399;
+    }
+
+    .hidden {
+        display: none !important;
+    }
 </style>
 </head>
 <body>
 
-<!-- زر الرجوع للقائمة الرئيسية (تمت الإضافة) -->
-<button onclick="window.location.href='index.html'" style="width: auto; padding: 10px 20px; margin: 10px auto; background: #333; color: gold; border: 2px solid gold; border-radius: 12px; font-weight: bold; display: block;">🏠 القائمة الرئيسية</button>
-
-<!-- تم تغيير الاسم هنا -->
 <h1>🛠️ مهيئات ومواسير</h1>
 <div id="datetime"></div>
 
-<!-- تم إزالة شاشة الدخول -->
-
-<!-- القائمة الرئيسية (تظهر مباشرة الآن) -->
-<div id="menuSection">
+<!-- القائمة الرئيسية -->
+<div id="menuSection" class="app-container">
     <h2>القائمة الرئيسية</h2>
-    <button class="btn-menu" onclick="showApp('boxApp')">📦 المهيئ</button>
-    <button class="btn-menu" onclick="showApp('pipeApp')">🔧 المواسير</button>
+    <button class="btn-menu" onclick="showApp('boxApp')">📦 حساب المهيئ</button>
+    <button class="btn-menu" onclick="showApp('pipeApp')">🔧 حساب المواسير</button>
 </div>
 
 <!-- ============ برنامج المهيئ ============ -->
-<div id="boxApp" class="hidden">
-    <h2>حساب المهيئ</h2>
+<div id="boxApp" class="app-container hidden">
+    <h2>📦 المهيئ</h2>
     <input type="number" id="length" placeholder="الطول (متر)">
     <input type="number" id="width" placeholder="العرض (متر)">
     <input type="number" id="height" placeholder="الارتفاع (متر)">
-    <br>
+    
     <!-- أزرار العمليات -->
-    <button id="calcBox" class="btn-gold">احسب</button>
-    <button id="addBoxToTotal" class="btn-add" title="أضف للمجموع">+</button>
-    <button id="resetBox" class="btn-reset">مسح</button>
+    <div class="btn-group">
+        <button id="calcBox" class="btn-gold">حساب</button>
+        <button id="addBoxToTotal" class="btn-add" title="أضف للمجموع">+</button>
+        <button id="resetBox" class="btn-reset">مسح</button>
+    </div>
     
     <div id="resultsBox"></div>
 
     <!-- الصندوق التراكمي -->
     <div id="boxTotalSection" class="hidden">
         <div class="total-box" id="boxGrandTotal">المجموع: 0</div>
-        <button onclick="clearBoxTotal()" class="btn-clear-all">بدء حساب جديد (تصفير)</button>
+        <button onclick="clearBoxTotal()" class="btn-clear-all">تصفير العداد وبدء جديد</button>
     </div>
     
-    <br><br>
     <button onclick="goBack()" class="btn-back">رجوع للقائمة</button>
 </div>
 
 <!-- ============ برنامج المواسير ============ -->
-<div id="pipeApp" class="hidden">
-    <h2>حساب المواسير</h2>
+<div id="pipeApp" class="app-container hidden">
+    <h2>🔧 المواسير</h2>
     <input type="number" id="pLength" placeholder="الطول (متر)">
     <input type="number" id="pDiameter" placeholder="القطر">
     <input type="number" id="pCount" placeholder="العدد">
-    <br>
+    
     <!-- أزرار العمليات -->
-    <button id="calcPipe" class="btn-gold">احسب</button>
-    <button id="addPipeToTotal" class="btn-add" title="أضف للمجموع">+</button>
-    <button id="resetPipe" class="btn-reset">مسح</button>
+    <div class="btn-group">
+        <button id="calcPipe" class="btn-gold">حساب</button>
+        <button id="addPipeToTotal" class="btn-add" title="أضف للمجموع">+</button>
+        <button id="resetPipe" class="btn-reset">مسح</button>
+    </div>
 
     <div id="resultsPipe"></div>
 
     <!-- الصندوق التراكمي -->
     <div id="pipeTotalSection" class="hidden">
         <div class="total-box" id="pipeGrandTotal">المجموع: 0</div>
-        <button onclick="clearPipeTotal()" class="btn-clear-all">بدء حساب جديد (تصفير)</button>
+        <button onclick="clearPipeTotal()" class="btn-clear-all">تصفير العداد وبدء جديد</button>
     </div>
 
-    <br><br>
     <button onclick="goBack()" class="btn-back">رجوع للقائمة</button>
 </div>
 
 <script>
+// ============================================
+// JavaScript - تم الاحتفاظ به كما هو بالضبط
+// ============================================
+
 // الوقت
 function updateDateTime(){
   const now=new Date();
@@ -110,8 +318,6 @@ function updateDateTime(){
 }
 setInterval(updateDateTime,1000);
 updateDateTime();
-
-// تم إزالة دالة التحقق من كلمة المرور
 
 // التنقل
 function showApp(appId){
@@ -195,7 +401,7 @@ document.getElementById('addBoxToTotal').onclick = function() {
         document.getElementById('length').value='';
         document.getElementById('width').value='';
         document.getElementById('height').value='';
-        document.getElementById('resultsBox').innerHTML='<div style="color:#00c853;font-weight:bold;">✅ تمت إضافة القيمة ('+currentBoxHighestValue.toLocaleString()+') للمجموع</div>';
+        document.getElementById('resultsBox').innerHTML='<div style="color:#34d399;font-weight:bold;margin-top:10px;">✅ تمت إضافة القيمة ('+currentBoxHighestValue.toLocaleString()+') للمجموع</div>';
         currentBoxHighestValue = 0;
         document.getElementById('length').focus();
     } else {
@@ -259,7 +465,7 @@ document.getElementById('addPipeToTotal').onclick = function() {
         document.getElementById('pLength').value='';
         document.getElementById('pDiameter').value='';
         document.getElementById('pCount').value='';
-        document.getElementById('resultsPipe').innerHTML='<div style="color:#00c853;font-weight:bold;">✅ تمت الإضافة للمجموع</div>';
+        document.getElementById('resultsPipe').innerHTML='<div style="color:#34d399;font-weight:bold;margin-top:10px;">✅ تمت الإضافة للمجموع</div>';
         currentPipeValue = 0;
         document.getElementById('pLength').focus();
     } else {
