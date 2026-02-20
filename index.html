@@ -9,7 +9,8 @@
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5); position:relative; z-index:10;}
     input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:16px;border-radius:6px;margin:10px 0;outline:none;box-sizing:border-box}
     input:focus{border-color:#58a6ff;}
-    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px;}
+    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px; transition:0.3s}
+    button.main-btn:disabled{background:#114a1c; color:#8b949e; cursor:not-allowed}
     .logout-btn{background:#da3633;color:white;border:none;padding:6px 12px;font-size:12px;font-weight:bold;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px}
     .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px;background:rgba(218,54,51,0.1);padding:5px;border-radius:4px;border:1px solid rgba(218,54,51,0.3)}
     
@@ -22,7 +23,7 @@
     
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
     .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;text-decoration:none;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-align:center; cursor:pointer; transition:0.2s}
-    .app-btn:active{transform:scale(0.95)}
+    .app-btn:active{transform:scale(0.95); background:#30363d;}
     .icon{font-size:28px;margin-bottom:8px}
     
     .tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;border-top:1px solid #30363d;padding-top:20px;}
@@ -81,13 +82,15 @@
 </div>
 
 <script>
-    const CURRENT_VERSION = "1.0"; // إصدار التطبيق (لا تغيره من هنا أبداً)
+    const CURRENT_VERSION = "1.0"; // لا تغير هذا الرقم أبداً من هنا
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
     const CHAT_ID = "-1003886528114";
     const SECRET_KEY = "QWRtaW5fMjZf";
     const PASS_ARRAY = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
 
     let failAttempts = 0;
+    
+    // البرامج الافتراضية (في حال لم يتم التحميل من الإنترنت بعد)
     let systemApps = [
         {name: "النبطشية", icon: "📅", url: "Nabatshia.html"},
         {name: "الورديات", icon: "🌙", url: "2.html"},
@@ -97,6 +100,7 @@
         {name: "المهيئ والمواسير", icon: "🏗️", url: "6.html"}
     ];
 
+    // جلب أو إنشاء معرف الجهاز
     let deviceID = localStorage.getItem("_u_id");
     if(!deviceID) {
         deviceID = "ID-" + Math.floor(Math.random() * 89999 + 10000);
@@ -104,12 +108,14 @@
     }
     document.getElementById("devID").innerText = "معرف جهازك: " + deviceID;
 
+    // تشغيل الساعة والتاريخ بشكل احترافي
     setInterval(() => {
         const d = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: true };
         document.getElementById("clock").innerText = d.toLocaleDateString('ar-EG', options);
     }, 1000);
 
+    // دالة رسم الأزرار
     function renderApps(appsArray) {
         const container = document.getElementById("apps-container");
         container.innerHTML = "";
@@ -122,6 +128,7 @@
         });
     }
 
+    // جلب الباسورد الصحيح
     function getTruePass() {
         const d = new Date();
         let y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
@@ -130,13 +137,22 @@
         return PASS_ARRAY[i % 5];
     }
 
-    async function getIP() {
-        if(!navigator.onLine) return "أوفلاين";
-        try {
-            let res = await fetch("https://api.ipify.org?format=json", { cache: "no-store" });
-            let data = await res.json();
-            return data.ip;
-        } catch(e) { return "فشل جلب الأيبي"; }
+    // إرسال الإشعارات لتليجرام في الخلفية (بدون التأثير على سرعة التطبيق)
+    function sendToTelegram(name, type="login") {
+        if(!navigator.onLine) return; // لو مفيش نت متعملش حاجة
+        
+        // جلب الأيبي وإرسال الرسالة
+        fetch("https://api.ipify.org?format=json", { cache: "no-store" })
+        .then(res => res.json())
+        .then(data => {
+            let ip = data.ip;
+            let text = type === "login" 
+                ? `✅ *دخول ناجح للتطبيق*\n👤 الاسم: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``
+                : `🚨 *محاولة اختراق (3 مرات خطأ)*\n👤 الاسم: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+            fetch(url).catch(()=>{}); // إرسال صامت
+        }).catch(()=>{}); // تجاهل لو الأيبي فشل
     }
 
     function isValidArabicName(name) {
@@ -145,18 +161,8 @@
         return regex.test(name) && words.length >= 3;
     }
 
-    async function sendToTelegram(name, type="login") {
-        if(!navigator.onLine) return; 
-        let ip = await getIP();
-        let text = type === "login" 
-            ? `✅ *دخول ناجح*\n👤 الاسم: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``
-            : `🚨 *محاولة اختراق (3 مرات خطأ)*\n👤 الاسم: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
-
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
-        fetch(url).catch(() => { new Image().src = url; });
-    }
-
-    async function login() {
+    // عملية الدخول
+    function login() {
         const nameInp = document.getElementById("userName").value.trim();
         const pinInp = document.getElementById("pIn").value.trim();
         const errorMsg = document.getElementById("eMsg");
@@ -194,37 +200,61 @@
         btn.innerText = "تفعيل ودخول";
     }
 
+    // عرض التطبيق
     function showApp(isLoggedIn) {
         if(isLoggedIn) {
             document.getElementById("lock-screen").style.display = "none";
             document.getElementById("app-menu").style.display = "block";
             document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name");
             
+            // تحميل الأزرار المتكيشة الأول (عشان لو أوفلاين يفتح فوراً)
             let cached = localStorage.getItem("_cached_apps");
             renderApps(cached ? JSON.parse(cached) : systemApps);
+            
+            // محاولة جلب التحديثات من النت في الخلفية
+            loadRemoteControl();
         } else {
             document.getElementById("lock-screen").style.display = "block";
             document.getElementById("app-menu").style.display = "none";
         }
     }
 
-    // --- السحر هنا: استدعاء ملف الـ GitHub بتاعك ---
+    // سحب ملف التحكم من GitHub (يتم تجاوز الكاش برقم عشوائي)
     function loadRemoteControl() {
-        if(!navigator.onLine) return; 
+        if(!navigator.onLine) return; // لو مفيش نت، اشتغل بالمتكيش عادي
+        
+        // مسح أي سكريبت قديم عشان التكرار
+        let oldScript = document.getElementById("remote-script");
+        if(oldScript) oldScript.remove();
+
         let script = document.createElement("script");
-        // ربطتلك الملف برابطك المباشر
+        script.id = "remote-script";
+        // الـ getTime هنا السحر اللي بيخلي الموبايل يسحب أحدث تعديل عملته في جيت هب فوراً
         script.src = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/control.js?v=" + new Date().getTime(); 
         document.body.appendChild(script);
     }
 
+    // الاستماع لعودة الإنترنت (لو فتح الموبايل والتطبيق شغال، يعمل أبديت لروابط البرامج فوراً)
+    window.addEventListener('online', loadRemoteControl);
+
+    // النسخ الاحتياطي الآمن (لا ينسخ باسورد الدخول ولا هوية الجهاز)
     function backupData() {
-        const data = JSON.stringify(localStorage);
+        let safeData = {};
+        for(let i=0; i<localStorage.length; i++) {
+            let key = localStorage.key(i);
+            // منع نسخ بيانات الحماية
+            if(key !== "_tkn_auth" && key !== "_u_id" && key !== "_u_name") {
+                safeData[key] = localStorage.getItem(key);
+            }
+        }
+        const data = JSON.stringify(safeData);
         const a = document.createElement('a');
         a.href = URL.createObjectURL(new Blob([data], {type: "text/plain"}));
         a.download = `backup_2026_${new Date().getTime()}.txt`;
         a.click();
     }
 
+    // استعادة البيانات
     function restoreData(event) {
         const file = event.target.files[0];
         if(!file) return;
@@ -232,7 +262,9 @@
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                for(let key in data) localStorage.setItem(key, data[key]);
+                for(let key in data) {
+                    localStorage.setItem(key, data[key]);
+                }
                 alert("✅ تمت الاستعادة بنجاح!");
                 location.reload();
             } catch(err) { alert("❌ فشلت الاستعادة، الملف غير صالح."); }
@@ -240,8 +272,8 @@
         reader.readAsText(file);
     }
 
+    // عند تشغيل التطبيق
     window.onload = function() {
-        loadRemoteControl(); 
         showApp(localStorage.getItem("_tkn_auth") === getTruePass());
     };
 
