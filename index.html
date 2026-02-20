@@ -75,9 +75,8 @@
     <div class="grid" id="apps-container"></div>
     
     <div class="tools-grid">
-        <button class="tool-btn" onclick="backupData()">📥 نسخة احتياطية</button>
-        <button class="tool-btn restore" onclick="document.getElementById('fileInp').click()">📤 استعادة</button>
-        <input type="file" id="fileInp" style="display:none;" accept=".txt" onchange="restoreData(event)">
+        <button class="tool-btn" onclick="backupDataCode()">📥 نسخ كود البيانات</button>
+        <button class="tool-btn restore" onclick="restoreDataCode()">📤 استعادة من كود</button>
     </div>
 </div>
 
@@ -90,7 +89,6 @@
 
     let failAttempts = 0;
     
-    // البرامج الافتراضية (في حال لم يتم التحميل من الإنترنت بعد)
     let systemApps = [
         {name: "النبطشية", icon: "📅", url: "Nabatshia.html"},
         {name: "الورديات", icon: "🌙", url: "2.html"},
@@ -100,7 +98,6 @@
         {name: "المهيئ والمواسير", icon: "🏗️", url: "6.html"}
     ];
 
-    // جلب أو إنشاء معرف الجهاز
     let deviceID = localStorage.getItem("_u_id");
     if(!deviceID) {
         deviceID = "ID-" + Math.floor(Math.random() * 89999 + 10000);
@@ -108,14 +105,12 @@
     }
     document.getElementById("devID").innerText = "معرف جهازك: " + deviceID;
 
-    // تشغيل الساعة والتاريخ بشكل احترافي
     setInterval(() => {
         const d = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: true };
         document.getElementById("clock").innerText = d.toLocaleDateString('ar-EG', options);
     }, 1000);
 
-    // دالة رسم الأزرار
     function renderApps(appsArray) {
         const container = document.getElementById("apps-container");
         container.innerHTML = "";
@@ -128,7 +123,6 @@
         });
     }
 
-    // جلب الباسورد الصحيح
     function getTruePass() {
         const d = new Date();
         let y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
@@ -137,11 +131,8 @@
         return PASS_ARRAY[i % 5];
     }
 
-    // إرسال الإشعارات لتليجرام في الخلفية (بدون التأثير على سرعة التطبيق)
     function sendToTelegram(name, type="login") {
-        if(!navigator.onLine) return; // لو مفيش نت متعملش حاجة
-        
-        // جلب الأيبي وإرسال الرسالة
+        if(!navigator.onLine) return;
         fetch("https://api.ipify.org?format=json", { cache: "no-store" })
         .then(res => res.json())
         .then(data => {
@@ -151,8 +142,8 @@
                 : `🚨 *محاولة اختراق (3 مرات خطأ)*\n👤 الاسم: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
 
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
-            fetch(url).catch(()=>{}); // إرسال صامت
-        }).catch(()=>{}); // تجاهل لو الأيبي فشل
+            fetch(url).catch(()=>{});
+        }).catch(()=>{});
     }
 
     function isValidArabicName(name) {
@@ -161,7 +152,48 @@
         return regex.test(name) && words.length >= 3;
     }
 
-    // عملية الدخول
+    // ==========================================
+    // 🛡️ فحص حالة التطبيق وقفل/طرد المستخدمين من التليجرام
+    // ==========================================
+    function checkAppStatusFromTelegram() {
+        if(!navigator.onLine) return; // لو مفيش نت هيشتغل عادي من الكاش
+
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${CHAT_ID}`;
+
+        fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            if(data.ok && data.result.description) {
+                let desc = data.result.description;
+                
+                // 1. الإيقاف الإجباري للجميع
+                if(desc.includes("[OFF]")) {
+                    document.body.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0d1117; color:#f85149; text-align:center; padding:20px; width:100%; box-sizing:border-box;">
+                            <div style="font-size:70px; margin-bottom:15px;">⛔</div>
+                            <h1 style="margin:0;">تم إيقاف النظام</h1>
+                            <p style="color:#8b949e; font-size:16px; margin-top:10px;">عذراً، تم إيقاف التطبيق مؤقتاً لجميع المستخدمين من قبل الإدارة.</p>
+                        </div>
+                    `;
+                    return; // توقف عن تنفيذ باقي الكود
+                }
+
+                // 2. طرد شخص معين برقم جهازه
+                if(desc.includes("BAN:" + deviceID)) {
+                    // حذف توثيق الدخول الخاص به
+                    localStorage.removeItem("_tkn_auth"); 
+                    document.body.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0d1117; color:#f85149; text-align:center; padding:20px; width:100%; box-sizing:border-box;">
+                            <div style="font-size:70px; margin-bottom:15px;">🚫</div>
+                            <h1 style="margin:0;">حظر الدخول</h1>
+                            <p style="color:#8b949e; font-size:16px; margin-top:10px;">تم حظر جهازك (${deviceID}) وطرده من النظام.</p>
+                        </div>
+                    `;
+                }
+            }
+        }).catch(()=>{}); // تجاهل لو حصل خطأ في الاتصال بتليجرام
+    }
+
     function login() {
         const nameInp = document.getElementById("userName").value.trim();
         const pinInp = document.getElementById("pIn").value.trim();
@@ -200,18 +232,15 @@
         btn.innerText = "تفعيل ودخول";
     }
 
-    // عرض التطبيق
     function showApp(isLoggedIn) {
         if(isLoggedIn) {
             document.getElementById("lock-screen").style.display = "none";
             document.getElementById("app-menu").style.display = "block";
             document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name");
             
-            // تحميل الأزرار المتكيشة الأول (عشان لو أوفلاين يفتح فوراً)
             let cached = localStorage.getItem("_cached_apps");
             renderApps(cached ? JSON.parse(cached) : systemApps);
             
-            // محاولة جلب التحديثات من النت في الخلفية
             loadRemoteControl();
         } else {
             document.getElementById("lock-screen").style.display = "block";
@@ -219,61 +248,90 @@
         }
     }
 
-    // سحب ملف التحكم من GitHub (يتم تجاوز الكاش برقم عشوائي)
     function loadRemoteControl() {
-        if(!navigator.onLine) return; // لو مفيش نت، اشتغل بالمتكيش عادي
-        
-        // مسح أي سكريبت قديم عشان التكرار
+        if(!navigator.onLine) return; 
         let oldScript = document.getElementById("remote-script");
         if(oldScript) oldScript.remove();
 
         let script = document.createElement("script");
         script.id = "remote-script";
-        // الـ getTime هنا السحر اللي بيخلي الموبايل يسحب أحدث تعديل عملته في جيت هب فوراً
         script.src = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/control.js?v=" + new Date().getTime(); 
         document.body.appendChild(script);
     }
 
-    // الاستماع لعودة الإنترنت (لو فتح الموبايل والتطبيق شغال، يعمل أبديت لروابط البرامج فوراً)
-    window.addEventListener('online', loadRemoteControl);
+    // فحص الأوامر من التليجرام عند عودة الإنترنت
+    window.addEventListener('online', () => {
+        loadRemoteControl();
+        checkAppStatusFromTelegram();
+    });
 
-    // النسخ الاحتياطي الآمن (لا ينسخ باسورد الدخول ولا هوية الجهاز)
-    function backupData() {
+    // ==========================================
+    // 📥 دالة النسخ الاحتياطي
+    // ==========================================
+    function backupDataCode() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
             let key = localStorage.key(i);
-            // منع نسخ بيانات الحماية
-            if(key !== "_tkn_auth" && key !== "_u_id" && key !== "_u_name") {
+            if(key !== "_tkn_auth" && key !== "_u_id" && key !== "_u_name" && key !== "_cached_apps") {
                 safeData[key] = localStorage.getItem(key);
             }
         }
-        const data = JSON.stringify(safeData);
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([data], {type: "text/plain"}));
-        a.download = `backup_2026_${new Date().getTime()}.txt`;
-        a.click();
+        
+        if(Object.keys(safeData).length === 0) {
+            alert("⚠️ لا توجد بيانات محفوظة لعمل نسخة احتياطية.");
+            return;
+        }
+
+        try {
+            const jsonStr = JSON.stringify(safeData);
+            const backupCode = btoa(encodeURIComponent(jsonStr));
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(backupCode).then(() => {
+                    alert("✅ تم نسخ كود النسخة الاحتياطية بنجاح!\nاحتفظ به في مكان آمن (مثل رسائل الواتساب المحفوظة).");
+                }).catch(() => {
+                    prompt("انسخ الكود التالي واحتفظ به:", backupCode);
+                });
+            } else {
+                prompt("انسخ الكود التالي واحتفظ به في مكان آمن:", backupCode);
+            }
+        } catch(err) {
+            alert("❌ حدث خطأ أثناء إنشاء الكود.");
+        }
     }
 
-    // استعادة البيانات
-    function restoreData(event) {
-        const file = event.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                for(let key in data) {
-                    localStorage.setItem(key, data[key]);
-                }
-                alert("✅ تمت الاستعادة بنجاح!");
-                location.reload();
-            } catch(err) { alert("❌ فشلت الاستعادة، الملف غير صالح."); }
-        };
-        reader.readAsText(file);
+    // ==========================================
+    // 📤 دالة الاستعادة 
+    // ==========================================
+    function restoreDataCode() {
+        let backupCode = prompt("📌 برجاء لصق كود الاستعادة هنا:");
+        
+        if(!backupCode || backupCode.trim() === "") return;
+
+        try {
+            const jsonStr = decodeURIComponent(atob(backupCode.trim()));
+            const data = JSON.parse(jsonStr);
+
+            let count = 0;
+            for(let key in data) {
+                localStorage.setItem(key, data[key]);
+                count++;
+            }
+
+            if(count > 0) {
+                alert("✅ تمت استعادة البيانات بنجاح!");
+                location.reload(); 
+            } else {
+                alert("⚠️ الكود صالح لكنه لا يحتوي على بيانات.");
+            }
+        } catch(err) { 
+            alert("❌ فشلت الاستعادة! الكود غير صحيح أو غير مكتمل."); 
+        }
     }
 
     // عند تشغيل التطبيق
     window.onload = function() {
+        checkAppStatusFromTelegram(); // أول شيء يعمل هو فحص الحظر أو الإيقاف
         showApp(localStorage.getItem("_tkn_auth") === getTruePass());
     };
 

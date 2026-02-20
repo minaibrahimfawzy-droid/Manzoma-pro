@@ -21,7 +21,37 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 20px 10px 50px;
+        padding: 40px 10px 50px; /* زيادة المساحة العلوية لتناسب الأيقونة */
+        position: relative;
+    }
+
+    /* زر العودة للصفحة الرئيسية للمشروع (أيقونة المنزل) */
+    .home-btn {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        text-decoration: none;
+        font-size: 1.5em;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        backdrop-filter: blur(12px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+
+    .home-btn:hover {
+        background: #38bdf8;
+        transform: scale(1.1) translateY(-3px);
+        border-color: transparent;
+        box-shadow: 0 8px 20px rgba(56, 189, 248, 0.4);
     }
 
     /* العناوين والوقت */
@@ -245,6 +275,10 @@
 </head>
 <body>
 
+<!-- زر العودة للصفحة الرئيسية للموقع -->
+<!-- ملحوظة: قم بتغيير index.html إلى اسم صفحتك الرئيسية إذا كان مختلفاً -->
+<a href="index.html" class="home-btn" title="العودة للصفحة الرئيسية للمشروع">🏠</a>
+
 <h1>🛠️ مهيئات ومواسير</h1>
 <div id="datetime"></div>
 
@@ -306,10 +340,6 @@
 </div>
 
 <script>
-// ============================================
-// JavaScript - تم الاحتفاظ به كما هو بالضبط
-// ============================================
-
 // الوقت
 function updateDateTime(){
   const now=new Date();
