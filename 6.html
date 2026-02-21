@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>مهيئات ومواسير</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
 <style>
-    /* الإعدادات الأساسية */
+    /* الإعدادات الأساسية - تم تعديل الخط ليعمل بدون إنترنت */
     * {
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-        font-family: 'Cairo', sans-serif;
+        /* استخدام خطوط النظام الأساسية لتعمل بدون إنترنت */
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Tahoma, Arial, sans-serif;
     }
 
     body {
@@ -21,7 +21,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 40px 10px 50px; /* زيادة المساحة العلوية لتناسب الأيقونة */
+        padding: 40px 10px 50px;
         position: relative;
     }
 
@@ -42,6 +42,7 @@
         align-items: center;
         border-radius: 50%;
         backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
         z-index: 1000;
@@ -275,9 +276,8 @@
 </head>
 <body>
 
-<!-- زر العودة للصفحة الرئيسية للموقع -->
-<!-- ملحوظة: قم بتغيير index.html إلى اسم صفحتك الرئيسية إذا كان مختلفاً -->
-<a href="index.html" class="home-btn" title="العودة للصفحة الرئيسية للمشروع">🏠</a>
+<!-- زر العودة للصفحة الرئيسية -->
+<a href="index.html" class="home-btn" title="العودة للصفحة الرئيسية">🏠</a>
 
 <h1>🛠️ مهيئات ومواسير</h1>
 <div id="datetime"></div>
