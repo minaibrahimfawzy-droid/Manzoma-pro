@@ -146,7 +146,7 @@
         .info-box small { font-size: 0.8rem; display: block; margin-bottom: 3px; }
         .info-box .val { font-size: 1.1rem; font-weight: bold; }
 
-        /* Modal مخصص (بديل Bootstrap Modal) */
+        /* Modal مخصص */
         .custom-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .custom-modal.show { display: flex; }
         .modal-content { background-color: #fff; padding: 0; border-radius: 0.5rem; width: 90%; max-width: 400px; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15); animation: slideDown 0.3s ease-out; }
@@ -209,18 +209,17 @@
     <div id="adjustTotalModal" class="custom-modal">
         <div class="modal-content">
             <div class="modal-header bg-warning text-dark">
-                <h4 class="m-0" style="font-size: 1rem;">تسوية المجموع (إضافة ذكية)</h4>
+                <!-- تم تغيير العنوان لضمان التحديث -->
+                <h4 class="m-0" style="font-size: 1rem;">تسوية المجموع (نفس اللمة)</h4>
                 <button onclick="closeModal('adjustTotalModal')" class="btn text-dark p-0" style="font-size:1.5rem;">&times;</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="adjustLaneName">
-                <!-- سنحتفظ بالقيم الحالية هنا للحساب -->
                 <input type="hidden" id="adjustCurrentCash">
                 <input type="hidden" id="adjustCurrentVisa">
                 
                 <h5 id="adjustTitle" class="text-center mb-2"></h5>
                 
-                <!-- عرض الحالة الحالية -->
                 <div class="d-flex justify-content-between mb-3 bg-light p-2 border rounded small text-center">
                     <div style="width:48%">
                         <span class="d-block text-muted">كاش حالي</span>
@@ -233,7 +232,6 @@
                     </div>
                 </div>
 
-                <!-- الإدخال الجديد -->
                 <div class="mb-2">
                     <label class="small fw-bold mb-1">المجموع النهائي (كاش + فيزا)</label>
                     <input type="number" id="targetTotalInput" class="form-control text-center fw-bold text-success" style="font-size:1.3rem;" oninput="calcDiff()">
@@ -245,9 +243,8 @@
                     <small class="text-muted" style="font-size:0.75rem;">اتركه فارغاً إذا كان المبلغ كله كاش</small>
                 </div>
 
-                <!-- عرض الفرق -->
                 <div class="mb-3 p-2 bg-light border rounded text-center">
-                    <div class="small fw-bold mb-1 text-decoration-underline">الفرق (سيضاف كـ لمـة أخيرة):</div>
+                    <div class="small fw-bold mb-1 text-decoration-underline">الفرق (سيضاف في الخانة المتاحة):</div>
                     <div class="d-flex justify-content-around">
                         <div>
                             <span class="small d-block">كاش</span>
@@ -291,7 +288,6 @@
         
         <!-- شريط البوابات -->
         <div class="d-flex align-items-center mb-3 no-print bg-white p-2 rounded shadow-sm">
-            <!-- زر الخروج للقائمة الرئيسية -->
             <a href="index.html" class="btn btn-danger btn-sm fw-bold ms-2 d-flex align-items-center gap-1" title="خروج للقائمة الرئيسية">
                 <svg class="icon" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
@@ -360,7 +356,6 @@
                 <div class="bg-primary text-white p-2 fw-bold small">الملخص المالي والختامي</div>
                 <div class="p-2 bg-white">
                     
-                    <!-- عرض إيرادات الفترات -->
                     <div class="row text-center mb-2" style="background:#f8f9fa; border:1px solid #ddd; border-radius:4px; margin:0;">
                         <div class="col-4 p-1 border-end">
                             <small class="text-muted d-block">إيراد صباحية</small>
@@ -416,7 +411,6 @@
                          </div>
                     </div>
                     
-                    <!-- --- الصف الأول: إيراد نقدي - إلكتروني - رقابة --- -->
                     <div class="row mb-1">
                         <div class="col-4 px-1">
                             <div class="info-box">
@@ -438,7 +432,6 @@
                         </div>
                     </div>
 
-                    <!-- الصف الثاني: توريد صباحي - مرحل - توريد حالي -->
                     <div class="row mb-1">
                         <div class="col-4 px-1" id="morningTawreedContainer">
                             <div class="info-box">
@@ -460,7 +453,6 @@
                         </div>
                     </div>
 
-                    <!-- الصف الثالث: الخزينة كاش + الإجمالي الكلي -->
                     <div class="row mt-2">
                         <div class="col-6 px-1">
                             <div class="bg-dark text-white rounded p-2 text-center border border-warning" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
@@ -485,13 +477,13 @@
     <script>
         /* --- المنطق البرمجي (Javascript) --- */
         
-        // 1. إدارة المودال
         function openModal(id) { 
             const m = document.getElementById(id); 
             m.classList.add('show'); 
             if(id === 'inputModal') setTimeout(()=>document.getElementById('modalAmount').focus(), 100);
             if(id === 'adjustTotalModal') setTimeout(()=>document.getElementById('targetTotalInput').focus(), 100);
         }
+        
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         
         window.onclick = function(event) {
@@ -500,7 +492,6 @@
             }
         }
 
-        // 2. الثوابت والبيانات
         const GATES_LIST_KEY = 'app_gates_offline_v2';
         const ACTIVE_GATE_KEY = 'app_active_gate_offline_v2';
         
@@ -508,10 +499,12 @@
             { id: 'helwan', name: 'بوابة حلوان' },
             { id: 'kureimat', name: 'بوابة الكريمات' }
         ];
+        
         const defaultLanes = [
             {name:'حارة 1',type:'entry'}, {name:'حارة 2',type:'entry'}, {name:'حارة 3',type:'entry'},
             {name:'خروج 1',type:'exit'}, {name:'خروج 2',type:'exit'}
         ];
+        
         const helwanLanes = [
             {name:'نقل 1',type:'entry'}, {name:'نقل 2',type:'entry'}, 
             {name:'ملاكي 1',type:'entry'}, {name:'ملاكي 2',type:'entry'}, {name:'ملاكي 3',type:'entry'}, {name:'ملاكي 4',type:'entry'}, 
@@ -526,9 +519,9 @@
         let currentFinance = { reqaba: [], tawreed: [] };
         let currentLemmaCount = 1;
 
-        // 3. التشغيل عند البدء
         window.onload = function() {
-            updateClock(); setInterval(updateClock, 1000);
+            updateClock(); 
+            setInterval(updateClock, 1000);
             setInitialDateAndShift();
             renderGateTabs();
             switchGate(activeGateId);
@@ -554,7 +547,6 @@
             }
         }
 
-        // 4. إدارة البوابات
         function renderGateTabs() {
             document.getElementById('gatesContainer').innerHTML = gates.map(g => `
                 <button onclick="switchGate('${g.id}')" 
@@ -563,6 +555,7 @@
                 </button>
             `).join('');
         }
+
         function promptNewGate() {
             const name = prompt("اسم البوابة الجديدة:");
             if (name) {
@@ -570,17 +563,21 @@
                 gates.push({ id, name });
                 localStorage.setItem(GATES_LIST_KEY, JSON.stringify(gates));
                 localStorage.setItem(`lanes_${id}`, JSON.stringify(defaultLanes));
-                renderGateTabs(); switchGate(id);
+                renderGateTabs(); 
+                switchGate(id);
             }
         }
+
         function switchGate(id) {
             activeGateId = id; localStorage.setItem(ACTIVE_GATE_KEY, id);
             renderGateTabs();
             const g = gates.find(x => x.id === id);
             document.getElementById('activeGateLabel').innerText = g ? g.name : 'Unknown';
             document.getElementById('settingsGateName').innerText = g ? g.name : '';
-            loadGateConfig(); loadDataForSelectedDate();
+            loadGateConfig(); 
+            loadDataForSelectedDate();
         }
+
         function loadGateConfig() {
             const stored = localStorage.getItem(`lanes_${activeGateId}`);
             lanes = stored ? JSON.parse(stored) : (activeGateId === 'helwan' ? helwanLanes : defaultLanes);
@@ -588,7 +585,6 @@
             renderLanesSettings();
         }
 
-        // 5. تحميل وحفظ البيانات
         function loadDataForSelectedDate() {
             const date = document.getElementById('dateInput').value;
             const shift = document.getElementById('shiftInput').value;
@@ -597,17 +593,23 @@
             currentTransactions = data.trans || [];
             currentFinance = data.fin || {reqaba:[], tawreed:[]};
             currentLemmaCount = data.lemmas || 1;
-            renderSheet(); renderFinanceLists(); calculateTotals(); updateReportHeader();
+            renderSheet(); 
+            renderFinanceLists(); 
+            calculateTotals(); 
+            updateReportHeader();
         }
+
         function autoSave() {
             const key = `${document.getElementById('dateInput').value}_${document.getElementById('shiftInput').value}`;
             archives[key] = { trans: currentTransactions, fin: currentFinance, lemmas: currentLemmaCount };
             localStorage.setItem(`archive_${activeGateId}`, JSON.stringify(archives));
             localStorage.setItem(`lanes_${activeGateId}`, JSON.stringify(lanes));
-            renderSheet(); renderFinanceLists(); calculateTotals(); updateReportHeader();
+            renderSheet(); 
+            renderFinanceLists(); 
+            calculateTotals(); 
+            updateReportHeader();
         }
 
-        // 6. رسم الجدول (مع صف المتبقي الذكي)
         function renderSheet() {
             const header = document.getElementById('sheetHeader');
             const body = document.getElementById('sheetBody');
@@ -629,16 +631,13 @@
             let colTotals = {}; lanes.forEach(l => colTotals[l.name] = 0);
             let running = {}; lanes.forEach(l => running[l.name] = 0);
             
-            // 1. حساب القيم الأخيرة لكل حارة بشكل مستقل
             let lastValues = {};
             let totalLastValues = 0;
 
             lanes.forEach(lane => {
-                // فلترة الترانزكشنز لهذه الحارة فقط
                 const laneTxs = currentTransactions.filter(t => t.lane === lane.name);
                 
                 if (laneTxs.length > 0) {
-                    // البحث عن الترانزكشن صاحب أعلى رقم لمة
                     const lastTx = laneTxs.reduce((prev, current) => (prev.lemma > current.lemma) ? prev : current);
                     const val = (lastTx.amount || 0) + (lastTx.visa || 0);
                     lastValues[lane.name] = val;
@@ -648,7 +647,6 @@
                 }
             });
 
-            // 2. بناء جسم الجدول
             for (let i = 1; i <= currentLemmaCount; i++) {
                 bHTML += `<tr>
                     <td class="lemma-col text-center">${i}
@@ -678,10 +676,8 @@
             }
             body.innerHTML = bHTML;
 
-            // بناء الفوتر
             let fHTML = '';
 
-            // 3. صف "المتبقي" (يعرض آخر قيمة تم إدخالها في كل حارة)
             fHTML += `<tr class="remaining-row">
                         <td class="text-center" style="background:#cfe2ff; color:#000;">المتبقي</td>`;
             lanes.forEach(l => {
@@ -690,7 +686,6 @@
             });
             fHTML += `<td class="text-center">${totalLastValues > 0 ? totalLastValues : '-'}</td></tr>`;
 
-            // 4. صف الإجمالي "ج"
             fHTML += `<tr class="footer-row"><td class="text-warning">ج</td>`;
             let grand = 0;
             lanes.forEach(l => { 
@@ -702,7 +697,6 @@
             footer.innerHTML = fHTML;
         }
 
-        // 7. العمليات والترانزكشن
         function deleteLemmaRow(n) {
             if(!confirm('هل تحذف صف اللمة رقم '+n+'؟')) return;
             currentTransactions = currentTransactions.filter(t => t.lemma !== n);
@@ -710,6 +704,7 @@
             if(currentLemmaCount > 1) currentLemmaCount--;
             autoSave();
         }
+
         function openInputModalEntry(lemma, lane) {
             document.getElementById('activeLemma').value = lemma;
             document.getElementById('activeLane').value = lane;
@@ -725,6 +720,7 @@
             
             openModal('inputModal');
         }
+
         function saveEntry(e) {
             e.preventDefault();
             const lemma = parseInt(document.getElementById('activeLemma').value);
@@ -740,15 +736,19 @@
             }
             autoSave(); closeModal('inputModal');
         }
+
         function deleteEntry() {
             const lemma = parseInt(document.getElementById('activeLemma').value);
             const lane = document.getElementById('activeLane').value;
             currentTransactions = currentTransactions.filter(t => !(t.lemma == lemma && t.lane === lane));
             autoSave(); closeModal('inputModal');
         }
-        function addNewLemmaRow() { currentLemmaCount++; autoSave(); }
 
-        // --- وظائف تعديل الإجمالي الذكي (معدلة لعدم فتح لمة عشوائياً) ---
+        function addNewLemmaRow() { 
+            currentLemmaCount++; 
+            autoSave(); 
+        }
+
         function openTotalAdjustModal(laneName) {
             let currCash = 0;
             let currVisa = 0;
@@ -820,11 +820,15 @@
             
             if ((targetTotal < (currCash + currVisa)) && !confirm("المجموع الجديد أقل من الحالي! هل أنت متأكد؟")) return;
 
-            // فحص هل السطر الحالي للحارة دي فاضي ولا مشغول؟
-            const existingTxInLastLemma = currentTransactions.find(t => t.lemma === currentLemmaCount && t.lane === lane);
-            
-            // لو الخانة مشغولة برقم، افتح سطر جديد.. لو فاضية، خليك في نفس السطر
-            if (existingTxInLastLemma) {
+            let isCellOccupied = false;
+            for (let i = 0; i < currentTransactions.length; i++) {
+                if (currentTransactions[i].lemma === currentLemmaCount && currentTransactions[i].lane === lane) {
+                    isCellOccupied = true;
+                    break;
+                }
+            }
+
+            if (isCellOccupied === true) {
                 currentLemmaCount++;
             }
             
@@ -839,22 +843,23 @@
             autoSave();
             closeModal('adjustTotalModal');
         }
-        // ------------------------------------
 
-        // 8. الماليات
         function addFinance(type) {
             const inp = document.getElementById(type === 'reqaba' ? 'newReqaba' : 'newTawreed');
             const val = parseFloat(inp.value);
             if (val > 0) { currentFinance[type].push({id:Date.now(), value:val}); inp.value=''; autoSave(); }
         }
-        window.removeFin = function(type, id) { currentFinance[type] = currentFinance[type].filter(i => i.id !== id); autoSave(); };
+
+        window.removeFin = function(type, id) { 
+            currentFinance[type] = currentFinance[type].filter(i => i.id !== id); autoSave(); 
+        };
+
         function renderFinanceLists() {
             const mk = (l, t) => l.map(i => `<span class="badge bg-light text-dark border me-1">${i.value} <span style="color:red;cursor:pointer;margin-right:4px;" onclick="removeFin('${t}',${i.id})">&times;</span></span>`).join(' ');
             document.getElementById('reqabaListContainer').innerHTML = mk(currentFinance.reqaba, 'reqaba');
             document.getElementById('tawreedListContainer').innerHTML = mk(currentFinance.tawreed, 'tawreed');
         }
 
-        // 9. الحسابات
         function calculateTotals() {
             const date = document.getElementById('dateInput').value;
             const shift = document.getElementById('shiftInput').value;
@@ -944,18 +949,21 @@
             document.getElementById('totalSafeVisaDisplay').innerText = totalSafeAndVisa.toLocaleString();
         }
 
-        // 10. إعدادات الحارات
         function renderLanesSettings() {
             document.getElementById('lanesListDisplay').innerHTML = lanes.map((l,i) => 
                 `<li class="d-flex justify-content-between p-1 border-bottom small">${l.name} <button onclick="delLane(${i})" class="btn btn-sm btn-danger py-0">x</button></li>`
             ).join('');
         }
+
         window.addNewLane = function() {
             const n = document.getElementById('newLaneName').value;
             const t = document.getElementById('newLaneType').value;
             if(n) { lanes.push({name:n, type:t}); autoSave(); renderLanesSettings(); }
         }
-        window.delLane = function(i) { if(confirm("حذف الحارة؟")) { lanes.splice(i,1); autoSave(); renderLanesSettings(); } }
+
+        window.delLane = function(i) { 
+            if(confirm("حذف الحارة؟")) { lanes.splice(i,1); autoSave(); renderLanesSettings(); } 
+        }
         
         function factoryResetGate() {
             if(confirm('سيتم مسح كل البيانات!')) {
@@ -965,15 +973,23 @@
             }
         }
 
-        // أدوات مساعدة
-        function changeDay(o) { const d = new Date(document.getElementById('dateInput').value); d.setDate(d.getDate()+o); document.getElementById('dateInput').valueAsDate = d; loadDataForSelectedDate(); }
+        function changeDay(o) { 
+            const d = new Date(document.getElementById('dateInput').value); 
+            d.setDate(d.getDate()+o); 
+            document.getElementById('dateInput').valueAsDate = d; 
+            loadDataForSelectedDate(); 
+        }
+
         function updateReportHeader() {
             const gn = gates.find(g=>g.id===activeGateId)?.name || "";
             document.getElementById('printReportTitle').innerText = "تقرير وردية - " + gn;
             document.getElementById('printDate').innerText = document.getElementById('dateInput').value;
             document.getElementById('printShift').innerText = document.getElementById('shiftInput').value;
         }
-        function updateClock(){ document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}); }
+
+        function updateClock(){ 
+            document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}); 
+        }
 
     </script>
     
