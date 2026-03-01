@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اللمات - الإصدار الذكي (المتبقي لكل حارة)</title>
+    <title>اللمات - الإصدار الذكي</title>
     <style>
         /* --- 1. أساسيات التصميم --- */
         :root {
@@ -146,7 +146,7 @@
         .info-box small { font-size: 0.8rem; display: block; margin-bottom: 3px; }
         .info-box .val { font-size: 1.1rem; font-weight: bold; }
 
-        /* Modal مخصص */
+        /* Modal مخصص (بديل Bootstrap Modal) */
         .custom-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
         .custom-modal.show { display: flex; }
         .modal-content { background-color: #fff; padding: 0; border-radius: 0.5rem; width: 90%; max-width: 400px; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15); animation: slideDown 0.3s ease-out; }
@@ -205,12 +205,12 @@
         </div>
     </div>
 
-    <!-- النافذة المنبثقة: تعديل الإجمالي (تعديل ذكي: كاش + فيزا) -->
+    <!-- النافذة المنبثقة: تعديل الإجمالي -->
     <div id="adjustTotalModal" class="custom-modal">
         <div class="modal-content">
             <div class="modal-header bg-warning text-dark">
-                <!-- تم تغيير العنوان لضمان التحديث -->
-                <h4 class="m-0" style="font-size: 1rem;">تسوية المجموع (نفس اللمة)</h4>
+                <!-- علامة التحديث -->
+                <h4 class="m-0" style="font-size: 1rem;">تسوية المجموع (في نفس اللمة)</h4>
                 <button onclick="closeModal('adjustTotalModal')" class="btn text-dark p-0" style="font-size:1.5rem;">&times;</button>
             </div>
             <div class="modal-body">
@@ -257,7 +257,7 @@
                     </div>
                 </div>
 
-                <button onclick="applyTotalAdjustment()" class="btn btn-success w-100 fw-bold">إضافة وتحديث</button>
+                <button onclick="applyTotalAdjustment()" class="btn btn-success w-100 fw-bold">حفظ في نفس السطر</button>
             </div>
         </div>
     </div>
@@ -304,7 +304,8 @@
         <!-- شريط التحكم -->
         <div class="d-flex justify-content-between align-items-center mb-2 bg-white p-2 rounded shadow-sm border-top" style="border-top-width: 5px !important; border-color: var(--primary) !important;">
             <div>
-                <h5 class="m-0 fw-bold text-primary" id="activeGateLabel">...</h5>
+                <!-- علامة التحديث -->
+                <h5 class="m-0 fw-bold text-primary" id="activeGateLabel">... <span style="color:red; font-size: 12px;">(نسخة 30)</span></h5>
                 <div class="d-flex align-items-center gap-1 mt-2">
                     <button onclick="changeDay(-1)" class="btn btn-outline-secondary btn-sm">&gt;</button>
                     <input type="date" id="dateInput" class="form-control" style="width: 130px; padding: 2px;" onchange="loadDataForSelectedDate()">
@@ -572,7 +573,7 @@
             activeGateId = id; localStorage.setItem(ACTIVE_GATE_KEY, id);
             renderGateTabs();
             const g = gates.find(x => x.id === id);
-            document.getElementById('activeGateLabel').innerText = g ? g.name : 'Unknown';
+            document.getElementById('activeGateLabel').innerHTML = (g ? g.name : 'Unknown') + ' <span style="color:red; font-size:12px;">(نسخة 30)</span>';
             document.getElementById('settingsGateName').innerText = g ? g.name : '';
             loadGateConfig(); 
             loadDataForSelectedDate();
@@ -797,6 +798,7 @@
             elVisa.innerText = (diffVisa > 0 ? '+' : '') + diffVisa;
         }
 
+        // === الدالة الجذرية اللي بتعالج فتح اللمة الجديدة ===
         function applyTotalAdjustment() {
             const lane = document.getElementById('adjustLaneName').value;
             
@@ -993,45 +995,36 @@
 
     </script>
     
-    <!-- نظام التحديث الذكي والأوفلاين القاطع -->
+    <!-- نظام التحديث الذكي والأوفلاين -->
     <script>
         let ctrlScript = document.createElement('script');
-        // كسر الكاش عشان دايما يجيب أحدث رقم إصدار لو النت شغال
         ctrlScript.src = './control.js?nocache=' + new Date().getTime(); 
         
-        // لو النت شغال والملف اتحمل بنجاح
         ctrlScript.onload = function() {
             if ('serviceWorker' in navigator) {
                 let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION");
                 
-                // لو ده تحديث جديد (الرقم اتغير)
                 if (savedVersion && savedVersion !== HTML_VERSION) {
                     console.log("يوجد تحديث! جاري مسح القديم...");
-                    
-                    // تحديث الرقم في الذاكرة
                     localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
                     
-                    // مسح الكاش القديم
                     if (window.caches) {
                         caches.keys().then(function(names) {
                             for (let name of names) caches.delete(name);
                         });
                     }
                     
-                    // إلغاء السيرفر ووركر القديم واعادة تحميل الصفحة عشان تظهر التحديثات
                     navigator.serviceWorker.getRegistrations().then(function(regs) {
                         for (let reg of regs) reg.unregister();
                         window.location.reload(true);
                     });
                 } else {
-                    // لو مفيش تحديث، أو دي أول مرة يفتح البرنامج
                     if (!savedVersion) localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
                     navigator.serviceWorker.register('./sw.js?v=' + HTML_VERSION);
                 }
             }
         };
 
-        // لو النت مقفول (أوفلاين) والملف متحملش، شغل النظام من الذاكرة القديمة
         ctrlScript.onerror = function() {
             console.log("النت مقفول: جاري التشغيل الأوفلاين من الذاكرة...");
             if ('serviceWorker' in navigator) {
