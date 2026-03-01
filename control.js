@@ -7,7 +7,7 @@ var APK_REQUIRED_VERSION = "1.0";
 var APK_DOWNLOAD_LINK = "https://www.mediafire.com/رابط_التطبيق_الجديد_هنا"; 
 
 // 🟢 2. رقم إصدار البرامج الـ 6 - (غيّر هذا الرقم في كل مرة تعدل فيها أي برنامج على جيت هب)
-var HTML_VERSION = "1.1"; 
+var HTML_VERSION = "25"; 
 
 // ==========================================
 

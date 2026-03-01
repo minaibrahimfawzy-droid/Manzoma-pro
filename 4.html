@@ -824,17 +824,22 @@
             // تحذير بسيط لو الأرقام بالسالب
             if ((targetTotal < (currCash + currVisa)) && !confirm("المجموع الجديد أقل من الحالي! هل أنت متأكد؟")) return;
 
-            // دمج التسوية في لمة واحدة (كاش + فيزا)
-            if (diffCash !== 0 || diffVisa !== 0) {
+            // 1. بنشوف هل اللمة (الصف) الأخير فيه رقم متسجل للحارة دي بالذات؟
+            const existingTxInLastLemma = currentTransactions.find(t => t.lemma === currentLemmaCount && t.lane === lane);
+            
+            // 2. لو الخانة بتاعت الحارة دي مش فاضية (فيها رقم قديم)، يبقى لازم نفتح صف جديد عشان منبوظش الحسبة
+            if (existingTxInLastLemma) {
                 currentLemmaCount++;
-                currentTransactions.push({ 
-                    id: Date.now(),
-                    lane: lane, 
-                    lemma: currentLemmaCount, 
-                    amount: diffCash, 
-                    visa: diffVisa 
-                });
             }
+            
+            // 3. تسجيل الفرق (هينزل في نفس اللمة طالما الخانة بتاعت الحارة دي فاضية)
+            currentTransactions.push({ 
+                id: Date.now(),
+                lane: lane, 
+                lemma: currentLemmaCount, 
+                amount: diffCash, 
+                visa: diffVisa 
+            });
             
             autoSave();
             closeModal('adjustTotalModal');
