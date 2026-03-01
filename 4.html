@@ -981,5 +981,15 @@
         function updateClock(){ document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}); }
 
     </script>
+    
+    <!-- ربط النظام بملف الكنترول والتحديثات والأوفلاين -->
+    <script src="./control.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js');
+            });
+        }
+    </script>
 </body>
 </html>

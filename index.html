@@ -238,30 +238,19 @@
             document.getElementById("app-menu").style.display = "block";
             document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name");
             
+            // في حالة عدم وجود الكنترول بيعرض البرامج الافتراضية كإحتياطي
             let cached = localStorage.getItem("_cached_apps");
-            renderApps(cached ? JSON.parse(cached) : systemApps);
-            
-            loadRemoteControl();
+            if (!document.getElementById("control-script-loaded")) {
+                renderApps(cached ? JSON.parse(cached) : systemApps);
+            }
         } else {
             document.getElementById("lock-screen").style.display = "block";
             document.getElementById("app-menu").style.display = "none";
         }
     }
 
-    function loadRemoteControl() {
-        if(!navigator.onLine) return; 
-        let oldScript = document.getElementById("remote-script");
-        if(oldScript) oldScript.remove();
-
-        let script = document.createElement("script");
-        script.id = "remote-script";
-        script.src = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/control.js?v=" + new Date().getTime(); 
-        document.body.appendChild(script);
-    }
-
     // فحص الأوامر من التليجرام عند عودة الإنترنت
     window.addEventListener('online', () => {
-        loadRemoteControl();
         checkAppStatusFromTelegram();
     });
 
@@ -340,5 +329,23 @@
         location.reload();
     }
 </script>
+
+<!-- ربط النظام بملف الكنترول المحلى عشان يشتغل أوفلاين ويقرأ التحديثات -->
+<script id="control-script-loaded" src="./control.js"></script>
+
+<!-- تفعيل نظام السيرفيس ووركر للأوفلاين -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./sw.js')
+            .then(function(reg) {
+                console.log('Service Worker Registered Successfully', reg.scope);
+            }).catch(function(err) {
+                console.log('Service Worker Registration Failed', err);
+            });
+        });
+    }
+</script>
+
 </body>
 </html>
