@@ -10,15 +10,14 @@ var APK_DOWNLOAD_LINK = "https://www.mediafire.com/رابط_التطبيق_ال�
 var HTML_VERSION = "26"; 
 
 // ==========================================
-var GITHUB_LINK = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
-
+// تم إلغاء رابط الجيت هاب واستبداله بمسارات محلية (./) لضمان عمل الأوفلاين
 var remoteApps = [
-    {name: "النبطشية", icon: "📅", url: GITHUB_LINK + "Nabatshia.html?v=" + HTML_VERSION},
-    {name: "الورديات", icon: "🌙", url: GITHUB_LINK + "2.html?v=" + HTML_VERSION},
-    {name: "التصفيات", icon: "⚖️", url: GITHUB_LINK + "3.html?v=" + HTML_VERSION},
-    {name: "اللمات", icon: "📝", url: GITHUB_LINK + "4.html?v=" + HTML_VERSION},
-    {name: "التدفق", icon: "🌊", url: GITHUB_LINK + "5.html?v=" + HTML_VERSION},
-    {name: "المهيئ والمواسير", icon: "🏗️", url: GITHUB_LINK + "6.html?v=" + HTML_VERSION}
+    {name: "النبطشية", icon: "📅", url: "./Nabatshia.html?v=" + HTML_VERSION},
+    {name: "الورديات", icon: "🌙", url: "./2.html?v=" + HTML_VERSION},
+    {name: "التصفيات", icon: "⚖️", url: "./3.html?v=" + HTML_VERSION},
+    {name: "اللمات", icon: "📝", url: "./4.html?v=" + HTML_VERSION},
+    {name: "التدفق", icon: "🌊", url: "./5.html?v=" + HTML_VERSION},
+    {name: "المهيئ والمواسير", icon: "🏗️", url: "./6.html?v=" + HTML_VERSION}
 ];
 
 // سطر الأمان: عشان الملف ده يقدر يشتغل كـ "ريموت" و كـ "مخزن أوفلاين"

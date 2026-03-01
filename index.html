@@ -81,7 +81,7 @@
 </div>
 
 <script>
-    const CURRENT_VERSION = "1.0"; // لا تغير هذا الرقم أبداً من هنا
+    const CURRENT_VERSION = "1.0"; 
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
     const CHAT_ID = "-1003886528114";
     const SECRET_KEY = "QWRtaW5fMjZf";
@@ -152,11 +152,8 @@
         return regex.test(name) && words.length >= 3;
     }
 
-    // ==========================================
-    // 🛡️ فحص حالة التطبيق وقفل/طرد المستخدمين من التليجرام
-    // ==========================================
     function checkAppStatusFromTelegram() {
-        if(!navigator.onLine) return; // لو مفيش نت هيشتغل عادي من الكاش
+        if(!navigator.onLine) return; 
 
         const url = `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${CHAT_ID}`;
 
@@ -166,7 +163,6 @@
             if(data.ok && data.result.description) {
                 let desc = data.result.description;
                 
-                // 1. الإيقاف الإجباري للجميع
                 if(desc.includes("[OFF]")) {
                     document.body.innerHTML = `
                         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0d1117; color:#f85149; text-align:center; padding:20px; width:100%; box-sizing:border-box;">
@@ -175,12 +171,10 @@
                             <p style="color:#8b949e; font-size:16px; margin-top:10px;">عذراً، تم إيقاف التطبيق مؤقتاً لجميع المستخدمين من قبل الإدارة.</p>
                         </div>
                     `;
-                    return; // توقف عن تنفيذ باقي الكود
+                    return; 
                 }
 
-                // 2. طرد شخص معين برقم جهازه
                 if(desc.includes("BAN:" + deviceID)) {
-                    // حذف توثيق الدخول الخاص به
                     localStorage.removeItem("_tkn_auth"); 
                     document.body.innerHTML = `
                         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0d1117; color:#f85149; text-align:center; padding:20px; width:100%; box-sizing:border-box;">
@@ -191,7 +185,7 @@
                     `;
                 }
             }
-        }).catch(()=>{}); // تجاهل لو حصل خطأ في الاتصال بتليجرام
+        }).catch(()=>{}); 
     }
 
     function login() {
@@ -238,25 +232,19 @@
             document.getElementById("app-menu").style.display = "block";
             document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name");
             
-            // في حالة عدم وجود الكنترول بيعرض البرامج الافتراضية كإحتياطي
             let cached = localStorage.getItem("_cached_apps");
-            if (!document.getElementById("control-script-loaded")) {
-                renderApps(cached ? JSON.parse(cached) : systemApps);
-            }
+            renderApps(cached ? JSON.parse(cached) : systemApps);
+            
         } else {
             document.getElementById("lock-screen").style.display = "block";
             document.getElementById("app-menu").style.display = "none";
         }
     }
 
-    // فحص الأوامر من التليجرام عند عودة الإنترنت
     window.addEventListener('online', () => {
         checkAppStatusFromTelegram();
     });
 
-    // ==========================================
-    // 📥 دالة النسخ الاحتياطي
-    // ==========================================
     function backupDataCode() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
@@ -289,9 +277,6 @@
         }
     }
 
-    // ==========================================
-    // 📤 دالة الاستعادة 
-    // ==========================================
     function restoreDataCode() {
         let backupCode = prompt("📌 برجاء لصق كود الاستعادة هنا:");
         
@@ -318,9 +303,8 @@
         }
     }
 
-    // عند تشغيل التطبيق
     window.onload = function() {
-        checkAppStatusFromTelegram(); // أول شيء يعمل هو فحص الحظر أو الإيقاف
+        checkAppStatusFromTelegram(); 
         showApp(localStorage.getItem("_tkn_auth") === getTruePass());
     };
 
@@ -330,21 +314,38 @@
     }
 </script>
 
-<!-- ربط النظام بملف الكنترول المحلى عشان يشتغل أوفلاين ويقرأ التحديثات -->
-<script id="control-script-loaded" src="./control.js"></script>
-
-<!-- تفعيل نظام السيرفيس ووركر للأوفلاين -->
+<!-- نظام التحديث الذكي (بيجبر الموبايل يمسح القديم ويحمل الجديد) -->
 <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('./sw.js')
-            .then(function(reg) {
-                console.log('Service Worker Registered Successfully', reg.scope);
-            }).catch(function(err) {
-                console.log('Service Worker Registration Failed', err);
-            });
-        });
-    }
+    let ctrlScript = document.createElement('script');
+    ctrlScript.src = './control.js?nocache=' + new Date().getTime(); 
+    
+    ctrlScript.onload = function() {
+        if ('serviceWorker' in navigator) {
+            let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION");
+            
+            // لو ده تحديث جديد (الرقم اتغير)
+            if (savedVersion && savedVersion !== HTML_VERSION) {
+                console.log("يوجد تحديث! جاري مسح القديم...");
+                if (window.caches) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) caches.delete(name);
+                    });
+                }
+                navigator.serviceWorker.getRegistrations().then(function(regs) {
+                    for (let reg of regs) reg.unregister();
+                    localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
+                    
+                    // عمل ريفريش أوتوماتيك عشان يظهر التحديث للمستخدم
+                    window.location.reload(true);
+                });
+            } else {
+                // لو مفيش تحديث، شغل النظام عادي
+                localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
+                navigator.serviceWorker.register('./sw.js?v=' + HTML_VERSION);
+            }
+        }
+    };
+    document.body.appendChild(ctrlScript);
 </script>
 
 </body>

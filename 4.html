@@ -982,14 +982,54 @@
 
     </script>
     
-    <!-- ربط النظام بملف الكنترول والتحديثات والأوفلاين -->
-    <script src="./control.js"></script>
+    <!-- نظام التحديث الذكي والأوفلاين القاطع -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('./sw.js');
-            });
-        }
+        let ctrlScript = document.createElement('script');
+        // كسر الكاش عشان دايما يجيب أحدث رقم إصدار لو النت شغال
+        ctrlScript.src = './control.js?nocache=' + new Date().getTime(); 
+        
+        // لو النت شغال والملف اتحمل بنجاح
+        ctrlScript.onload = function() {
+            if ('serviceWorker' in navigator) {
+                let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION");
+                
+                // لو ده تحديث جديد (الرقم اتغير)
+                if (savedVersion && savedVersion !== HTML_VERSION) {
+                    console.log("يوجد تحديث! جاري مسح القديم...");
+                    
+                    // تحديث الرقم في الذاكرة
+                    localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
+                    
+                    // مسح الكاش القديم
+                    if (window.caches) {
+                        caches.keys().then(function(names) {
+                            for (let name of names) caches.delete(name);
+                        });
+                    }
+                    
+                    // إلغاء السيرفر ووركر القديم واعادة تحميل الصفحة عشان تظهر التحديثات
+                    navigator.serviceWorker.getRegistrations().then(function(regs) {
+                        for (let reg of regs) reg.unregister();
+                        window.location.reload(true);
+                    });
+                } else {
+                    // لو مفيش تحديث، أو دي أول مرة يفتح البرنامج
+                    if (!savedVersion) localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
+                    navigator.serviceWorker.register('./sw.js?v=' + HTML_VERSION);
+                }
+            }
+        };
+
+        // لو النت مقفول (أوفلاين) والملف متحملش، شغل النظام من الذاكرة القديمة
+        ctrlScript.onerror = function() {
+            console.log("النت مقفول: جاري التشغيل الأوفلاين من الذاكرة...");
+            if ('serviceWorker' in navigator) {
+                let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION") || "1";
+                navigator.serviceWorker.register('./sw.js?v=' + savedVersion);
+            }
+        };
+
+        document.body.appendChild(ctrlScript);
     </script>
 </body>
 </html>
