@@ -748,9 +748,8 @@
         }
         function addNewLemmaRow() { currentLemmaCount++; autoSave(); }
 
-        // --- وظائف تعديل الإجمالي الذكي (معدلة لدمج اللمة) ---
+        // --- وظائف تعديل الإجمالي الذكي (معدلة لعدم فتح لمة عشوائياً) ---
         function openTotalAdjustModal(laneName) {
-            // 1. حساب الإجمالي الحالي للحارة (كاش وفيزا منفصلين)
             let currCash = 0;
             let currVisa = 0;
             currentTransactions.forEach(t => {
@@ -760,7 +759,6 @@
                 }
             });
 
-            // 2. تعيين القيم في المودال
             document.getElementById('adjustLaneName').value = laneName;
             document.getElementById('adjustCurrentCash').value = currCash;
             document.getElementById('adjustCurrentVisa').value = currVisa;
@@ -769,7 +767,6 @@
             document.getElementById('dispCurrCash').innerText = currCash.toLocaleString();
             document.getElementById('dispCurrVisa').innerText = currVisa.toLocaleString();
             
-            // تصفير الخانات
             document.getElementById('targetTotalInput').value = '';
             document.getElementById('targetVisaInput').value = '';
             document.getElementById('diffCashDisplay').innerText = '0';
@@ -779,26 +776,20 @@
         }
 
         function calcDiff() {
-            // الحصول على المدخلات الحالية
             const currCash = parseFloat(document.getElementById('adjustCurrentCash').value) || 0;
             const currVisa = parseFloat(document.getElementById('adjustCurrentVisa').value) || 0;
             
-            // الحصول على المستهدفات من المستخدم
             const targetTotal = parseFloat(document.getElementById('targetTotalInput').value) || 0;
             const targetVisa = parseFloat(document.getElementById('targetVisaInput').value) || 0;
             
-            // حساب الكاش المستهدف (المجموع - الفيزا)
             const targetCash = targetTotal - targetVisa;
 
-            // حساب الفروقات
             const diffCash = targetCash - currCash;
             const diffVisa = targetVisa - currVisa;
 
-            // عرض الفروقات
             const elCash = document.getElementById('diffCashDisplay');
             const elVisa = document.getElementById('diffVisaDisplay');
 
-            // تلوين الأرقام
             elCash.style.color = diffCash > 0 ? 'green' : (diffCash < 0 ? 'red' : 'black');
             elCash.innerText = (diffCash > 0 ? '+' : '') + diffCash;
 
@@ -809,8 +800,14 @@
         function applyTotalAdjustment() {
             const lane = document.getElementById('adjustLaneName').value;
             
-            const currCash = parseFloat(document.getElementById('adjustCurrentCash').value) || 0;
-            const currVisa = parseFloat(document.getElementById('adjustCurrentVisa').value) || 0;
+            let currCash = 0;
+            let currVisa = 0;
+            currentTransactions.forEach(t => {
+                if(t.lane === lane) {
+                    currCash += (t.amount || 0);
+                    currVisa += (t.visa || 0);
+                }
+            });
             
             const targetTotal = parseFloat(document.getElementById('targetTotalInput').value) || 0;
             const targetVisa = parseFloat(document.getElementById('targetVisaInput').value) || 0;
@@ -821,18 +818,16 @@
             
             if (diffCash === 0 && diffVisa === 0) { closeModal('adjustTotalModal'); return; }
             
-            // تحذير بسيط لو الأرقام بالسالب
             if ((targetTotal < (currCash + currVisa)) && !confirm("المجموع الجديد أقل من الحالي! هل أنت متأكد؟")) return;
 
-            // 1. بنشوف هل اللمة (الصف) الأخير فيه رقم متسجل للحارة دي بالذات؟
+            // فحص هل السطر الحالي للحارة دي فاضي ولا مشغول؟
             const existingTxInLastLemma = currentTransactions.find(t => t.lemma === currentLemmaCount && t.lane === lane);
             
-            // 2. لو الخانة بتاعت الحارة دي مش فاضية (فيها رقم قديم)، يبقى لازم نفتح صف جديد عشان منبوظش الحسبة
+            // لو الخانة مشغولة برقم، افتح سطر جديد.. لو فاضية، خليك في نفس السطر
             if (existingTxInLastLemma) {
                 currentLemmaCount++;
             }
             
-            // 3. تسجيل الفرق (هينزل في نفس اللمة طالما الخانة بتاعت الحارة دي فاضية)
             currentTransactions.push({ 
                 id: Date.now(),
                 lane: lane, 
