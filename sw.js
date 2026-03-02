@@ -1,57 +1,48 @@
 // ==========================================
-// ملف Service Worker النهائي (sw.js)
+// ملف Service Worker الذكي (الإنترنت أولاً ثم الأوفلاين)
 // ==========================================
 
-// 1. استدعاء ملف الكنترول لقراءة الإصدار وقائمة البرامج
-importScripts('./control.js');
+const CACHE_NAME = 'manzoma-dynamic-v31';
 
-// 2. اسم الكاش بيتحدث أوتوماتيك برقم الإصدار
-const CACHE_NAME = 'manzoma-cache-v' + HTML_VERSION; 
-
-// 3. الملفات الأساسية جداً
-let ASSETS_TO_CACHE = [
-    './',
-    './index.html',
-    './control.js'
-];
-
-// 4. السحر هنا: قراءة كل البرامج اللي إنت ضايفها في control.js وتخزينها أوتوماتيك
-if (typeof remoteApps !== 'undefined') {
-    remoteApps.forEach(app => {
-        ASSETS_TO_CACHE.push(app.url); // بيسحب رابط البرنامج (الورديات، اللمات، التدفق.. الخ)
-    });
-}
-
-// 5. التثبيت والتخزين في الموبايل
+// 1. التثبيت
 self.addEventListener('install', (event) => {
     self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
-    );
 });
 
-// 6. مسح الذاكرة القديمة لما الرقم يتغير
+// 2. التفعيل ومسح أي كاش قديم
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((keys) => {
+        caches.keys().then((cacheNames) => {
             return Promise.all(
-                keys.map((key) => {
-                    if (key !== CACHE_NAME) return caches.delete(key);
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME) {
+                        return caches.delete(cacheName);
+                    }
                 })
             );
         }).then(() => self.clients.claim())
     );
 });
 
-// 7. التشغيل (لو في نت يجيب الجديد ويحدث الذاكرة، مفيش نت يشغل المتخزن)
+// 3. الاعتراض (السحر كله هنا)
 self.addEventListener('fetch', (event) => {
+    if (event.request.method !== 'GET') return;
+
     event.respondWith(
         fetch(event.request)
             .then((response) => {
-                const resClone = response.clone();
-                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
-                return response;
+                // لو النت شغال والملف جه سليم: خده، اعمله نسخة، واحفظه في الكاش للأوفلاين
+                if (response && response.status === 200) {
+                    let responseClone = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseClone);
+                    });
+                }
+                return response; // واعرضه للمستخدم
             })
-            .catch(() => caches.match(event.request))
+            .catch(() => {
+                // لو النت مقفول: روح دور في الكاش وهات آخر نسخة اتخزنت (وتجاهل رقم التحديث ?v=31)
+                return caches.match(event.request, { ignoreSearch: true });
+            })
     );
 });
