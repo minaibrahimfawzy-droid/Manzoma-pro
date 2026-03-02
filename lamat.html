@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اللمات - الإصدار الذكي</title>
+    <style>
+        /* --- 1. أساسيات التصميم --- */
+        :root {
+            --primary: #0d6efd; --success: #198754; --danger: #dc3545; --warning: #ffc107; 
+            --dark: #212529; --light: #f8f9fa; --secondary: #6c757d; --info: #0dcaf0;
+            --border-color: #dee2e6;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; color: #212529; font-size: 1rem; line-height: 1.5; }
+        
+        /* أدوات التخطيط */
+        .container { width: 100%; padding: 15px; margin: 0 auto; max-width: 1400px; }
+        .d-flex { display: flex; }
+        .flex-column { flex-direction: column; }
+        .align-items-center { align-items: center; }
+        .justify-content-between { justify-content: space-between; }
+        .justify-content-center { justify-content: center; }
+        .gap-1 { gap: 0.25rem; } .gap-2 { gap: 0.5rem; }
+        .w-100 { width: 100%; } .text-center { text-align: center; } .text-end { text-align: end; }
+        .m-0 { margin: 0 !important; } .mb-1 { margin-bottom: 0.25rem; } .mb-2 { margin-bottom: 0.5rem; } .mb-3 { margin-bottom: 1rem; } .mt-2 { margin-top: 0.5rem; }
+        .p-1 { padding: 0.25rem; } .p-2 { padding: 0.5rem; } .p-3 { padding: 1rem; }
+        .rounded { border-radius: 0.375rem; } .shadow-sm { box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); }
+        .fw-bold { font-weight: 700; } .small { font-size: 0.875em; }
+        .d-none { display: none !important; }
+
+        /* الألوان والخلفيات */
+        .bg-white { background-color: #fff; } .bg-light { background-color: var(--light); } .bg-dark { background-color: var(--dark); color: #fff; }
+        .bg-primary { background-color: var(--primary); } .text-white { color: #fff; }
+        .text-primary { color: var(--primary); } .text-success { color: var(--success); } .text-danger { color: var(--danger); } .text-warning { color: var(--warning); } .text-muted { color: #6c757d; } .text-info { color: #0aa2c0; }
+        .border { border: 1px solid var(--border-color); } .border-top { border-top: 1px solid var(--border-color); } .border-end { border-left: 1px solid var(--border-color); }
+        
+        /* الأزرار والنماذج */
+        .btn { display: inline-block; font-weight: 400; line-height: 1.5; text-align: center; text-decoration: none; vertical-align: middle; cursor: pointer; user-select: none; border: 1px solid transparent; padding: .375rem .75rem; font-size: 1rem; border-radius: .25rem; transition: color .15s ease-in-out,background-color .15s ease-in-out; }
+        .btn-sm { padding: .25rem .5rem; font-size: .875rem; }
+        .btn-primary { color: #fff; background-color: var(--primary); border-color: var(--primary); }
+        .btn-success { color: #fff; background-color: var(--success); border-color: var(--success); }
+        .btn-danger { color: #fff; background-color: var(--danger); border-color: var(--danger); }
+        .btn-warning { color: #000; background-color: var(--warning); border-color: var(--warning); }
+        .btn-outline-secondary { color: var(--secondary); border-color: var(--secondary); background: transparent; }
+        .btn-outline-secondary:hover { color: #fff; background-color: var(--secondary); }
+        .btn-outline-success { color: var(--success); border-color: var(--success); background: transparent; }
+        .btn-outline-danger { color: var(--danger); border-color: var(--danger); background: transparent; }
+        
+        .form-control, .form-select { display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #212529; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; appearance: none; border-radius: .25rem; transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out; }
+        .input-group { display: flex; align-items: stretch; width: 100%; }
+        .input-group .form-control { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+        .input-group .btn { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+
+        /* Grid System مبسط */
+        .row { display: flex; flex-wrap: wrap; margin-right: -0.5rem; margin-left: -0.5rem; }
+        .row > * { padding-right: 0.5rem; padding-left: 0.5rem; width: 100%; }
+        .col { flex: 1 0 0%; } .col-3 { width: 25%; flex: 0 0 auto; } .col-4 { width: 33.3333%; flex: 0 0 auto; } .col-6 { width: 50%; flex: 0 0 auto; } .col-12 { width: 100%; flex: 0 0 auto; }
+
+        /* --- 2. تخصيصات البرنامج --- */
+        /* التبويبات */
+        .gates-nav { overflow-x: auto; white-space: nowrap; padding-bottom: 5px; }
+        .gate-tab { border-radius: 20px; margin-left: 5px; font-weight: bold; }
+        .gate-tab.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .gate-tab.inactive { background-color: white; color: #555; border-color: #dee2e6; }
+        
+        /* الجدول */
+        .sheet-table { width: 100%; border-collapse: collapse; background: white; min-width: 900px; }
+        .sheet-table th, .sheet-table td { border: 1px solid #444; text-align: center; vertical-align: middle; padding: 0; height: 45px; position: relative; }
+        
+        /* ألوان الهيدر */
+        .sheet-header th { font-size: 0.9rem; padding: 5px; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .header-malaki-entry { background-color: #198754 !important; border-bottom: 4px solid #0f5132; }
+        .header-naql { background-color: #d35400 !important; border-bottom: 4px solid #873600; }
+        .header-malaki-exit { background-color: #0d6efd !important; border-bottom: 4px solid #084298; }
+        .header-mizan { background-color: #dc3545 !important; border-bottom: 4px solid #842029; }
+        .header-default { background-color: #343a40 !important; border-bottom: 4px solid #212529; }
+        .header-total { background-color: #000 !important; color: #ffc107 !important; border-bottom: 4px solid #ffc107; }
+
+        /* الخلايا */
+        .cell-clickable { cursor: pointer; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .cell-clickable:hover { background-color: #f8f9fa; }
+        .cell-clickable.has-value { background-color: #e8f5e9; }
+        .cell-amount { font-weight: bold; font-size: 1.1em; line-height: 1; color: #000; }
+        .cell-visa { font-size: 0.75em; color: var(--info); font-weight: bold; margin-top: 1px; }
+        .cell-total { font-size: 0.7em; color: var(--secondary); border-top: 1px solid #ccc; width: 90%; margin-top: 2px; }
+        .row-total-col { background-color: #fff3cd; font-weight: bold; font-size: 1.1rem; }
+        .lemma-col { background-color: #e9ecef; font-weight: bold; width: 40px; }
+        
+        /* --- تعديل سطر الإجمالي (ج) --- */
+        .footer-row td { 
+            background-color: var(--dark); 
+            color: white; 
+            height: 35px;
+            font-size: 0.85rem; 
+            white-space: nowrap; 
+            overflow: hidden;
+            padding: 0 2px;
+        }
+        
+        .footer-cell-interactive {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .footer-cell-interactive:hover {
+            background-color: #495057 !important;
+            color: #ffc107 !important;
+        }
+
+        .grand-total-cell { 
+            background-color: var(--warning) !important; 
+            color: #000 !important; 
+            font-size: 1rem !important;
+            font-weight: bold; 
+        }
+
+        /* تنسيق صف المتبقي */
+        .remaining-row td {
+            background-color: #e3f2fd; /* لون أزرق فاتح مميز */
+            color: #0d6efd;
+            border-top: 3px double #adb5bd;
+            font-weight: bold;
+        }
+
+        .lemma-delete-btn { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); font-size: 10px; color: var(--danger); cursor: pointer; display: none; }
+        .lemma-col:hover .lemma-delete-btn { display: block; }
+
+        /* الصناديق الملخصة */
+        .summary-box { border-radius: 8px; padding: 5px; margin-bottom: 5px; border: 1px solid #ddd; }
+        .summary-label { display: block; font-size: 0.75rem; color: #666; font-weight: bold; }
+        .summary-value { font-weight: bold; font-size: 1.1rem; }
+
+        /* تنسيق بوكسات الإيراد في الأسفل */
+        .info-box {
+            background-color: #eef2f7; 
+            border: 1px solid #dee2e6; 
+            border-radius: 5px; 
+            padding: 8px; 
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .info-box.highlight { background-color: #fff3cd; border-color: #ffc107; }
+        .info-box small { font-size: 0.8rem; display: block; margin-bottom: 3px; }
+        .info-box .val { font-size: 1.1rem; font-weight: bold; }
+
+        /* Modal مخصص (بديل Bootstrap Modal) */
+        .custom-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .custom-modal.show { display: flex; }
+        .modal-content { background-color: #fff; padding: 0; border-radius: 0.5rem; width: 90%; max-width: 400px; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15); animation: slideDown 0.3s ease-out; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid var(--border-color); }
+        .modal-body { padding: 1rem; }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* SVG Icons */
+        .icon { width: 1.2em; height: 1.2em; vertical-align: -0.2em; fill: currentColor; }
+        .icon-lg { width: 2em; height: 2em; }
+
+        /* الطباعة */
+        .report-header { display: none; text-align: center; border-bottom: 2px solid #000; margin-bottom: 10px; }
+        @media print {
+            body { background: white; }
+            .no-print { display: none !important; }
+            .sheet-table { min-width: 100%; }
+            .report-header { display: block; }
+            .cell-total { color: #333 !important; }
+            .row-total-col { background-color: #eee !important; }
+            .finance-inputs { display: none; }
+            #printableArea { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- النافذة المنبثقة: تسجيل مبلغ (نقدي + فيزا) -->
+    <div id="inputModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h4 class="m-0" style="font-size: 1rem;" id="modalTitle">تسجيل مبلغ</h4>
+                <button onclick="closeModal('inputModal')" class="btn text-white p-0" style="font-size:1.5rem;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="modalForm" onsubmit="saveEntry(event)">
+                    <input type="hidden" id="activeLemma">
+                    <input type="hidden" id="activeLane">
+                    
+                    <div class="mb-3">
+                        <label class="small fw-bold mb-1 text-dark">المبلغ النقدي (كاش)</label>
+                        <input type="number" id="modalAmount" class="form-control text-center fw-bold text-primary" style="font-size:1.5rem;" placeholder="0">
+                    </div>
+
+                    <div class="mb-3 bg-light p-2 rounded border">
+                        <label class="small fw-bold mb-1 text-info" style="color: #0aa2c0;">دفع إلكتروني (فيزا)</label>
+                        <input type="number" id="modalVisa" class="form-control text-center fw-bold text-info" style="font-size:1.2rem; color: #0aa2c0;" placeholder="0">
+                    </div>
+
+                    <div class="d-flex flex-column gap-2">
+                        <button type="submit" class="btn btn-success fw-bold">حفظ</button>
+                        <button type="button" onclick="deleteEntry()" class="btn btn-outline-danger btn-sm">تصفير (مسح الكل)</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- النافذة المنبثقة: تعديل الإجمالي -->
+    <div id="adjustTotalModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <!-- علامة التحديث -->
+                <h4 class="m-0" style="font-size: 1rem;">تسوية المجموع (في نفس اللمة)</h4>
+                <button onclick="closeModal('adjustTotalModal')" class="btn text-dark p-0" style="font-size:1.5rem;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="adjustLaneName">
+                <input type="hidden" id="adjustCurrentCash">
+                <input type="hidden" id="adjustCurrentVisa">
+                
+                <h5 id="adjustTitle" class="text-center mb-2"></h5>
+                
+                <div class="d-flex justify-content-between mb-3 bg-light p-2 border rounded small text-center">
+                    <div style="width:48%">
+                        <span class="d-block text-muted">كاش حالي</span>
+                        <strong id="dispCurrCash">0</strong>
+                    </div>
+                    <div style="border-right:1px solid #ccc"></div>
+                    <div style="width:48%">
+                        <span class="d-block text-muted">فيزا حالي</span>
+                        <strong id="dispCurrVisa" class="text-info">0</strong>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label class="small fw-bold mb-1">المجموع النهائي (كاش + فيزا)</label>
+                    <input type="number" id="targetTotalInput" class="form-control text-center fw-bold text-success" style="font-size:1.3rem;" oninput="calcDiff()">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="small fw-bold mb-1 text-info">مبلغ الفيزا (الموجود ضمن المجموع)</label>
+                    <input type="number" id="targetVisaInput" class="form-control text-center fw-bold text-info" style="font-size:1.1rem;" oninput="calcDiff()">
+                    <small class="text-muted" style="font-size:0.75rem;">اتركه فارغاً إذا كان المبلغ كله كاش</small>
+                </div>
+
+                <div class="mb-3 p-2 bg-light border rounded text-center">
+                    <div class="small fw-bold mb-1 text-decoration-underline">الفرق (سيضاف في الخانة المتاحة):</div>
+                    <div class="d-flex justify-content-around">
+                        <div>
+                            <span class="small d-block">كاش</span>
+                            <span id="diffCashDisplay" class="fw-bold" style="font-size:1.1rem;">0</span>
+                        </div>
+                        <div>
+                            <span class="small d-block">فيزا</span>
+                            <span id="diffVisaDisplay" class="fw-bold text-info" style="font-size:1.1rem;">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="applyTotalAdjustment()" class="btn btn-success w-100 fw-bold">حفظ في نفس السطر</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- النافذة المنبثقة: الإعدادات -->
+    <div id="settingsModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h4 class="m-0" style="font-size: 1rem;">الإعدادات</h4>
+                <button onclick="closeModal('settingsModal')" class="btn text-white p-0" style="font-size:1.5rem;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h5 id="settingsGateName" class="text-warning text-center m-0 mb-2"></h5>
+                <div class="input-group mb-2">
+                    <input type="text" id="newLaneName" class="form-control" placeholder="اسم الحارة">
+                    <select id="newLaneType" class="form-select" style="max-width: 80px;"><option value="entry">دخول</option><option value="exit">خروج</option></select>
+                    <button onclick="addNewLane()" class="btn btn-success">+</button>
+                </div>
+                <ul id="lanesListDisplay" style="list-style: none; padding: 0; margin-bottom: 1rem; max-height: 200px; overflow-y: auto;"></ul>
+                <hr>
+                <button onclick="factoryResetGate()" class="btn btn-danger w-100 fw-bold">حذف بيانات البوابة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="container" id="main-app">
+        
+        <!-- شريط البوابات -->
+        <div class="d-flex align-items-center mb-3 no-print bg-white p-2 rounded shadow-sm">
+            <a href="index.html" class="btn btn-danger btn-sm fw-bold ms-2 d-flex align-items-center gap-1" title="خروج للقائمة الرئيسية">
+                <svg class="icon" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                </svg>
+                خروج
+            </a>
+
+            <div class="gates-nav d-flex" style="flex-grow:1;" id="gatesContainer"></div>
+            <button onclick="promptNewGate()" class="btn btn-outline-success add-gate-btn ms-2" title="إضافة بوابة">
+                <svg class="icon" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2z"/></svg>
+            </button>
+        </div>
+
+        <!-- شريط التحكم -->
+        <div class="d-flex justify-content-between align-items-center mb-2 bg-white p-2 rounded shadow-sm border-top" style="border-top-width: 5px !important; border-color: var(--primary) !important;">
+            <div>
+                <!-- علامة التحديث -->
+                <h5 class="m-0 fw-bold text-primary" id="activeGateLabel">... <span style="color:red; font-size: 12px;">(نسخة 30)</span></h5>
+                <div class="d-flex align-items-center gap-1 mt-2">
+                    <button onclick="changeDay(-1)" class="btn btn-outline-secondary btn-sm">&gt;</button>
+                    <input type="date" id="dateInput" class="form-control" style="width: 130px; padding: 2px;" onchange="loadDataForSelectedDate()">
+                    <button onclick="changeDay(1)" class="btn btn-outline-secondary btn-sm">&lt;</button>
+                    <select id="shiftInput" class="form-select" style="width: 100px; padding: 2px;" onchange="loadDataForSelectedDate()">
+                        <option value="صباحية">صباحية</option>
+                        <option value="مسائية">مسائية</option>
+                    </select>
+                </div>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-secondary mb-2" style="background:#6c757d; color:white; padding:3px 6px; border-radius:4px;" id="clockDisplay">00:00</span>
+                <div>
+                    <button class="btn btn-sm btn-outline-dark" onclick="openModal('settingsModal')">
+                        <svg class="icon" viewBox="0 0 16 16"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1-1.255-.52l-.094-.319z"/></svg>
+                    </button>
+                    <button onclick="window.print()" class="btn btn-sm btn-primary fw-bold">
+                        <svg class="icon" viewBox="0 0 16 16"><path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/><path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/></svg>
+                        طباعة / PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="printableArea">
+            <div class="report-header">
+                <h2 id="printReportTitle">تقرير وردية</h2>
+                <div class="d-flex justify-content-center gap-2 mb-2" style="font-size:1.1rem; color:#555;">
+                    <span id="printDate"></span> | <span id="printShift"></span>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="sheet-table">
+                    <thead class="sheet-header" id="sheetHeader"></thead>
+                    <tbody id="sheetBody"></tbody>
+                    <tfoot id="sheetFooter"></tfoot>
+                </table>
+            </div>
+
+            <div class="my-2 no-print">
+                <button onclick="addNewLemmaRow()" class="btn btn-warning w-100 fw-bold">
+                    + إضافة صف لمة جديد
+                </button>
+            </div>
+
+            <!-- الملخص المالي -->
+            <div class="rounded border mt-2 shadow-sm" style="border-color: var(--primary) !important; overflow: hidden;">
+                <div class="bg-primary text-white p-2 fw-bold small">الملخص المالي والختامي</div>
+                <div class="p-2 bg-white">
+                    
+                    <div class="row text-center mb-2" style="background:#f8f9fa; border:1px solid #ddd; border-radius:4px; margin:0;">
+                        <div class="col-4 p-1 border-end">
+                            <small class="text-muted d-block">إيراد صباحية</small>
+                            <span id="morningTotalDisplay" class="fw-bold text-primary">0</span>
+                        </div>
+                        <div class="col-4 p-1 border-end">
+                            <small class="text-muted d-block">إيراد مسائية</small>
+                            <span id="eveningTotalDisplay" class="fw-bold text-muted">0</span>
+                        </div>
+                        <div class="col-4 p-1 bg-white">
+                            <small class="text-muted d-block">إجمالي اليوم</small>
+                            <span id="grandTotalDayDisplay" class="fw-bold text-success" style="font-size:1.2rem;">0</span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-6 border-end p-2">
+                            <strong class="small text-primary d-block mb-1">بنود الرقابة</strong>
+                            <div class="input-group mb-1 no-print">
+                                <input type="number" id="newReqaba" class="form-control" placeholder="مبلغ">
+                                <button onclick="addFinance('reqaba')" class="btn btn-primary">+</button>
+                            </div>
+                            <div id="reqabaListContainer" class="small text-muted"></div>
+                        </div>
+                        <div class="col-6 p-2">
+                            <strong class="small text-danger d-block mb-1">بنود التوريد</strong>
+                            <div class="input-group mb-1 no-print">
+                                <input type="number" id="newTawreed" class="form-control" placeholder="مبلغ">
+                                <button onclick="addFinance('tawreed')" class="btn btn-danger">+</button>
+                            </div>
+                            <div id="tawreedListContainer" class="small text-muted"></div>
+                        </div>
+                    </div>
+
+                    <div class="row text-center mb-2">
+                         <div class="col-4 p-1">
+                            <div class="summary-box" style="background:#fff5f5; border-color:#f5c6cb;">
+                                <span class="summary-label text-danger">إجمالي التوريدات (ص+م)</span>
+                                <span id="totalTawreedAllShifts" class="summary-value text-danger">0</span>
+                            </div>
+                         </div>
+                         <div class="col-4 p-1">
+                            <div class="summary-box" style="background:#e3f2fd; border-color:#90caf9;">
+                                <span class="summary-label" style="color:#0d6efd">إجمالي فيزا (ص+م)</span>
+                                <span id="totalVisaDayDisplay" class="summary-value" style="color:#0d6efd">0</span>
+                            </div>
+                         </div>
+                         <div class="col-4 p-1">
+                            <div class="summary-box bg-success text-white">
+                                <span class="summary-label" style="color:rgba(255,255,255,0.8)">الصافي النهائي (خزينة+فيزا)</span>
+                                <span id="netFinalTotal" class="summary-value">0</span>
+                            </div>
+                         </div>
+                    </div>
+                    
+                    <div class="row mb-1">
+                        <div class="col-4 px-1">
+                            <div class="info-box">
+                                <small>ايراد نقدي</small>
+                                <div class="val text-dark" id="totalLanes">0</div>
+                            </div>
+                        </div>
+                        <div class="col-4 px-1">
+                            <div class="info-box" style="background-color: #e3f2fd;">
+                                <small style="color:#0aa2c0;">إلكتروني (فيزا)</small>
+                                <div class="val" style="color:#0aa2c0;" id="totalVisa">0</div>
+                            </div>
+                        </div>
+                        <div class="col-4 px-1">
+                            <div class="info-box">
+                                <small class="text-primary">رقابة</small>
+                                <div class="val text-primary" id="totalReqaba">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-4 px-1" id="morningTawreedContainer">
+                            <div class="info-box">
+                                <small class="text-muted">توريد صباحي</small>
+                                <div class="val text-muted" id="morningTawreedDisplay">0</div>
+                            </div>
+                        </div>
+                        <div class="col-4 px-1" id="carryOverContainer">
+                            <div class="info-box">
+                                <small class="text-secondary">مرحل صباحي</small>
+                                <div class="val text-secondary" id="carryOverDisplay">0</div>
+                            </div>
+                        </div>
+                        <div class="col-4 px-1">
+                            <div class="info-box">
+                                <small class="text-danger">توريد حالي</small>
+                                <div class="val text-danger" id="totalTawreed">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <div class="col-6 px-1">
+                            <div class="bg-dark text-white rounded p-2 text-center border border-warning" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                <small style="color:#bbb;">خزينة حالية (كاش)</small>
+                                <div class="fw-bold text-warning" style="font-size:1.4rem;" id="safeBalance">0</div>
+                            </div>
+                        </div>
+                        <div class="col-6 px-1">
+                            <div class="bg-dark text-white rounded p-2 text-center border border-info" style="height:100%; display:flex; flex-direction:column; justify-content:center;">
+                                <small style="color:#bbb;">إجمالي (خزينة + فيزا)</small>
+                                <div class="fw-bold text-info" style="font-size:1.4rem;" id="totalSafeVisaDisplay">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div style="height:50px;"></div>
+    </div>
+
+    <script>
+        /* --- المنطق البرمجي (Javascript) --- */
+        
+        function openModal(id) { 
+            const m = document.getElementById(id); 
+            m.classList.add('show'); 
+            if(id === 'inputModal') setTimeout(()=>document.getElementById('modalAmount').focus(), 100);
+            if(id === 'adjustTotalModal') setTimeout(()=>document.getElementById('targetTotalInput').focus(), 100);
+        }
+        
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('custom-modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        const GATES_LIST_KEY = 'app_gates_offline_v2';
+        const ACTIVE_GATE_KEY = 'app_active_gate_offline_v2';
+        
+        const initialGates = [
+            { id: 'helwan', name: 'بوابة حلوان' },
+            { id: 'kureimat', name: 'بوابة الكريمات' }
+        ];
+        
+        const defaultLanes = [
+            {name:'حارة 1',type:'entry'}, {name:'حارة 2',type:'entry'}, {name:'حارة 3',type:'entry'},
+            {name:'خروج 1',type:'exit'}, {name:'خروج 2',type:'exit'}
+        ];
+        
+        const helwanLanes = [
+            {name:'نقل 1',type:'entry'}, {name:'نقل 2',type:'entry'}, 
+            {name:'ملاكي 1',type:'entry'}, {name:'ملاكي 2',type:'entry'}, {name:'ملاكي 3',type:'entry'}, {name:'ملاكي 4',type:'entry'}, 
+            {name:'ملاكي خروج',type:'exit'}, {name:'موازين 1',type:'exit'}, {name:'موازين 2',type:'exit'}
+        ];
+
+        let gates = JSON.parse(localStorage.getItem(GATES_LIST_KEY)) || initialGates;
+        let activeGateId = localStorage.getItem(ACTIVE_GATE_KEY) || 'helwan';
+        let lanes = [];
+        let archives = {};
+        let currentTransactions = [];
+        let currentFinance = { reqaba: [], tawreed: [] };
+        let currentLemmaCount = 1;
+
+        window.onload = function() {
+            updateClock(); 
+            setInterval(updateClock, 1000);
+            setInitialDateAndShift();
+            renderGateTabs();
+            switchGate(activeGateId);
+        };
+
+        function setInitialDateAndShift() {
+            if (!document.getElementById('dateInput').value) {
+                const now = new Date();
+                const mins = now.getHours() * 60 + now.getMinutes();
+                const morningEnd = 21 * 60 + 15; 
+                
+                if (mins >= 540 && mins <= morningEnd) {
+                    document.getElementById('shiftInput').value = 'صباحية';
+                    document.getElementById('dateInput').valueAsDate = now;
+                } else if (mins > morningEnd) {
+                    document.getElementById('shiftInput').value = 'مسائية';
+                    document.getElementById('dateInput').valueAsDate = now;
+                } else {
+                    document.getElementById('shiftInput').value = 'مسائية';
+                    const y = new Date(now); y.setDate(y.getDate() - 1);
+                    document.getElementById('dateInput').valueAsDate = y;
+                }
+            }
+        }
+
+        function renderGateTabs() {
+            document.getElementById('gatesContainer').innerHTML = gates.map(g => `
+                <button onclick="switchGate('${g.id}')" 
+                        class="gate-tab btn ${g.id === activeGateId ? 'active' : 'inactive'}">
+                    ${g.name}
+                </button>
+            `).join('');
+        }
+
+        function promptNewGate() {
+            const name = prompt("اسم البوابة الجديدة:");
+            if (name) {
+                const id = 'gate_' + Date.now();
+                gates.push({ id, name });
+                localStorage.setItem(GATES_LIST_KEY, JSON.stringify(gates));
+                localStorage.setItem(`lanes_${id}`, JSON.stringify(defaultLanes));
+                renderGateTabs(); 
+                switchGate(id);
+            }
+        }
+
+        function switchGate(id) {
+            activeGateId = id; localStorage.setItem(ACTIVE_GATE_KEY, id);
+            renderGateTabs();
+            const g = gates.find(x => x.id === id);
+            document.getElementById('activeGateLabel').innerHTML = (g ? g.name : 'Unknown') + ' <span style="color:red; font-size:12px;">(نسخة 30)</span>';
+            document.getElementById('settingsGateName').innerText = g ? g.name : '';
+            loadGateConfig(); 
+            loadDataForSelectedDate();
+        }
+
+        function loadGateConfig() {
+            const stored = localStorage.getItem(`lanes_${activeGateId}`);
+            lanes = stored ? JSON.parse(stored) : (activeGateId === 'helwan' ? helwanLanes : defaultLanes);
+            archives = JSON.parse(localStorage.getItem(`archive_${activeGateId}`)) || {};
+            renderLanesSettings();
+        }
+
+        function loadDataForSelectedDate() {
+            const date = document.getElementById('dateInput').value;
+            const shift = document.getElementById('shiftInput').value;
+            const key = `${date}_${shift}`;
+            const data = archives[key] || { trans: [], fin: {reqaba:[], tawreed:[]}, lemmas: 1 };
+            currentTransactions = data.trans || [];
+            currentFinance = data.fin || {reqaba:[], tawreed:[]};
+            currentLemmaCount = data.lemmas || 1;
+            renderSheet(); 
+            renderFinanceLists(); 
+            calculateTotals(); 
+            updateReportHeader();
+        }
+
+        function autoSave() {
+            const key = `${document.getElementById('dateInput').value}_${document.getElementById('shiftInput').value}`;
+            archives[key] = { trans: currentTransactions, fin: currentFinance, lemmas: currentLemmaCount };
+            localStorage.setItem(`archive_${activeGateId}`, JSON.stringify(archives));
+            localStorage.setItem(`lanes_${activeGateId}`, JSON.stringify(lanes));
+            renderSheet(); 
+            renderFinanceLists(); 
+            calculateTotals(); 
+            updateReportHeader();
+        }
+
+        function renderSheet() {
+            const header = document.getElementById('sheetHeader');
+            const body = document.getElementById('sheetBody');
+            const footer = document.getElementById('sheetFooter');
+            
+            let hHTML = '<tr><th class="lemma-col">م</th>';
+            lanes.forEach(l => {
+                let cls = 'header-default';
+                if (l.name.includes('نقل')) cls = 'header-naql';
+                else if (l.name.includes('موازين') || l.name.includes('ميزان')) cls = 'header-mizan';
+                else if (l.name.includes('ملاكي') && l.type === 'exit') cls = 'header-malaki-exit';
+                else if (l.name.includes('ملاكي') && l.type === 'entry') cls = 'header-malaki-entry';
+                hHTML += `<th class="${cls}">${l.name}</th>`;
+            });
+            hHTML += '<th class="header-total">إجمالي</th></tr>';
+            header.innerHTML = hHTML;
+
+            let bHTML = '';
+            let colTotals = {}; lanes.forEach(l => colTotals[l.name] = 0);
+            let running = {}; lanes.forEach(l => running[l.name] = 0);
+            
+            let lastValues = {};
+            let totalLastValues = 0;
+
+            lanes.forEach(lane => {
+                const laneTxs = currentTransactions.filter(t => t.lane === lane.name);
+                
+                if (laneTxs.length > 0) {
+                    const lastTx = laneTxs.reduce((prev, current) => (prev.lemma > current.lemma) ? prev : current);
+                    const val = (lastTx.amount || 0) + (lastTx.visa || 0);
+                    lastValues[lane.name] = val;
+                    totalLastValues += val;
+                } else {
+                    lastValues[lane.name] = 0;
+                }
+            });
+
+            for (let i = 1; i <= currentLemmaCount; i++) {
+                bHTML += `<tr>
+                    <td class="lemma-col text-center">${i}
+                        <div class="lemma-delete-btn" onclick="deleteLemmaRow(${i})"> حذف</div>
+                    </td>`;
+                let rowSum = 0;
+                lanes.forEach(lane => {
+                    const tx = currentTransactions.find(t => t.lemma == i && t.lane === lane.name);
+                    const val = tx ? (tx.amount || 0) : 0;
+                    const vVal = tx ? (tx.visa || 0) : 0;
+                    
+                    const totalVal = val + vVal;
+                    
+                    running[lane.name] += totalVal; 
+                    colTotals[lane.name] += totalVal; 
+                    rowSum += totalVal;
+                    
+                    bHTML += `<td class="p-0">
+                        <div class="cell-clickable ${totalVal > 0 ? 'has-value' : ''}" onclick="openInputModalEntry(${i}, '${lane.name}')">
+                            <span class="cell-amount">${val > 0 ? val : ''}</span>
+                            ${vVal > 0 ? `<span class="cell-visa">${vVal} فيزا</span>` : ''}
+                            <span class="cell-total">${running[lane.name]}</span>
+                        </div>
+                    </td>`;
+                });
+                bHTML += `<td class="row-total-col">${rowSum > 0 ? rowSum.toLocaleString() : '-'}</td></tr>`;
+            }
+            body.innerHTML = bHTML;
+
+            let fHTML = '';
+
+            fHTML += `<tr class="remaining-row">
+                        <td class="text-center" style="background:#cfe2ff; color:#000;">المتبقي</td>`;
+            lanes.forEach(l => {
+                const val = lastValues[l.name];
+                fHTML += `<td class="text-center">${val > 0 ? val : '-'}</td>`;
+            });
+            fHTML += `<td class="text-center">${totalLastValues > 0 ? totalLastValues : '-'}</td></tr>`;
+
+            fHTML += `<tr class="footer-row"><td class="text-warning">ج</td>`;
+            let grand = 0;
+            lanes.forEach(l => { 
+                fHTML += `<td class="footer-cell-interactive" onclick="openTotalAdjustModal('${l.name}')" title="اضغط لتعديل الإجمالي">${colTotals[l.name]}</td>`; 
+                grand += colTotals[l.name]; 
+            });
+            fHTML += `<td class="grand-total-cell">${grand.toLocaleString()}</td></tr>`;
+            
+            footer.innerHTML = fHTML;
+        }
+
+        function deleteLemmaRow(n) {
+            if(!confirm('هل تحذف صف اللمة رقم '+n+'؟')) return;
+            currentTransactions = currentTransactions.filter(t => t.lemma !== n);
+            currentTransactions.forEach(t => { if(t.lemma > n) t.lemma--; });
+            if(currentLemmaCount > 1) currentLemmaCount--;
+            autoSave();
+        }
+
+        function openInputModalEntry(lemma, lane) {
+            document.getElementById('activeLemma').value = lemma;
+            document.getElementById('activeLane').value = lane;
+            const tx = currentTransactions.find(t => t.lemma == lemma && t.lane === lane);
+            
+            let label = `لمة ${lemma} - ${lane}`;
+            if (tx && (tx.amount > 0 || tx.visa > 0)) label = "تعديل: " + label;
+            else label = "تسجيل: " + label;
+
+            document.getElementById('modalTitle').innerText = label;
+            document.getElementById('modalAmount').value = (tx && tx.amount) ? tx.amount : '';
+            document.getElementById('modalVisa').value = (tx && tx.visa) ? tx.visa : '';
+            
+            openModal('inputModal');
+        }
+
+        function saveEntry(e) {
+            e.preventDefault();
+            const lemma = parseInt(document.getElementById('activeLemma').value);
+            const lane = document.getElementById('activeLane').value;
+            const amt = parseFloat(document.getElementById('modalAmount').value) || 0;
+            const visa = parseFloat(document.getElementById('modalVisa').value) || 0;
+            
+            if (amt > 0 || visa > 0) {
+                currentTransactions = currentTransactions.filter(t => !(t.lemma == lemma && t.lane === lane));
+                currentTransactions.push({ id: Date.now(), lane, lemma, amount: amt, visa: visa });
+            } else {
+                currentTransactions = currentTransactions.filter(t => !(t.lemma == lemma && t.lane === lane));
+            }
+            autoSave(); closeModal('inputModal');
+        }
+
+        function deleteEntry() {
+            const lemma = parseInt(document.getElementById('activeLemma').value);
+            const lane = document.getElementById('activeLane').value;
+            currentTransactions = currentTransactions.filter(t => !(t.lemma == lemma && t.lane === lane));
+            autoSave(); closeModal('inputModal');
+        }
+
+        function addNewLemmaRow() { 
+            currentLemmaCount++; 
+            autoSave(); 
+        }
+
+        function openTotalAdjustModal(laneName) {
+            let currCash = 0;
+            let currVisa = 0;
+            currentTransactions.forEach(t => {
+                if(t.lane === laneName) {
+                    currCash += (t.amount || 0);
+                    currVisa += (t.visa || 0);
+                }
+            });
+
+            document.getElementById('adjustLaneName').value = laneName;
+            document.getElementById('adjustCurrentCash').value = currCash;
+            document.getElementById('adjustCurrentVisa').value = currVisa;
+            
+            document.getElementById('adjustTitle').innerText = `تسوية: ${laneName}`;
+            document.getElementById('dispCurrCash').innerText = currCash.toLocaleString();
+            document.getElementById('dispCurrVisa').innerText = currVisa.toLocaleString();
+            
+            document.getElementById('targetTotalInput').value = '';
+            document.getElementById('targetVisaInput').value = '';
+            document.getElementById('diffCashDisplay').innerText = '0';
+            document.getElementById('diffVisaDisplay').innerText = '0';
+            
+            openModal('adjustTotalModal');
+        }
+
+        function calcDiff() {
+            const currCash = parseFloat(document.getElementById('adjustCurrentCash').value) || 0;
+            const currVisa = parseFloat(document.getElementById('adjustCurrentVisa').value) || 0;
+            
+            const targetTotal = parseFloat(document.getElementById('targetTotalInput').value) || 0;
+            const targetVisa = parseFloat(document.getElementById('targetVisaInput').value) || 0;
+            
+            const targetCash = targetTotal - targetVisa;
+
+            const diffCash = targetCash - currCash;
+            const diffVisa = targetVisa - currVisa;
+
+            const elCash = document.getElementById('diffCashDisplay');
+            const elVisa = document.getElementById('diffVisaDisplay');
+
+            elCash.style.color = diffCash > 0 ? 'green' : (diffCash < 0 ? 'red' : 'black');
+            elCash.innerText = (diffCash > 0 ? '+' : '') + diffCash;
+
+            elVisa.style.color = diffVisa > 0 ? '#0dcaf0' : (diffVisa < 0 ? 'red' : '#0dcaf0');
+            elVisa.innerText = (diffVisa > 0 ? '+' : '') + diffVisa;
+        }
+
+        // === الدالة الجذرية اللي بتعالج فتح اللمة الجديدة ===
+        function applyTotalAdjustment() {
+            const lane = document.getElementById('adjustLaneName').value;
+            
+            let currCash = 0;
+            let currVisa = 0;
+            currentTransactions.forEach(t => {
+                if(t.lane === lane) {
+                    currCash += (t.amount || 0);
+                    currVisa += (t.visa || 0);
+                }
+            });
+            
+            const targetTotal = parseFloat(document.getElementById('targetTotalInput').value) || 0;
+            const targetVisa = parseFloat(document.getElementById('targetVisaInput').value) || 0;
+            const targetCash = targetTotal - targetVisa;
+
+            const diffCash = targetCash - currCash;
+            const diffVisa = targetVisa - currVisa;
+            
+            if (diffCash === 0 && diffVisa === 0) { closeModal('adjustTotalModal'); return; }
+            
+            if ((targetTotal < (currCash + currVisa)) && !confirm("المجموع الجديد أقل من الحالي! هل أنت متأكد؟")) return;
+
+            let isCellOccupied = false;
+            for (let i = 0; i < currentTransactions.length; i++) {
+                if (currentTransactions[i].lemma === currentLemmaCount && currentTransactions[i].lane === lane) {
+                    isCellOccupied = true;
+                    break;
+                }
+            }
+
+            if (isCellOccupied === true) {
+                currentLemmaCount++;
+            }
+            
+            currentTransactions.push({ 
+                id: Date.now(),
+                lane: lane, 
+                lemma: currentLemmaCount, 
+                amount: diffCash, 
+                visa: diffVisa 
+            });
+            
+            autoSave();
+            closeModal('adjustTotalModal');
+        }
+
+        function addFinance(type) {
+            const inp = document.getElementById(type === 'reqaba' ? 'newReqaba' : 'newTawreed');
+            const val = parseFloat(inp.value);
+            if (val > 0) { currentFinance[type].push({id:Date.now(), value:val}); inp.value=''; autoSave(); }
+        }
+
+        window.removeFin = function(type, id) { 
+            currentFinance[type] = currentFinance[type].filter(i => i.id !== id); autoSave(); 
+        };
+
+        function renderFinanceLists() {
+            const mk = (l, t) => l.map(i => `<span class="badge bg-light text-dark border me-1">${i.value} <span style="color:red;cursor:pointer;margin-right:4px;" onclick="removeFin('${t}',${i.id})">&times;</span></span>`).join(' ');
+            document.getElementById('reqabaListContainer').innerHTML = mk(currentFinance.reqaba, 'reqaba');
+            document.getElementById('tawreedListContainer').innerHTML = mk(currentFinance.tawreed, 'tawreed');
+        }
+
+        function calculateTotals() {
+            const date = document.getElementById('dateInput').value;
+            const shift = document.getElementById('shiftInput').value;
+            
+            let cashTotal = 0;
+            let visaTotal = 0;
+            currentTransactions.forEach(t => {
+                cashTotal += (t.amount || 0);
+                visaTotal += (t.visa || 0);
+            });
+
+            const r = currentFinance.reqaba.reduce((s, i) => s + i.value, 0);
+            const t = currentFinance.tawreed.reduce((s, i) => s + i.value, 0);
+            
+            const currRev = cashTotal + visaTotal + r;
+            const currCashRev = cashTotal + r;
+
+            const mData = archives[`${date}_صباحية`];
+            const eData = archives[`${date}_مسائية`];
+            
+            const getRev = (d) => {
+                if(!d) return 0;
+                let c = 0, v = 0;
+                (d.trans||[]).forEach(x => { c += (x.amount||0); v += (x.visa||0); });
+                const req = (d.fin?.reqaba||[]).reduce((a,b)=>a+b.value,0);
+                return c + v + req;
+            };
+            const getCashRev = (d) => {
+                if(!d) return 0;
+                let c = 0;
+                (d.trans||[]).forEach(x => { c += (x.amount||0); });
+                const req = (d.fin?.reqaba||[]).reduce((a,b)=>a+b.value,0);
+                return c + req;
+            };
+            const getVisaOnly = (d) => {
+                if(!d) return 0;
+                let v = 0;
+                (d.trans||[]).forEach(x => { v += (x.visa||0); });
+                return v;
+            };
+            
+            const getTaw = (d) => !d ? 0 : (d.fin?.tawreed||[]).reduce((a,b)=>a+b.value,0);
+
+            const mRev = shift === 'صباحية' ? currRev : getRev(mData);
+            const eRev = shift === 'مسائية' ? currRev : getRev(eData);
+            const mTaw = shift === 'صباحية' ? t : getTaw(mData);
+            const eTaw = shift === 'مسائية' ? t : getTaw(eData);
+
+            document.getElementById('morningTotalDisplay').innerText = mRev.toLocaleString();
+            document.getElementById('eveningTotalDisplay').innerText = eRev.toLocaleString();
+            document.getElementById('grandTotalDayDisplay').innerText = (mRev + eRev).toLocaleString();
+            document.getElementById('totalTawreedAllShifts').innerText = (mTaw + eTaw).toLocaleString();
+            document.getElementById('netFinalTotal').innerText = ((mRev + eRev) - (mTaw + eTaw)).toLocaleString();
+
+            const mVisa = shift === 'صباحية' ? visaTotal : getVisaOnly(mData);
+            const eVisa = shift === 'مسائية' ? visaTotal : getVisaOnly(eData);
+            const totalDayVisa = mVisa + eVisa;
+            document.getElementById('totalVisaDayDisplay').innerText = totalDayVisa.toLocaleString();
+
+            let carry = 0;
+            const mornTawContainer = document.getElementById('morningTawreedContainer');
+            const carryContainer = document.getElementById('carryOverContainer');
+
+            if (shift === 'مسائية') {
+                const mCash = getCashRev(mData);
+                carry = mCash - mTaw;
+                
+                mornTawContainer.style.visibility = 'visible';
+                carryContainer.style.visibility = 'visible';
+                
+                document.getElementById('carryOverDisplay').innerText = carry.toLocaleString();
+                document.getElementById('morningTawreedDisplay').innerText = mTaw.toLocaleString();
+            } else {
+                mornTawContainer.style.visibility = 'hidden';
+                carryContainer.style.visibility = 'hidden';
+            }
+
+            document.getElementById('totalLanes').innerText = cashTotal.toLocaleString();
+            document.getElementById('totalVisa').innerText = visaTotal.toLocaleString();
+            document.getElementById('totalReqaba').innerText = r.toLocaleString();
+            document.getElementById('totalTawreed').innerText = t.toLocaleString();
+            
+            const safe = (cashTotal + r + carry) - t;
+            document.getElementById('safeBalance').innerText = safe.toLocaleString();
+
+            const totalSafeAndVisa = safe + visaTotal;
+            document.getElementById('totalSafeVisaDisplay').innerText = totalSafeAndVisa.toLocaleString();
+        }
+
+        function renderLanesSettings() {
+            document.getElementById('lanesListDisplay').innerHTML = lanes.map((l,i) => 
+                `<li class="d-flex justify-content-between p-1 border-bottom small">${l.name} <button onclick="delLane(${i})" class="btn btn-sm btn-danger py-0">x</button></li>`
+            ).join('');
+        }
+
+        window.addNewLane = function() {
+            const n = document.getElementById('newLaneName').value;
+            const t = document.getElementById('newLaneType').value;
+            if(n) { lanes.push({name:n, type:t}); autoSave(); renderLanesSettings(); }
+        }
+
+        window.delLane = function(i) { 
+            if(confirm("حذف الحارة؟")) { lanes.splice(i,1); autoSave(); renderLanesSettings(); } 
+        }
+        
+        function factoryResetGate() {
+            if(confirm('سيتم مسح كل البيانات!')) {
+                localStorage.removeItem(`archive_${activeGateId}`);
+                localStorage.removeItem(`lanes_${activeGateId}`);
+                location.reload();
+            }
+        }
+
+        function changeDay(o) { 
+            const d = new Date(document.getElementById('dateInput').value); 
+            d.setDate(d.getDate()+o); 
+            document.getElementById('dateInput').valueAsDate = d; 
+            loadDataForSelectedDate(); 
+        }
+
+        function updateReportHeader() {
+            const gn = gates.find(g=>g.id===activeGateId)?.name || "";
+            document.getElementById('printReportTitle').innerText = "تقرير وردية - " + gn;
+            document.getElementById('printDate').innerText = document.getElementById('dateInput').value;
+            document.getElementById('printShift').innerText = document.getElementById('shiftInput').value;
+        }
+
+        function updateClock(){ 
+            document.getElementById('clockDisplay').innerText = new Date().toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'}); 
+        }
+
+    </script>
+    
+    <!-- نظام التحديث الذكي والأوفلاين -->
+    <script>
+        let ctrlScript = document.createElement('script');
+        ctrlScript.src = './control.js?nocache=' + new Date().getTime(); 
+        
+        ctrlScript.onload = function() {
+            if ('serviceWorker' in navigator) {
+                let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION");
+                
+                if (savedVersion && savedVersion !== HTML_VERSION) {
+                    console.log("يوجد تحديث! جاري مسح القديم...");
+                    localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
+                    
+                    if (window.caches) {
+                        caches.keys().then(function(names) {
+                            for (let name of names) caches.delete(name);
+                        });
+                    }
+                    
+                    navigator.serviceWorker.getRegistrations().then(function(regs) {
+                        for (let reg of regs) reg.unregister();
+                        window.location.reload(true);
+                    });
+                } else {
+                    if (!savedVersion) localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
+                    navigator.serviceWorker.register('./sw.js?v=' + HTML_VERSION);
+                }
+            }
+        };
+
+        ctrlScript.onerror = function() {
+            console.log("النت مقفول: جاري التشغيل الأوفلاين من الذاكرة...");
+            if ('serviceWorker' in navigator) {
+                let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION") || "1";
+                navigator.serviceWorker.register('./sw.js?v=' + savedVersion);
+            }
+        };
+
+        document.body.appendChild(ctrlScript);
+    </script>
+</body>
+</html>
