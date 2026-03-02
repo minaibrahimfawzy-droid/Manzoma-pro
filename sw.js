@@ -1,20 +1,19 @@
 // ==========================================
-// ملف Service Worker الذكي (الإنترنت أولاً ثم الأوفلاين)
+// ملف Service Worker (التخزين المزدوج لضمان الأوفلاين)
 // ==========================================
 
-const CACHE_NAME = 'manzoma-dynamic-v31';
+const CACHE_NAME = 'manzoma-pro-v32'; // رقم جديد لكسر أي كاش قديم
 
-// 1. التثبيت
 self.addEventListener('install', (event) => {
     self.skipWaiting();
 });
 
-// 2. التفعيل ومسح أي كاش قديم
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
+                    // مسح أي ذاكرة قديمة عشان نفضي مكان للجديد
                     if (cacheName !== CACHE_NAME) {
                         return caches.delete(cacheName);
                     }
@@ -24,24 +23,31 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// 3. الاعتراض (السحر كله هنا)
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
     event.respondWith(
         fetch(event.request)
-            .then((response) => {
-                // لو النت شغال والملف جه سليم: خده، اعمله نسخة، واحفظه في الكاش للأوفلاين
-                if (response && response.status === 200) {
-                    let responseClone = response.clone();
+            .then((networkResponse) => {
+                // 🟢 في حالة وجود إنترنت:
+                if (networkResponse && networkResponse.status === 200) {
+                    const cacheCopy1 = networkResponse.clone();
+                    const cacheCopy2 = networkResponse.clone();
+                    
                     caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseClone);
+                        // 1. احفظ الملف بالرابط كامل (بالرقم ?v=32)
+                        cache.put(event.request, cacheCopy1);
+                        
+                        // 2. احفظ نفس الملف برابط نظيف (من غير أرقام) لضمان الأوفلاين
+                        const cleanUrl = event.request.url.split('?')[0];
+                        cache.put(cleanUrl, cacheCopy2);
                     });
                 }
-                return response; // واعرضه للمستخدم
+                return networkResponse;
             })
             .catch(() => {
-                // لو النت مقفول: روح دور في الكاش وهات آخر نسخة اتخزنت (وتجاهل رقم التحديث ?v=31)
+                // 🔴 في حالة انقطاع الإنترنت (أوفلاين):
+                // تجاهل أي أرقام في الرابط وهات أحدث ملف متخزن
                 return caches.match(event.request, { ignoreSearch: true });
             })
     );
