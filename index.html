@@ -34,17 +34,6 @@
     #update-screen{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(13,17,23,0.95); z-index:999; flex-direction:column; align-items:center; justify-content:center;}
     #update-screen .box{background:#161b22; padding:30px; border-radius:12px; text-align:center; border:1px solid #f85149; box-shadow:0 0 30px rgba(248,81,73,0.3); width:80%;}
     #update-screen button{background:#f85149; color:#fff; border:none; padding:12px 20px; font-size:16px; border-radius:6px; cursor:pointer; margin-top:20px; font-weight:bold;}
-
-    /* النوافذ المنبثقة للنسخ والاستعادة */
-    .modal-overlay {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;}
-    .modal-box {background:#161b22; padding:20px; border-radius:12px; width:100%; max-width:400px; border:1px solid #30363d; text-align:center;}
-    .modal-box h3 {margin-top:0; color:#fff;}
-    .modal-box textarea {width:100%; height:150px; background:#0d1117; color:#58a6ff; border:1px solid #30363d; padding:10px; border-radius:6px; margin-bottom:15px; resize:none; direction:ltr; font-family:monospace; box-sizing:border-box;}
-    .modal-box textarea:focus {border-color:#58a6ff; outline:none;}
-    .modal-btns {display:flex; gap:10px;}
-    .modal-btns button {flex:1; padding:10px; border-radius:6px; border:none; cursor:pointer; font-weight:bold;}
-    .btn-green {background:#238636; color:white;}
-    .btn-red {background:#da3633; color:white;}
 </style>
 </head>
 <body oncontextmenu="return false">
@@ -55,30 +44,6 @@
         <h2 style="color:#fff;">تحديث هام مطلوب!</h2>
         <p style="color:#8b949e;">يوجد إصدار جديد، يجب التحديث للمتابعة.</p>
         <button id="updateBtn">تحميل التحديث الآن</button>
-    </div>
-</div>
-
-<div id="backupModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3>📥 كود النسخة الاحتياطية</h3>
-        <p style="font-size:12px; color:#8b949e;">انسخ الكود بالكامل واحتفظ به في مكان آمن</p>
-        <textarea id="backupText" readonly></textarea>
-        <div class="modal-btns">
-            <button class="btn-green" onclick="copyBackupText()">نسخ الكود</button>
-            <button class="btn-red" onclick="closeModal('backupModal')">إغلاق</button>
-        </div>
-    </div>
-</div>
-
-<div id="restoreModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3>📤 استعادة البيانات</h3>
-        <p style="font-size:12px; color:#8b949e;">قم بلصق كود النسخة الاحتياطية هنا</p>
-        <textarea id="restoreText" placeholder="الصق الكود هنا..."></textarea>
-        <div class="modal-btns">
-            <button class="btn-green" onclick="processRestore()">استعادة الآن</button>
-            <button class="btn-red" onclick="closeModal('restoreModal')">إلغاء</button>
-        </div>
     </div>
 </div>
 
@@ -109,8 +74,12 @@
     <div class="grid" id="apps-container"></div>
     
     <div class="tools-grid">
-        <button class="tool-btn" onclick="openBackupModal()">📥 نسخ كود البيانات</button>
-        <button class="tool-btn restore" onclick="openRestoreModal()">📤 استعادة من كود</button>
+        <!-- أزرار نظام الملفات الجديد -->
+        <button class="tool-btn" onclick="downloadBackupFile()">📥 تحميل ملف البيانات</button>
+        <button class="tool-btn restore" onclick="document.getElementById('fileInput').click()">📤 استعادة من ملف</button>
+        
+        <!-- حقل رفع الملف المخفي -->
+        <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileRestore(event)">
     </div>
 </div>
 
@@ -274,107 +243,86 @@
     window.addEventListener('online', () => { checkAppStatusFromTelegram(); });
 
     // ==========================================================
-    // نظام الاستعادة الجبار (يحلل كل أنواع الأكواد ويفلتر الشوائب)
+    // 📁 نظام النسخ والاستعادة بالملفات (الجديد كلياً والأكثر أماناً)
     // ==========================================================
     
-    function closeModal(id) { document.getElementById(id).style.display = "none"; }
-
-    function openBackupModal() {
+    // دالة تحميل البيانات في ملف (.json)
+    function downloadBackupFile() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
             let key = localStorage.key(i);
+            // استثناء ملفات النظام الخاصة بتسجيل الدخول والتحديثات
             if(key !== "_tkn_auth" && key !== "_u_id" && key !== "_u_name" && key !== "_cached_apps" && key !== "MANZOMA_OFFLINE_VERSION") {
                 safeData[key] = localStorage.getItem(key);
             }
         }
-        if(Object.keys(safeData).length === 0) {
-            alert("⚠️ لا توجد بيانات محفوظة لعمل نسخة احتياطية.");
-            return;
-        }
-        try {
-            const jsonStr = JSON.stringify(safeData);
-            const backupCode = btoa(unescape(encodeURIComponent(jsonStr)));
-            document.getElementById("backupText").value = backupCode;
-            document.getElementById("backupModal").style.display = "flex";
-        } catch(err) { alert("❌ حدث خطأ أثناء إنشاء الكود."); }
-    }
-
-    function copyBackupText() {
-        let copyText = document.getElementById("backupText");
-        copyText.select();
-        copyText.setSelectionRange(0, 999999); 
-        try {
-            document.execCommand("copy");
-            alert("✅ تم نسخ الكود بنجاح!\nاحتفظ به في مكان آمن.");
-            closeModal('backupModal');
-        } catch (err) { alert("⚠️ فشل النسخ التلقائي، الرجاء التحديد يدوياً."); }
-    }
-
-    function openRestoreModal() {
-        document.getElementById("restoreText").value = "";
-        document.getElementById("restoreModal").style.display = "flex";
-    }
-
-    function processRestore() {
-        let backupCode = document.getElementById("restoreText").value.trim();
         
-        if(!backupCode) {
-            alert("⚠️ برجاء لصق الكود أولاً.");
+        if(Object.keys(safeData).length === 0) {
+            alert("⚠️ لا توجد بيانات محفوظة في التطبيق لعمل نسخة احتياطية.");
             return;
         }
-
-        // 1. فلترة صارمة: مسح أي حرف مش تبع الكود الأساسي (بيمسح المسافات، الرموز المخفية، الإيموجي)
-        let cleanCode = backupCode.replace(/[^A-Za-z0-9+/=]/g, '');
-
-        // 2. إصلاح علامات التساوي المفقودة في نهاية الكود
-        while (cleanCode.length % 4 !== 0) {
-            cleanCode += '=';
-        }
-
-        let dataToRestore = null;
-        let decodedString = "";
 
         try {
-            let base64Decoded = atob(cleanCode);
+            // تحويل البيانات لملف نصي منسق
+            const jsonStr = JSON.stringify(safeData, null, 2);
+            
+            // إنشاء ملف افتراضي
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            // عمل زر تحميل مخفي والضغط عليه
+            const a = document.createElement("a");
+            a.href = url;
+            
+            // تسمية الملف بالتاريخ (مثال: Manzoma_Backup_2024-03-06.json)
+            const d = new Date();
+            const dateStr = d.toISOString().split('T')[0];
+            a.download = `Manzoma_Backup_${dateStr}.json`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url); // تنظيف الذاكرة
+            
+        } catch(err) {
+            alert("❌ حدث خطأ أثناء إنشاء ملف النسخة الاحتياطية.");
+        }
+    }
 
-            // التجربة الأولى: للكود الجديد المدمج
+    // دالة قراءة الملف واستعادة البيانات
+    function handleFileRestore(event) {
+        const file = event.target.files[0];
+        if (!file) return; // لو المستخدم قفل النافذة ومختارش ملف
+
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
             try {
-                decodedString = decodeURIComponent(escape(base64Decoded));
-                dataToRestore = JSON.parse(decodedString);
-            } catch (e1) {
-                // التجربة الثانية: للكود القديم الخاص بك 
-                try {
-                    decodedString = decodeURIComponent(base64Decoded);
-                    dataToRestore = JSON.parse(decodedString);
-                } catch (e2) {
-                    // التجربة الثالثة: لو كان بدون تشفير إضافي
-                    try {
-                        dataToRestore = JSON.parse(base64Decoded);
-                    } catch (e3) {
-                        throw new Error("فشل كل محاولات الفك");
-                    }
+                // قراءة محتوى الملف وتحويله لكود برمجي
+                const data = JSON.parse(e.target.result);
+                
+                let count = 0;
+                for(let key in data) {
+                    localStorage.setItem(key, data[key]);
+                    count++;
                 }
+                
+                if(count > 0) {
+                    alert("✅ تمت استعادة البيانات بنجاح!\nتم استرجاع (" + count + ") سجل من الملف.");
+                    location.reload(); 
+                } else {
+                    alert("⚠️ الملف المرفق سليم ولكنه فارغ ولا يحتوي على بيانات.");
+                }
+            } catch(err) {
+                alert("❌ فشلت الاستعادة! تأكد أنك اخترت ملف النسخة الاحتياطية الصحيح والذي ينتهي بـ (.json).");
             }
-        } catch(finalError) {
-            // لو الفلترة والإصلاح منفعوش، يبقى الكود ده مقطوع نصه فعلاً
-            alert("❌ الكود تالف أو ناقص!\nيبدو أنك لم تقم بنسخ الكود بالكامل من المصدر، حاول نسخه مرة أخرى وتأكد من تحديده كله.");
-            return;
-        }
-
-        // 3. الحفظ في الذاكرة بنجاح
-        if (dataToRestore && typeof dataToRestore === 'object') {
-            let count = 0;
-            for(let key in dataToRestore) {
-                localStorage.setItem(key, dataToRestore[key]);
-                count++;
-            }
-            if(count > 0) {
-                alert("✅ تمت استعادة البيانات بنجاح!");
-                location.reload(); 
-            } else {
-                alert("⚠️ الكود صالح ولكنه لا يحتوي على أي بيانات محفوظة.");
-            }
-        }
+        };
+        
+        // قراءة الملف كنص
+        reader.readAsText(file);
+        
+        // تصفير زر الاختيار عشان لو حب يختار نفس الملف تاني يشتغل
+        event.target.value = ''; 
     }
     // ==========================================================
 
