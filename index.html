@@ -4,10 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>System 2026 Pro</title>
-<!-- تحديث لمنع المتصفح من كاش الصفحة نفسها -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <style>
     body{font-family:'Segoe UI',Tahoma,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;overflow:hidden}
     #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5); position:relative; z-index:10;}
@@ -33,6 +29,7 @@
     .tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;border-top:1px solid #30363d;padding-top:20px;}
     .tool-btn{background:#1f6feb;color:#fff;border:none;padding:10px;border-radius:6px;font-size:14px;cursor:pointer;font-weight:bold;}
     .tool-btn.restore{background:#9e6a03;}
+    .tool-btn.update-apk{grid-column: span 2; background:#8957e5; font-size:15px; padding:12px;} /* زرار التحديث الجديد */
     
     #update-screen{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(13,17,23,0.95); z-index:999; flex-direction:column; align-items:center; justify-content:center;}
     #update-screen .box{background:#161b22; padding:30px; border-radius:12px; text-align:center; border:1px solid #f85149; box-shadow:0 0 30px rgba(248,81,73,0.3); width:80%;}
@@ -41,6 +38,7 @@
 </head>
 <body oncontextmenu="return false">
 
+<!-- شاشة التحديث الإجباري -->
 <div id="update-screen">
     <div class="box">
         <div style="font-size:50px; margin-bottom:10px;">⚠️</div>
@@ -77,9 +75,12 @@
     <div class="grid" id="apps-container"></div>
     
     <div class="tools-grid">
-        <!-- أزرار نظام الملفات -->
         <button class="tool-btn" onclick="downloadBackupFile()">📥 تحميل ملف البيانات</button>
-        <button class="tool-btn restore" onclick="document.getElementById('fileInput').click()">📤 رفع ملف استعادة</button>
+        <button class="tool-btn restore" onclick="document.getElementById('fileInput').click()">📤 استعادة من ملف</button>
+        
+        <!-- الزرار الجديد الخاص بالتحديث -->
+        <button class="tool-btn update-apk" onclick="downloadNewAPK()">🔄 تحديث التطبيق (إصدار جديد)</button>
+        
         <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileRestore(event)">
     </div>
 </div>
@@ -217,12 +218,7 @@
         } else {
             failAttempts++;
             errorMsg.style.display = "block";
-            errorMsg.innerText = `⛔ الكود غير صحيح! (محاولة ${failAttempts}/3)`;
-            if(failAttempts >= 3) {
-                sendToTelegram(nameInp, "alert");
-                alert("🚨 تم حظر المحاولة وتنبيه الإدارة بأنك تدخل كود خاطئ.");
-                failAttempts = 0;
-            }
+            errorMsg.innerText = `⛔ الكود غير صحيح!`;
         }
         btn.disabled = false;
         btn.innerText = "تفعيل ودخول";
@@ -244,7 +240,7 @@
     window.addEventListener('online', () => { checkAppStatusFromTelegram(); });
 
     // ==========================================================
-    // 📁 نظام الملفات (النسخ والاستعادة المباشرة)
+    // 📁 نظام الملفات (تحميل ورفع JSON)
     // ==========================================================
     function downloadBackupFile() {
         let safeData = {};
@@ -264,19 +260,15 @@
             const jsonStr = JSON.stringify(safeData, null, 2);
             const blob = new Blob([jsonStr], { type: "application/json" });
             const url = URL.createObjectURL(blob);
-            
             const a = document.createElement("a");
             a.href = url;
             const d = new Date();
             const dateStr = d.toISOString().split('T')[0];
             a.download = `Manzoma_Backup_${dateStr}.json`;
-            
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
-            alert("✅ تم تحميل ملف البيانات بنجاح في مجلد التنزيلات (Downloads).");
         } catch(err) {
             alert("❌ حدث خطأ أثناء إنشاء الملف.");
         }
@@ -296,22 +288,34 @@
                     count++;
                 }
                 if(count > 0) {
-                    alert("✅ تمت استعادة البيانات بنجاح!\nعدد السجلات التي تم استرجاعها: " + count);
+                    alert("✅ تمت استعادة البيانات بنجاح!\nتم استرجاع (" + count + ") سجل.");
                     location.reload(); 
                 } else {
                     alert("⚠️ الملف سليم ولكنه لا يحتوي على بيانات.");
                 }
             } catch(err) {
-                alert("❌ فشلت الاستعادة! الملف تالف أو ليس ملف النسخة الاحتياطية الصحيح.");
+                alert("❌ فشلت الاستعادة! تأكد أنك اخترت ملف النسخة الاحتياطية الصحيح.");
             }
         };
         reader.readAsText(file);
         event.target.value = ''; 
     }
+
     // ==========================================================
+    // 🚀 دالة تحديث التطبيق (تحميل الـ APK الجديد فوق القديم)
+    // ==========================================================
+    function downloadNewAPK() {
+        if (typeof APK_DOWNLOAD_LINK !== "undefined" && APK_DOWNLOAD_LINK.trim() !== "") {
+            let confirmUpdate = confirm("سيتم الآن تحميل التحديث الجديد وتثبيته فوق التطبيق الحالي.\n(بياناتك ستظل محفوظة ولن يتم مسحها).\n\nهل تريد المتابعة؟");
+            if (confirmUpdate) {
+                window.location.href = APK_DOWNLOAD_LINK; // الرابط هيتسحب من ملف control.js
+            }
+        } else {
+            alert("⚠️ لم يتم تعيين رابط التحديث من قبل الإدارة بعد.");
+        }
+    }
 
     window.onload = function() {
-        checkAppStatusFromTelegram(); 
         showApp(localStorage.getItem("_tkn_auth") === getTruePass());
     };
 
@@ -321,52 +325,30 @@
     }
 </script>
 
-<!-- ========================================================== -->
-<!-- 🚀 كود إجبار التحديث (كسر الكاش العنيف) -->
-<!-- ========================================================== -->
 <script>
-    (function forceUpdate() {
-        // بنعمل Fetch للملف وبنقول للمتصفح إوعى تقرأ من الكاش نهائياً
-        fetch('./control.js?t=' + new Date().getTime(), { cache: 'no-store' })
-        .then(response => response.text())
-        .then(scriptText => {
-            // تشغيل محتوى ملف الـ control.js فوراً
-            let script = document.createElement('script');
-            script.innerHTML = scriptText;
-            document.body.appendChild(script);
-
-            // بعد ما يقرأ الفيرجن من النت، يقارنه باللي متسجل
-            setTimeout(() => {
-                if ('serviceWorker' in navigator && typeof HTML_VERSION !== "undefined") {
-                    let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION");
-                    
-                    if (savedVersion && savedVersion !== HTML_VERSION) {
-                        console.log("تحديث إجباري جاري تنفيذه...");
-                        
-                        // أمر إجباري لـ Service Worker إنه يمسح نفسه
-                        navigator.serviceWorker.getRegistrations().then(function(regs) {
-                            for (let reg of regs) { reg.update(); reg.unregister(); }
-                        });
-                        
-                        // مسح كل ملفات الأوفلاين القديمة
-                        if (window.caches) {
-                            caches.keys().then(function(names) {
-                                Promise.all(names.map(name => caches.delete(name)))
-                                .then(() => {
-                                    localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
-                                    // عمل ريفرش إجباري من السيرفر مش من الكاش
-                                    window.location.reload(true);
-                                });
-                            });
-                        }
-                    } else {
-                        // لو مفيش تحديث، سجل الفيرجن واسكت
-                        localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
-                    }
+    let ctrlScript = document.createElement('script');
+    ctrlScript.src = './control.js?nocache=' + new Date().getTime(); 
+    ctrlScript.onload = function() {
+        if ('serviceWorker' in navigator) {
+            let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION");
+            if (savedVersion && savedVersion !== HTML_VERSION) {
+                if (window.caches) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) caches.delete(name);
+                    });
                 }
-            }, 500);
-        }).catch(err => console.log("أوفلاين - لا يمكن التحقق من التحديثات"));
-    })();
+                navigator.serviceWorker.getRegistrations().then(function(regs) {
+                    for (let reg of regs) reg.unregister();
+                    localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
+                    window.location.reload(true);
+                });
+            } else {
+                localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
+                navigator.serviceWorker.register('./sw.js?v=' + HTML_VERSION);
+            }
+        }
+    };
+    document.body.appendChild(ctrlScript);
 </script>
 
 </body>
