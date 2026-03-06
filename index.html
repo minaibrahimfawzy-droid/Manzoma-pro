@@ -35,7 +35,7 @@
     #update-screen .box{background:#161b22; padding:30px; border-radius:12px; text-align:center; border:1px solid #f85149; box-shadow:0 0 30px rgba(248,81,73,0.3); width:80%;}
     #update-screen button{background:#f85149; color:#fff; border:none; padding:12px 20px; font-size:16px; border-radius:6px; cursor:pointer; margin-top:20px; font-weight:bold;}
 
-    /* النوافذ المنبثقة الجديدة للنسخ والاستعادة */
+    /* النوافذ المنبثقة الجديدة للنسخ والاستعادة المانعة للقص */
     .modal-overlay {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;}
     .modal-box {background:#161b22; padding:20px; border-radius:12px; width:100%; max-width:400px; border:1px solid #30363d; text-align:center;}
     .modal-box h3 {margin-top:0; color:#fff;}
@@ -282,9 +282,9 @@
         checkAppStatusFromTelegram();
     });
 
-    // -----------------------------------------------------
-    // نظام النسخ والاستعادة المطور (بدون Prompt)
-    // -----------------------------------------------------
+    // ==========================================================
+    // نظام النسخ والاستعادة "الذكي" (يدعم الأكواد القديمة والجديدة)
+    // ==========================================================
     
     function closeModal(id) {
         document.getElementById(id).style.display = "none";
@@ -294,7 +294,6 @@
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
             let key = localStorage.key(i);
-            // استثناء ملفات النظام من النسخ
             if(key !== "_tkn_auth" && key !== "_u_id" && key !== "_u_name" && key !== "_cached_apps" && key !== "MANZOMA_OFFLINE_VERSION") {
                 safeData[key] = localStorage.getItem(key);
             }
@@ -307,7 +306,7 @@
 
         try {
             const jsonStr = JSON.stringify(safeData);
-            // التشفير الآمن الذي يدعم العربية
+            // التشفير الجديد الآمن (قصير الحجم)
             const backupCode = btoa(unescape(encodeURIComponent(jsonStr)));
             
             document.getElementById("backupText").value = backupCode;
@@ -320,7 +319,7 @@
     function copyBackupText() {
         let copyText = document.getElementById("backupText");
         copyText.select();
-        copyText.setSelectionRange(0, 999999); // للهواتف
+        copyText.setSelectionRange(0, 999999); 
         
         try {
             document.execCommand("copy");
@@ -336,6 +335,7 @@
         document.getElementById("restoreModal").style.display = "flex";
     }
 
+    // دالة الاستعادة الذكية تقرأ الكود القديم والجديد
     function processRestore() {
         let backupCode = document.getElementById("restoreText").value.trim();
         
@@ -344,17 +344,30 @@
             return;
         }
 
-        try {
-            // مسح أي مسافات أو فواصل أسطر وضعها الهاتف بالخطأ
-            let cleanCode = backupCode.replace(/\s/g, '');
-            
-            // فك التشفير
-            const jsonStr = decodeURIComponent(escape(atob(cleanCode)));
-            const data = JSON.parse(jsonStr);
+        let cleanCode = backupCode.replace(/\s/g, ''); // تنظيف المسافات المخفية
+        let dataToRestore = null;
 
+        // 1. محاولة الفك بالطريقة الجديدة (الحديثة)
+        try {
+            const jsonStr = decodeURIComponent(escape(atob(cleanCode)));
+            dataToRestore = JSON.parse(jsonStr);
+        } catch(e1) {
+            // 2. إذا فشلت، نحاول بالطريقة القديمة (التي تخص الكود الذي معك حالياً)
+            try {
+                const oldJsonStr = decodeURIComponent(atob(cleanCode));
+                dataToRestore = JSON.parse(oldJsonStr);
+            } catch(e2) {
+                // إذا فشلت الطريقتين، إذن الكود تالف فعلاً أو ناقص
+                alert("❌ فشلت الاستعادة!\nالكود غير صحيح أو ناقص، تأكد أنك نسخته بالكامل.");
+                return;
+            }
+        }
+
+        // إذا نجح الفك (بأي من الطريقتين)، نقوم بحفظ البيانات
+        if (dataToRestore && typeof dataToRestore === 'object') {
             let count = 0;
-            for(let key in data) {
-                localStorage.setItem(key, data[key]);
+            for(let key in dataToRestore) {
+                localStorage.setItem(key, dataToRestore[key]);
                 count++;
             }
 
@@ -364,12 +377,9 @@
             } else {
                 alert("⚠️ الكود صالح لكنه لا يحتوي على أي بيانات.");
             }
-        } catch(err) { 
-            console.error(err);
-            alert("❌ الكود غير صحيح أو ناقص!\nتأكد أنك قمت بنسخ الكود بالكامل ولصقه بدون مسح أي حرف منه."); 
         }
     }
-    // -----------------------------------------------------
+    // ==========================================================
 
     window.onload = function() {
         checkAppStatusFromTelegram(); 
@@ -391,7 +401,6 @@
         if ('serviceWorker' in navigator) {
             let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION");
             
-            // لو ده تحديث جديد (الرقم اتغير)
             if (savedVersion && savedVersion !== HTML_VERSION) {
                 console.log("يوجد تحديث! جاري مسح القديم...");
                 if (window.caches) {
@@ -402,12 +411,9 @@
                 navigator.serviceWorker.getRegistrations().then(function(regs) {
                     for (let reg of regs) reg.unregister();
                     localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
-                    
-                    // عمل ريفريش أوتوماتيك عشان يظهر التحديث للمستخدم
                     window.location.reload(true);
                 });
             } else {
-                // لو مفيش تحديث، شغل النظام عادي
                 localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
                 navigator.serviceWorker.register('./sw.js?v=' + HTML_VERSION);
             }
