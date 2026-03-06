@@ -4,37 +4,297 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>System 2026 Pro</title>
+
+<!-- إضافة خط Cairo الاحترافي -->
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+
 <style>
-    body{font-family:'Segoe UI',Tahoma,sans-serif;background-color:#0d1117;color:#c9d1d9;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;user-select:none;overflow:hidden}
-    #lock-screen{background:#161b22;border:1px solid #30363d;padding:30px;border-radius:12px;text-align:center;width:85%;max-width:320px;box-shadow:0 10px 30px rgba(0,0,0,0.5); position:relative; z-index:10;}
-    input{background:#0d1117;border:1px solid #30363d;color:#58a6ff;padding:12px;width:100%;text-align:center;font-size:16px;border-radius:6px;margin:10px 0;outline:none;box-sizing:border-box}
-    input:focus{border-color:#58a6ff;}
-    button.main-btn{background:#238636;color:#fff;border:none;padding:12px 0;width:100%;font-size:16px;font-weight:bold;border-radius:6px;cursor:pointer;margin-top:10px; transition:0.3s}
-    button.main-btn:disabled{background:#114a1c; color:#8b949e; cursor:not-allowed}
-    .logout-btn{background:#da3633;color:white;border:none;padding:6px 12px;font-size:12px;font-weight:bold;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px}
-    .error{color:#f85149;margin-top:10px;display:none;font-weight:bold;font-size:13px;background:rgba(218,54,51,0.1);padding:5px;border-radius:4px;border:1px solid rgba(218,54,51,0.3)}
+    /* ========================================= */
+    /* 1. التنسيقات الأساسية والخلفية المتدرجة */
+    /* ========================================= */
+    body {
+        font-family: 'Cairo', sans-serif;
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* خلفية احترافية متدرجة */
+        color: #ffffff;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        user-select: none;
+        overflow: hidden;
+    }
+
+    /* ========================================= */
+    /* 2. شاشة القفل (بتأثير الزجاج المودرن) */
+    /* ========================================= */
+    #lock-screen {
+        background: rgba(20, 30, 45, 0.6);
+        backdrop-filter: blur(15px); /* تأثير الزجاج */
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 40px 30px;
+        border-radius: 20px;
+        text-align: center;
+        width: 85%;
+        max-width: 340px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        position: relative; 
+        z-index: 10;
+    }
+    input {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #00d2ff;
+        padding: 14px;
+        width: 100%;
+        text-align: center;
+        font-size: 16px;
+        font-family: 'Cairo', sans-serif;
+        border-radius: 12px;
+        margin: 12px 0;
+        outline: none;
+        box-sizing: border-box;
+        transition: 0.3s;
+    }
+    input:focus {
+        border-color: #00d2ff;
+        box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+    }
+    input::placeholder {
+        color: #8b949e;
+    }
+    button.main-btn {
+        background: linear-gradient(45deg, #11998e, #38ef7d); /* زرار دخول متدرج أخضر */
+        color: #fff;
+        border: none;
+        padding: 14px 0;
+        width: 100%;
+        font-size: 18px;
+        font-weight: 800;
+        font-family: 'Cairo', sans-serif;
+        border-radius: 12px;
+        cursor: pointer;
+        margin-top: 15px;
+        box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+        transition: all 0.3s ease;
+    }
+    button.main-btn:active {
+        transform: scale(0.95);
+    }
+    button.main-btn:disabled {
+        background: #444; 
+        color: #888; 
+        box-shadow: none;
+        cursor: not-allowed;
+    }
     
-    #app-menu{display:none;width:100%;height:100vh;padding:20px;box-sizing:border-box;overflow-y:auto}
-    .menu-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;border-bottom:1px solid #30363d;padding-bottom:15px}
-    .user-info{text-align:right; font-size:14px; color:#8b949e;}
-    .user-info span {color:#58a6ff; font-weight:bold;}
+    #devID {
+        font-size: 13px;
+        color: #00d2ff;
+        font-family: monospace;
+        margin-top: 20px;
+        background: rgba(0,0,0,0.3);
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px dashed rgba(0, 210, 255, 0.3);
+    }
+    .error {
+        color: #ff4b4b;
+        margin-top: 15px;
+        display: none;
+        font-weight: bold;
+        font-size: 14px;
+        background: rgba(255, 75, 75, 0.1);
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 75, 75, 0.3);
+    }
+
+    /* ========================================= */
+    /* 3. القائمة الرئيسية للتطبيقات */
+    /* ========================================= */
+    #app-menu {
+        display: none;
+        width: 100%;
+        height: 100vh;
+        padding: 25px 20px;
+        box-sizing: border-box;
+        overflow-y: auto;
+    }
+    .menu-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 15px;
+    }
+    .user-info {
+        text-align: right; 
+        font-size: 15px; 
+        color: #d1d5db;
+    }
+    .user-info span {
+        color: #00d2ff; 
+        font-weight: 800;
+        font-size: 17px;
+    }
+    .logout-btn {
+        background: linear-gradient(45deg, #ff416c, #ff4b2b);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        font-size: 14px;
+        font-family: 'Cairo', sans-serif;
+        font-weight: bold;
+        border-radius: 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 10px rgba(255, 75, 43, 0.3);
+        transition: 0.3s;
+    }
+    .logout-btn:active { transform: scale(0.9); }
     
-    .datetime{text-align:center; font-size:13px; color:#238636; margin-bottom:20px; font-weight:bold; background:#161b22; padding:10px; border-radius:8px; border:1px solid #30363d;}
+    /* تصميم الساعة */
+    .datetime {
+        text-align: center; 
+        font-size: 14px; 
+        color: #38ef7d; 
+        margin-bottom: 25px; 
+        font-weight: 600; 
+        background: rgba(0,0,0,0.2); 
+        padding: 12px; 
+        border-radius: 12px; 
+        border: 1px solid rgba(255,255,255,0.05);
+        backdrop-filter: blur(5px);
+    }
     
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;padding-bottom:20px}
-    .app-btn{background:#21262d;border:1px solid #30363d;border-radius:10px;padding:15px;text-decoration:none;color:#c9d1d9;display:flex;flex-direction:column;align-items:center;justify-content:center;height:110px;text-align:center; cursor:pointer; transition:0.2s}
-    .app-btn:active{transform:scale(0.95); background:#30363d;}
-    .icon{font-size:28px;margin-bottom:8px}
+    /* ========================================= */
+    /* 4. تصميم أزرار التطبيقات (الشكل الجديد) */
+    /* ========================================= */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        padding-bottom: 30px;
+    }
+    .app-btn {
+        background: rgba(255, 255, 255, 0.05); /* زجاج شفاف */
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px; /* حواف ناعمة بدلاً من الشكل المايل */
+        padding: 20px 10px;
+        text-decoration: none;
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 120px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer; 
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+    .app-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    .app-btn:active {
+        transform: scale(0.93); /* حركة ناعمة عند اللمس */
+        background: rgba(255, 255, 255, 0.15);
+    }
+    .icon {
+        font-size: 35px;
+        margin-bottom: 12px;
+        filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+    }
     
-    .tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;border-top:1px solid #30363d;padding-top:20px;}
-    .tool-btn{background:#1f6feb;color:#fff;border:none;padding:10px;border-radius:6px;font-size:14px;cursor:pointer;font-weight:bold;}
-    .tool-btn.restore{background:#9e6a03;}
-    .tool-btn.update-apk{grid-column: span 2; background:#8957e5; font-size:15px; padding:12px;} 
+    /* ========================================= */
+    /* 5. أزرار الأدوات السفلية */
+    /* ========================================= */
+    .tools-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 10px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 25px;
+        padding-bottom: 20px;
+    }
+    .tool-btn {
+        background: rgba(31, 111, 235, 0.2);
+        color: #58a6ff;
+        border: 1px solid rgba(88, 166, 255, 0.3);
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-family: 'Cairo', sans-serif;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    .tool-btn:active { transform: scale(0.95); }
+    .tool-btn.restore {
+        background: rgba(210, 153, 34, 0.2);
+        color: #e3b341;
+        border-color: rgba(227, 179, 65, 0.3);
+    }
+    .tool-btn.update-apk {
+        grid-column: span 2; 
+        background: linear-gradient(45deg, #8e2de2, #4a00e0);
+        color: white;
+        border: none;
+        font-size: 15px; 
+        padding: 15px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(142, 45, 226, 0.4);
+    } 
     
-    #update-screen{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(13,17,23,0.95); z-index:999; flex-direction:column; align-items:center; justify-content:center;}
-    #update-screen .box{background:#161b22; padding:30px; border-radius:12px; text-align:center; border:1px solid #f85149; box-shadow:0 0 30px rgba(248,81,73,0.3); width:80%;}
-    #update-screen button{background:#f85149; color:#fff; border:none; padding:12px 20px; font-size:16px; border-radius:6px; cursor:pointer; margin-top:20px; font-weight:bold;}
-    #update-screen button:disabled{background:#5c1e1a; cursor:not-allowed; color:#8b949e;}
+    /* ========================================= */
+    /* 6. شاشة التحديث الإجباري */
+    /* ========================================= */
+    #update-screen {
+        display: none; 
+        position: fixed; 
+        top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(10, 15, 25, 0.95); 
+        backdrop-filter: blur(10px);
+        z-index: 999; 
+        flex-direction: column; align-items: center; justify-content: center;
+    }
+    #update-screen .box {
+        background: rgba(30, 40, 55, 0.9); 
+        padding: 40px 30px; 
+        border-radius: 20px; 
+        text-align: center; 
+        border: 1px solid #ff4b4b; 
+        box-shadow: 0 0 40px rgba(255, 75, 75, 0.3); 
+        width: 85%;
+        max-width: 350px;
+    }
+    #update-screen button {
+        background: linear-gradient(45deg, #ff416c, #ff4b2b);
+        color: #fff; 
+        border: none; 
+        padding: 14px 20px; 
+        font-size: 16px; 
+        font-family: 'Cairo', sans-serif;
+        border-radius: 12px; 
+        cursor: pointer; 
+        margin-top: 25px; 
+        font-weight: bold;
+        width: 100%;
+        box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+    }
+    #update-screen button:disabled {
+        background: #444; cursor: not-allowed; color: #888; box-shadow: none;
+    }
 </style>
 </head>
 <body oncontextmenu="return false">
@@ -42,30 +302,30 @@
 <!-- شاشة التحديث الإجباري -->
 <div id="update-screen">
     <div class="box">
-        <div style="font-size:50px; margin-bottom:10px;">⚠️</div>
-        <h2 id="update-title" style="color:#fff;">تحديث هام مطلوب!</h2>
-        <p id="update-desc" style="color:#8b949e;">يوجد إصدار جديد، يجب التحديث للمتابعة.</p>
+        <div style="font-size:60px; margin-bottom:15px; filter: drop-shadow(0 0 10px red);">⚠️</div>
+        <h2 id="update-title" style="color:#fff; margin-bottom: 10px;">تحديث هام مطلوب!</h2>
+        <p id="update-desc" style="color:#b0b3b8; font-size: 14px; line-height: 1.6;">يوجد إصدار جديد، يجب التحديث للمتابعة.</p>
         <button id="updateBtn">تحميل التحديث الآن</button>
     </div>
 </div>
 
 <div id="lock-screen">
-    <div style="font-size:40px;margin-bottom:10px;">🛡️</div>
-    <h2 style="margin:0;color:#fff;font-size:18px;">نظام 2026 المحمي</h2>
+    <div style="font-size:50px;margin-bottom:15px; filter: drop-shadow(0 0 10px #00d2ff);">🛡️</div>
+    <h2 style="margin:0 0 20px 0;color:#fff;font-size:22px; font-weight: 800;">نظام 2026 المحمي</h2>
     
     <input type="text" id="userName" placeholder="الاسم ثلاثي (عربي فقط)...">
     <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
     
     <button class="main-btn" id="loginBtn" onclick="login()">تفعيل ودخول</button>
     
-    <p id="devID" style="font-size:12px;color:#58a6ff;font-family:monospace;margin-top:15px;background:#0d1117;padding:5px;border-radius:4px;border:1px dashed #30363d"></p>
+    <p id="devID"></p>
     <p id="eMsg" class="error">⛔ الكود غير صحيح!</p>
 </div>
 
 <div id="app-menu">
     <div class="menu-header">
         <div>
-            <h2 style="margin:0; font-size:18px; color:#fff; text-align:right;">الرئيسية</h2>
+            <h2 style="margin:0 0 5px 0; font-size:20px; color:#fff; text-align:right; font-weight: 800;">الرئيسية</h2>
             <div class="user-info" id="displayUserName">مرحباً: <span></span></div>
         </div>
         <button id="logoutBtn" class="logout-btn" onclick="logout()"><span>خروج</span> 🚪</button>
@@ -86,7 +346,7 @@
 <script src="control.js"></script>
 
 <script>
-    const CURRENT_VERSION = "1.0"; // رقم نسخة الـ APK الحالية
+    const CURRENT_VERSION = "1.0"; 
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
     const CHAT_ID = "-1003886528114";
     const SECRET_KEY = "QWRtaW5fMjZf";
@@ -166,10 +426,10 @@
                 let desc = data.result.description;
                 if(desc.includes("[OFF]")) {
                     document.body.innerHTML = `
-                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0d1117; color:#f85149; text-align:center; padding:20px; width:100%; box-sizing:border-box;">
-                            <div style="font-size:70px; margin-bottom:15px;">⛔</div>
-                            <h1 style="margin:0;">تم إيقاف النظام</h1>
-                            <p style="color:#8b949e; font-size:16px; margin-top:10px;">عذراً، تم إيقاف التطبيق مؤقتاً لجميع المستخدمين من قبل الإدارة.</p>
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0f2027; color:#ff4b4b; text-align:center; padding:20px; width:100%; box-sizing:border-box; font-family:'Cairo', sans-serif;">
+                            <div style="font-size:80px; margin-bottom:20px; filter: drop-shadow(0 0 15px red);">⛔</div>
+                            <h1 style="margin:0; font-size:30px;">تم إيقاف النظام</h1>
+                            <p style="color:#b0b3b8; font-size:18px; margin-top:15px; line-height:1.6;">عذراً، تم إيقاف التطبيق مؤقتاً لجميع المستخدمين من قبل الإدارة.</p>
                         </div>
                     `;
                     return; 
@@ -338,15 +598,12 @@
                 if(response.ok) {
                     let cacheRequest = new Request('./' + file); 
                     await cache.put(cacheRequest, response.clone());
-                } else {
-                    throw new Error("ملف مفقود: " + file);
                 }
             }
             localStorage.setItem("MANZOMA_OFFLINE_VERSION", newVersion);
             alert("✅ تم تثبيت التحديث بنجاح! سيتم إعادة تشغيل النظام.");
             window.location.reload(true); 
         } catch(e) {
-            console.error(e);
             alert("❌ حدث خطأ أثناء تحميل التحديث، تأكد من قوة الإنترنت.");
             btn.disabled = false; btn.innerText = "إعادة المحاولة";
         }

@@ -3,13 +3,13 @@
 // ==========================================
 
 // 🔴 1. إعدادات الـ APK (ميديا فاير)
-// حط رابط التحميل بتاع ميديا فاير ما بين علامتين التنصيص هنا
-var APK_REQUIRED_VERSION = "1.1"; 
-var APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/wz73hokaxccbgxv/Manzoma+pro31.apk/file"; 
+// رفعنا الإصدار لـ 1.2 عشان يجبر التطبيق يفتح ميديا فاير ويحمل النسخة pro32
+var APK_REQUIRED_VERSION = "1.2"; 
+var APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/cmpkyqefy9mvu82/Manzoma+pro32.apk/file"; 
 
 // 🟢 2. رقم إصدار البرامج (التحديث الهوائي)
-// كل ما تعدل حاجة في الـ 6 برامج، خلي الرقم ده أكبر (مثلاً 115) عشان التطبيق يسحب التعديل
-var HTML_VERSION = "115"; 
+// رفعناه لـ 117 عشان لو فيه أي تعديل في الصفحات يسحبه بالمرة
+var HTML_VERSION = "117"; 
 
 // 🔵 3. روابط البرامج (يجب أن تظل كما هي للعمل أوفلاين)
 var remoteApps = [
