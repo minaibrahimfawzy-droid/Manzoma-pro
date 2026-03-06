@@ -83,11 +83,10 @@
     </div>
 </div>
 
-<!-- استدعاء ملف الكنترول المحلي للحصول على المتغيرات الحالية -->
 <script src="control.js"></script>
 
 <script>
-    const CURRENT_VERSION = "1.0"; 
+    const CURRENT_VERSION = "1.0"; // رقم نسخة الـ APK الحالية
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
     const CHAT_ID = "-1003886528114";
     const SECRET_KEY = "QWRtaW5fMjZf";
@@ -95,7 +94,6 @@
 
     let failAttempts = 0;
     
-    // الأزرار ستفتح الملفات مباشرة من الكاش (الأوفلاين)
     let systemApps = [
         {name: "النبطشية", icon: "📅", url: "Nabatshia.html"},
         {name: "الورديات", icon: "🌙", url: "2.html"},
@@ -163,10 +161,7 @@
         if(!navigator.onLine) return; 
 
         const url = `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${CHAT_ID}`;
-
-        fetch(url)
-        .then(res => res.json())
-        .then(data => {
+        fetch(url).then(res => res.json()).then(data => {
             if(data.ok && data.result.description) {
                 let desc = data.result.description;
                 if(desc.includes("[OFF]")) {
@@ -178,16 +173,6 @@
                         </div>
                     `;
                     return; 
-                }
-                if(desc.includes("BAN:" + deviceID)) {
-                    localStorage.removeItem("_tkn_auth"); 
-                    document.body.innerHTML = `
-                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0d1117; color:#f85149; text-align:center; padding:20px; width:100%; box-sizing:border-box;">
-                            <div style="font-size:70px; margin-bottom:15px;">🚫</div>
-                            <h1 style="margin:0;">حظر الدخول</h1>
-                            <p style="color:#8b949e; font-size:16px; margin-top:10px;">تم حظر جهازك (${deviceID}) وطرده من النظام.</p>
-                        </div>
-                    `;
                 }
             }
         }).catch(()=>{}); 
@@ -240,9 +225,7 @@
 
     window.addEventListener('online', () => { checkAppStatusFromTelegram(); });
 
-    // ==========================================================
-    // 📁 نظام الملفات (تحميل ورفع JSON)
-    // ==========================================================
+    // نظام النسخ الاحتياطي
     function downloadBackupFile() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
@@ -251,52 +234,26 @@
                 safeData[key] = localStorage.getItem(key);
             }
         }
-        
-        if(Object.keys(safeData).length === 0) {
-            alert("⚠️ لا توجد بيانات محفوظة لعمل نسخة احتياطية.");
-            return;
-        }
-
-        try {
-            const jsonStr = JSON.stringify(safeData, null, 2);
-            const blob = new Blob([jsonStr], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            const d = new Date();
-            const dateStr = d.toISOString().split('T')[0];
-            a.download = `Manzoma_Backup_${dateStr}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        } catch(err) {
-            alert("❌ حدث خطأ أثناء إنشاء الملف.");
-        }
+        if(Object.keys(safeData).length === 0) { alert("⚠️ لا توجد بيانات محفوظة."); return; }
+        const jsonStr = JSON.stringify(safeData, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Manzoma_Backup_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
     }
 
     function handleFileRestore(event) {
         const file = event.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = function(e) {
             try {
                 const data = JSON.parse(e.target.result);
-                let count = 0;
-                for(let key in data) {
-                    localStorage.setItem(key, data[key]);
-                    count++;
-                }
-                if(count > 0) {
-                    alert("✅ تمت استعادة البيانات بنجاح!\nتم استرجاع (" + count + ") سجل.");
-                    location.reload(); 
-                } else {
-                    alert("⚠️ الملف سليم ولكنه لا يحتوي على بيانات.");
-                }
-            } catch(err) {
-                alert("❌ فشلت الاستعادة! تأكد أنك اخترت ملف النسخة الاحتياطية الصحيح.");
-            }
+                for(let key in data) localStorage.setItem(key, data[key]);
+                alert("✅ تمت استعادة البيانات بنجاح!"); location.reload(); 
+            } catch(err) { alert("❌ فشلت الاستعادة!"); }
         };
         reader.readAsText(file);
         event.target.value = ''; 
@@ -304,8 +261,7 @@
 
     function downloadNewAPK() {
         if (typeof APK_DOWNLOAD_LINK !== "undefined" && APK_DOWNLOAD_LINK.trim() !== "") {
-            let confirmUpdate = confirm("سيتم الآن تحميل التحديث الجديد وتثبيته فوق التطبيق الحالي.\n(بياناتك ستظل محفوظة ولن يتم مسحها).\n\nهل تريد المتابعة؟");
-            if (confirmUpdate) {
+            if (confirm("سيتم تحميل التحديث الجديد للبرنامج. هل تريد المتابعة؟")) {
                 window.location.href = APK_DOWNLOAD_LINK; 
             }
         } else {
@@ -313,10 +269,7 @@
         }
     }
 
-    function logout() {
-        localStorage.removeItem("_tkn_auth");
-        location.reload();
-    }
+    function logout() { localStorage.removeItem("_tkn_auth"); location.reload(); }
 
     window.onload = function() {
         showApp(localStorage.getItem("_tkn_auth") === getTruePass());
@@ -327,43 +280,33 @@
 <script>
     const GITHUB_BASE_URL = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
     
-    // الملفات التي سيتم سحبها وتخزينها للعمل أوفلاين
+    // أسماء الملفات التي سيتم سحبها للعمل أوفلاين
     const filesToUpdate = [
-        "index.html", 
-        "control.js", 
-        "sw.js",
-        "Nabatshia.html", 
-        "2.html", 
-        "3.html", 
-        "4.html", 
-        "5.html", 
-        "6.html"
+        "index.html", "control.js", "sw.js",
+        "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html"
     ];
 
     function checkGithubForUpdates() {
-        if (!navigator.onLine) return; // العمل أوفلاين إذا لم يوجد إنترنت
+        if (!navigator.onLine) return; // يعمل أوفلاين إذا لا يوجد إنترنت
 
-        // فحص ملف control.js الموجود على جيتهاب
         fetch(GITHUB_BASE_URL + "control.js?nocache=" + new Date().getTime())
         .then(res => res.text())
         .then(text => {
-            // 1. فحص تحديث الـ APK أولاً (الأولوية القصوى)
+            // فحص تحديث الـ APK 
             let apkVerMatch = text.match(/var APK_REQUIRED_VERSION = "([\d.]+)";/);
             let apkLinkMatch = text.match(/var APK_DOWNLOAD_LINK = "(.*?)";/);
             
-            if (apkVerMatch && typeof CURRENT_VERSION !== "undefined" && parseFloat(apkVerMatch[1]) > parseFloat(CURRENT_VERSION)) {
+            if (apkVerMatch && parseFloat(apkVerMatch[1]) > parseFloat(CURRENT_VERSION)) {
                 document.getElementById("update-screen").style.display = "flex";
                 document.getElementById("update-title").innerText = "تحديث هام للتطبيق!";
                 document.getElementById("update-desc").innerText = "يوجد إصدار جديد للتطبيق (APK)، يجب التحديث للمتابعة.";
                 let updateBtn = document.getElementById("updateBtn");
                 updateBtn.innerText = "تحميل التطبيق الآن";
-                updateBtn.onclick = function() {
-                    if(apkLinkMatch) window.location.href = apkLinkMatch[1];
-                };
-                return; // إيقاف التنفيذ هنا حتى يحدّث الـ APK
+                updateBtn.onclick = function() { if(apkLinkMatch) window.location.href = apkLinkMatch[1]; };
+                return; 
             }
 
-            // 2. فحص تحديث ملفات HTML/JS (التحديث الهوائي أوفلاين)
+            // فحص التحديث الهوائي (OTA) للملفات الداخلية
             let htmlVerMatch = text.match(/var HTML_VERSION = "(\d+)";/);
             if(htmlVerMatch && htmlVerMatch[1]) {
                 let onlineVersion = parseInt(htmlVerMatch[1]);
@@ -373,62 +316,46 @@
                     document.getElementById("update-screen").style.display = "flex";
                     document.getElementById("update-title").innerText = "تحديث جديد للملفات!";
                     document.getElementById("update-desc").innerText = "تم إطلاق تحديث جديد للبرامج، يجب سحب الملفات للمتابعة.";
-                    
                     let updateBtn = document.getElementById("updateBtn");
                     updateBtn.innerText = "تحميل وتثبيت التحديث الآن";
-                    updateBtn.onclick = function() {
-                        downloadFilesFromGithub(onlineVersion);
-                    };
+                    updateBtn.onclick = function() { downloadFilesFromGithub(onlineVersion); };
                 }
             }
-        }).catch(err => console.log("خطأ في جلب التحديثات:", err));
+        }).catch(err => console.log("خطأ:", err));
     }
 
     async function downloadFilesFromGithub(newVersion) {
         let btn = document.getElementById("updateBtn");
         btn.disabled = true;
-        
         try {
-            // فتح الكاش لحفظ الملفات داخله (لكي تعمل أوفلاين)
             const cache = await caches.open("manzoma-cache-v1");
-            
             for(let i = 0; i < filesToUpdate.length; i++) {
                 let file = filesToUpdate[i];
                 let percent = Math.round(((i + 1) / filesToUpdate.length) * 100);
-                btn.innerText = `جاري سحب الملفات... ${percent}%`;
+                btn.innerText = `جاري التحديث... ${percent}%`;
                 
-                // جلب الملف من جيتهاب
                 let response = await fetch(GITHUB_BASE_URL + file + "?nocache=" + new Date().getTime());
-                
                 if(response.ok) {
-                    // حفظ الملف بالمسار المحلي في الكاش ليتم استخدامه أوفلاين
                     let cacheRequest = new Request('./' + file); 
                     await cache.put(cacheRequest, response.clone());
+                } else {
+                    throw new Error("ملف مفقود: " + file);
                 }
             }
-
-            btn.innerText = "100% - اكتمل التحديث";
-            // تحديث رقم الإصدار في الجهاز عشان ميطلبش تحديث تاني
             localStorage.setItem("MANZOMA_OFFLINE_VERSION", newVersion);
-            
             alert("✅ تم تثبيت التحديث بنجاح! سيتم إعادة تشغيل النظام.");
-            window.location.reload(true); // عمل ريستارت للتطبيق بالملفات الجديدة
-            
+            window.location.reload(true); 
         } catch(e) {
-            alert("❌ حدث خطأ أثناء تحميل التحديث، تأكد من قوة الإنترنت وحاول مجدداً.");
-            btn.disabled = false;
-            btn.innerText = "إعادة المحاولة";
+            console.error(e);
+            alert("❌ حدث خطأ أثناء تحميل التحديث، تأكد من قوة الإنترنت.");
+            btn.disabled = false; btn.innerText = "إعادة المحاولة";
         }
     }
 
-    // بمجرد فتح التطبيق يبدأ فحص التحديثات + تسجيل Service Worker للأوفلاين
     window.addEventListener('load', () => {
         checkGithubForUpdates();
-        
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(reg => {
-                console.log('Service Worker Registered Successfully');
-            });
+            navigator.serviceWorker.register('./sw.js');
         }
     });
 </script>
