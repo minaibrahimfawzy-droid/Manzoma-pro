@@ -29,11 +29,12 @@
     .tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px;border-top:1px solid #30363d;padding-top:20px;}
     .tool-btn{background:#1f6feb;color:#fff;border:none;padding:10px;border-radius:6px;font-size:14px;cursor:pointer;font-weight:bold;}
     .tool-btn.restore{background:#9e6a03;}
-    .tool-btn.update-apk{grid-column: span 2; background:#8957e5; font-size:15px; padding:12px;} /* زرار التحديث الجديد */
+    .tool-btn.update-apk{grid-column: span 2; background:#8957e5; font-size:15px; padding:12px;} 
     
     #update-screen{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(13,17,23,0.95); z-index:999; flex-direction:column; align-items:center; justify-content:center;}
     #update-screen .box{background:#161b22; padding:30px; border-radius:12px; text-align:center; border:1px solid #f85149; box-shadow:0 0 30px rgba(248,81,73,0.3); width:80%;}
     #update-screen button{background:#f85149; color:#fff; border:none; padding:12px 20px; font-size:16px; border-radius:6px; cursor:pointer; margin-top:20px; font-weight:bold;}
+    #update-screen button:disabled{background:#5c1e1a; cursor:not-allowed; color:#8b949e;}
 </style>
 </head>
 <body oncontextmenu="return false">
@@ -42,8 +43,8 @@
 <div id="update-screen">
     <div class="box">
         <div style="font-size:50px; margin-bottom:10px;">⚠️</div>
-        <h2 style="color:#fff;">تحديث هام مطلوب!</h2>
-        <p style="color:#8b949e;">يوجد إصدار جديد، يجب التحديث للمتابعة.</p>
+        <h2 id="update-title" style="color:#fff;">تحديث هام مطلوب!</h2>
+        <p id="update-desc" style="color:#8b949e;">يوجد إصدار جديد، يجب التحديث للمتابعة.</p>
         <button id="updateBtn">تحميل التحديث الآن</button>
     </div>
 </div>
@@ -77,13 +78,13 @@
     <div class="tools-grid">
         <button class="tool-btn" onclick="downloadBackupFile()">📥 تحميل ملف البيانات</button>
         <button class="tool-btn restore" onclick="document.getElementById('fileInput').click()">📤 استعادة من ملف</button>
-        
-        <!-- الزرار الجديد الخاص بالتحديث -->
         <button class="tool-btn update-apk" onclick="downloadNewAPK()">🔄 تحديث التطبيق (إصدار جديد)</button>
-        
         <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileRestore(event)">
     </div>
 </div>
+
+<!-- استدعاء ملف الكنترول المحلي للحصول على المتغيرات الحالية -->
+<script src="control.js"></script>
 
 <script>
     const CURRENT_VERSION = "1.0"; 
@@ -94,6 +95,7 @@
 
     let failAttempts = 0;
     
+    // الأزرار ستفتح الملفات مباشرة من الكاش (الأوفلاين)
     let systemApps = [
         {name: "النبطشية", icon: "📅", url: "Nabatshia.html"},
         {name: "الورديات", icon: "🌙", url: "2.html"},
@@ -229,8 +231,7 @@
             document.getElementById("lock-screen").style.display = "none";
             document.getElementById("app-menu").style.display = "block";
             document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name");
-            let cached = localStorage.getItem("_cached_apps");
-            renderApps(cached ? JSON.parse(cached) : systemApps);
+            renderApps(systemApps);
         } else {
             document.getElementById("lock-screen").style.display = "block";
             document.getElementById("app-menu").style.display = "none";
@@ -246,7 +247,7 @@
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
             let key = localStorage.key(i);
-            if(key !== "_tkn_auth" && key !== "_u_id" && key !== "_u_name" && key !== "_cached_apps" && key !== "MANZOMA_OFFLINE_VERSION") {
+            if(key !== "_tkn_auth" && key !== "_u_id" && key !== "_u_name" && key !== "MANZOMA_OFFLINE_VERSION") {
                 safeData[key] = localStorage.getItem(key);
             }
         }
@@ -301,54 +302,135 @@
         event.target.value = ''; 
     }
 
-    // ==========================================================
-    // 🚀 دالة تحديث التطبيق (تحميل الـ APK الجديد فوق القديم)
-    // ==========================================================
     function downloadNewAPK() {
         if (typeof APK_DOWNLOAD_LINK !== "undefined" && APK_DOWNLOAD_LINK.trim() !== "") {
             let confirmUpdate = confirm("سيتم الآن تحميل التحديث الجديد وتثبيته فوق التطبيق الحالي.\n(بياناتك ستظل محفوظة ولن يتم مسحها).\n\nهل تريد المتابعة؟");
             if (confirmUpdate) {
-                window.location.href = APK_DOWNLOAD_LINK; // الرابط هيتسحب من ملف control.js
+                window.location.href = APK_DOWNLOAD_LINK; 
             }
         } else {
             alert("⚠️ لم يتم تعيين رابط التحديث من قبل الإدارة بعد.");
         }
     }
 
-    window.onload = function() {
-        showApp(localStorage.getItem("_tkn_auth") === getTruePass());
-    };
-
     function logout() {
         localStorage.removeItem("_tkn_auth");
         location.reload();
     }
+
+    window.onload = function() {
+        showApp(localStorage.getItem("_tkn_auth") === getTruePass());
+    };
 </script>
 
+<!-- سكريبت التحديث الهوائي (OTA) المربوط بـ Github -->
 <script>
-    let ctrlScript = document.createElement('script');
-    ctrlScript.src = './control.js?nocache=' + new Date().getTime(); 
-    ctrlScript.onload = function() {
-        if ('serviceWorker' in navigator) {
-            let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION");
-            if (savedVersion && savedVersion !== HTML_VERSION) {
-                if (window.caches) {
-                    caches.keys().then(function(names) {
-                        for (let name of names) caches.delete(name);
-                    });
-                }
-                navigator.serviceWorker.getRegistrations().then(function(regs) {
-                    for (let reg of regs) reg.unregister();
-                    localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
-                    window.location.reload(true);
-                });
-            } else {
-                localStorage.setItem("MANZOMA_OFFLINE_VERSION", HTML_VERSION);
-                navigator.serviceWorker.register('./sw.js?v=' + HTML_VERSION);
+    const GITHUB_BASE_URL = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
+    
+    // الملفات التي سيتم سحبها وتخزينها للعمل أوفلاين
+    const filesToUpdate = [
+        "index.html", 
+        "control.js", 
+        "sw.js",
+        "Nabatshia.html", 
+        "2.html", 
+        "3.html", 
+        "4.html", 
+        "5.html", 
+        "6.html"
+    ];
+
+    function checkGithubForUpdates() {
+        if (!navigator.onLine) return; // العمل أوفلاين إذا لم يوجد إنترنت
+
+        // فحص ملف control.js الموجود على جيتهاب
+        fetch(GITHUB_BASE_URL + "control.js?nocache=" + new Date().getTime())
+        .then(res => res.text())
+        .then(text => {
+            // 1. فحص تحديث الـ APK أولاً (الأولوية القصوى)
+            let apkVerMatch = text.match(/var APK_REQUIRED_VERSION = "([\d.]+)";/);
+            let apkLinkMatch = text.match(/var APK_DOWNLOAD_LINK = "(.*?)";/);
+            
+            if (apkVerMatch && typeof CURRENT_VERSION !== "undefined" && parseFloat(apkVerMatch[1]) > parseFloat(CURRENT_VERSION)) {
+                document.getElementById("update-screen").style.display = "flex";
+                document.getElementById("update-title").innerText = "تحديث هام للتطبيق!";
+                document.getElementById("update-desc").innerText = "يوجد إصدار جديد للتطبيق (APK)، يجب التحديث للمتابعة.";
+                let updateBtn = document.getElementById("updateBtn");
+                updateBtn.innerText = "تحميل التطبيق الآن";
+                updateBtn.onclick = function() {
+                    if(apkLinkMatch) window.location.href = apkLinkMatch[1];
+                };
+                return; // إيقاف التنفيذ هنا حتى يحدّث الـ APK
             }
+
+            // 2. فحص تحديث ملفات HTML/JS (التحديث الهوائي أوفلاين)
+            let htmlVerMatch = text.match(/var HTML_VERSION = "(\d+)";/);
+            if(htmlVerMatch && htmlVerMatch[1]) {
+                let onlineVersion = parseInt(htmlVerMatch[1]);
+                let localVersion = parseInt(localStorage.getItem("MANZOMA_OFFLINE_VERSION") || "0");
+
+                if(onlineVersion > localVersion) {
+                    document.getElementById("update-screen").style.display = "flex";
+                    document.getElementById("update-title").innerText = "تحديث جديد للملفات!";
+                    document.getElementById("update-desc").innerText = "تم إطلاق تحديث جديد للبرامج، يجب سحب الملفات للمتابعة.";
+                    
+                    let updateBtn = document.getElementById("updateBtn");
+                    updateBtn.innerText = "تحميل وتثبيت التحديث الآن";
+                    updateBtn.onclick = function() {
+                        downloadFilesFromGithub(onlineVersion);
+                    };
+                }
+            }
+        }).catch(err => console.log("خطأ في جلب التحديثات:", err));
+    }
+
+    async function downloadFilesFromGithub(newVersion) {
+        let btn = document.getElementById("updateBtn");
+        btn.disabled = true;
+        
+        try {
+            // فتح الكاش لحفظ الملفات داخله (لكي تعمل أوفلاين)
+            const cache = await caches.open("manzoma-cache-v1");
+            
+            for(let i = 0; i < filesToUpdate.length; i++) {
+                let file = filesToUpdate[i];
+                let percent = Math.round(((i + 1) / filesToUpdate.length) * 100);
+                btn.innerText = `جاري سحب الملفات... ${percent}%`;
+                
+                // جلب الملف من جيتهاب
+                let response = await fetch(GITHUB_BASE_URL + file + "?nocache=" + new Date().getTime());
+                
+                if(response.ok) {
+                    // حفظ الملف بالمسار المحلي في الكاش ليتم استخدامه أوفلاين
+                    let cacheRequest = new Request('./' + file); 
+                    await cache.put(cacheRequest, response.clone());
+                }
+            }
+
+            btn.innerText = "100% - اكتمل التحديث";
+            // تحديث رقم الإصدار في الجهاز عشان ميطلبش تحديث تاني
+            localStorage.setItem("MANZOMA_OFFLINE_VERSION", newVersion);
+            
+            alert("✅ تم تثبيت التحديث بنجاح! سيتم إعادة تشغيل النظام.");
+            window.location.reload(true); // عمل ريستارت للتطبيق بالملفات الجديدة
+            
+        } catch(e) {
+            alert("❌ حدث خطأ أثناء تحميل التحديث، تأكد من قوة الإنترنت وحاول مجدداً.");
+            btn.disabled = false;
+            btn.innerText = "إعادة المحاولة";
         }
-    };
-    document.body.appendChild(ctrlScript);
+    }
+
+    // بمجرد فتح التطبيق يبدأ فحص التحديثات + تسجيل Service Worker للأوفلاين
+    window.addEventListener('load', () => {
+        checkGithubForUpdates();
+        
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').then(reg => {
+                console.log('Service Worker Registered Successfully');
+            });
+        }
+    });
 </script>
 
 </body>

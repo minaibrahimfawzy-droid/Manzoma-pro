@@ -1,39 +1,11 @@
-const CACHE_NAME = 'manzoma-safe-v1';
+const CACHE_NAME = 'manzoma-cache-v1';
 
-self.addEventListener('install', (event) => {
-    self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(() => self.clients.claim())
-    );
-});
-
-self.addEventListener('fetch', (event) => {
-    if (event.request.method !== 'GET') return;
-
+// لما التطبيق يطلب أي ملف، هنجيبه من الكاش الأول عشان يشتغل أوفلاين
+self.addEventListener('fetch', event => {
     event.respondWith(
-        fetch(event.request)
-            .then((networkResponse) => {
-                // لو النت شغال: احفظ النسخة الجديدة
-                const clone = networkResponse.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, clone);
-                });
-                return networkResponse;
-            })
-            .catch(() => {
-                // لو مفيش نت: شغل النسخة المحفوظة (مع تجاهل أي أرقام إصدارات في الرابط)
-                return caches.match(event.request, { ignoreSearch: true });
-            })
+        caches.match(event.request).then(response => {
+            // لو الملف موجود في الجهاز (الكاش) هاته، لو مش موجود هاته من النت
+            return response || fetch(event.request);
+        })
     );
 });
