@@ -34,6 +34,17 @@
     #update-screen{display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(13,17,23,0.95); z-index:999; flex-direction:column; align-items:center; justify-content:center;}
     #update-screen .box{background:#161b22; padding:30px; border-radius:12px; text-align:center; border:1px solid #f85149; box-shadow:0 0 30px rgba(248,81,73,0.3); width:80%;}
     #update-screen button{background:#f85149; color:#fff; border:none; padding:12px 20px; font-size:16px; border-radius:6px; cursor:pointer; margin-top:20px; font-weight:bold;}
+
+    /* النوافذ المنبثقة الجديدة للنسخ والاستعادة */
+    .modal-overlay {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;}
+    .modal-box {background:#161b22; padding:20px; border-radius:12px; width:100%; max-width:400px; border:1px solid #30363d; text-align:center;}
+    .modal-box h3 {margin-top:0; color:#fff;}
+    .modal-box textarea {width:100%; height:150px; background:#0d1117; color:#58a6ff; border:1px solid #30363d; padding:10px; border-radius:6px; margin-bottom:15px; resize:none; direction:ltr; font-family:monospace; box-sizing:border-box;}
+    .modal-box textarea:focus {border-color:#58a6ff; outline:none;}
+    .modal-btns {display:flex; gap:10px;}
+    .modal-btns button {flex:1; padding:10px; border-radius:6px; border:none; cursor:pointer; font-weight:bold;}
+    .btn-green {background:#238636; color:white;}
+    .btn-red {background:#da3633; color:white;}
 </style>
 </head>
 <body oncontextmenu="return false">
@@ -45,6 +56,32 @@
         <h2 style="color:#fff;">تحديث هام مطلوب!</h2>
         <p style="color:#8b949e;">يوجد إصدار جديد، يجب التحديث للمتابعة.</p>
         <button id="updateBtn">تحميل التحديث الآن</button>
+    </div>
+</div>
+
+<!-- نافذة أخذ النسخة الاحتياطية -->
+<div id="backupModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>📥 كود النسخة الاحتياطية</h3>
+        <p style="font-size:12px; color:#8b949e;">انسخ الكود بالكامل واحتفظ به في مكان آمن</p>
+        <textarea id="backupText" readonly></textarea>
+        <div class="modal-btns">
+            <button class="btn-green" onclick="copyBackupText()">نسخ الكود</button>
+            <button class="btn-red" onclick="closeModal('backupModal')">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة استعادة النسخة الاحتياطية -->
+<div id="restoreModal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>📤 استعادة البيانات</h3>
+        <p style="font-size:12px; color:#8b949e;">قم بلصق كود النسخة الاحتياطية هنا</p>
+        <textarea id="restoreText" placeholder="الصق الكود هنا..."></textarea>
+        <div class="modal-btns">
+            <button class="btn-green" onclick="processRestore()">استعادة الآن</button>
+            <button class="btn-red" onclick="closeModal('restoreModal')">إلغاء</button>
+        </div>
     </div>
 </div>
 
@@ -75,8 +112,8 @@
     <div class="grid" id="apps-container"></div>
     
     <div class="tools-grid">
-        <button class="tool-btn" onclick="backupDataCode()">📥 نسخ كود البيانات</button>
-        <button class="tool-btn restore" onclick="restoreDataCode()">📤 استعادة من كود</button>
+        <button class="tool-btn" onclick="openBackupModal()">📥 نسخ كود البيانات</button>
+        <button class="tool-btn restore" onclick="openRestoreModal()">📤 استعادة من كود</button>
     </div>
 </div>
 
@@ -245,11 +282,20 @@
         checkAppStatusFromTelegram();
     });
 
-    function backupDataCode() {
+    // -----------------------------------------------------
+    // نظام النسخ والاستعادة المطور (بدون Prompt)
+    // -----------------------------------------------------
+    
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+    }
+
+    function openBackupModal() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
             let key = localStorage.key(i);
-            if(key !== "_tkn_auth" && key !== "_u_id" && key !== "_u_name" && key !== "_cached_apps") {
+            // استثناء ملفات النظام من النسخ
+            if(key !== "_tkn_auth" && key !== "_u_id" && key !== "_u_name" && key !== "_cached_apps" && key !== "MANZOMA_OFFLINE_VERSION") {
                 safeData[key] = localStorage.getItem(key);
             }
         }
@@ -261,29 +307,49 @@
 
         try {
             const jsonStr = JSON.stringify(safeData);
-            const backupCode = btoa(encodeURIComponent(jsonStr));
-
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(backupCode).then(() => {
-                    alert("✅ تم نسخ كود النسخة الاحتياطية بنجاح!\nاحتفظ به في مكان آمن (مثل رسائل الواتساب المحفوظة).");
-                }).catch(() => {
-                    prompt("انسخ الكود التالي واحتفظ به:", backupCode);
-                });
-            } else {
-                prompt("انسخ الكود التالي واحتفظ به في مكان آمن:", backupCode);
-            }
+            // التشفير الآمن الذي يدعم العربية
+            const backupCode = btoa(unescape(encodeURIComponent(jsonStr)));
+            
+            document.getElementById("backupText").value = backupCode;
+            document.getElementById("backupModal").style.display = "flex";
         } catch(err) {
             alert("❌ حدث خطأ أثناء إنشاء الكود.");
         }
     }
 
-    function restoreDataCode() {
-        let backupCode = prompt("📌 برجاء لصق كود الاستعادة هنا:");
+    function copyBackupText() {
+        let copyText = document.getElementById("backupText");
+        copyText.select();
+        copyText.setSelectionRange(0, 999999); // للهواتف
         
-        if(!backupCode || backupCode.trim() === "") return;
+        try {
+            document.execCommand("copy");
+            alert("✅ تم نسخ الكود بنجاح!\nاحتفظ به في مكان آمن.");
+            closeModal('backupModal');
+        } catch (err) {
+            alert("⚠️ فشل النسخ التلقائي، الرجاء التحديد يدوياً والنسخ.");
+        }
+    }
+
+    function openRestoreModal() {
+        document.getElementById("restoreText").value = "";
+        document.getElementById("restoreModal").style.display = "flex";
+    }
+
+    function processRestore() {
+        let backupCode = document.getElementById("restoreText").value.trim();
+        
+        if(!backupCode || backupCode === "") {
+            alert("⚠️ برجاء لصق الكود أولاً.");
+            return;
+        }
 
         try {
-            const jsonStr = decodeURIComponent(atob(backupCode.trim()));
+            // مسح أي مسافات أو فواصل أسطر وضعها الهاتف بالخطأ
+            let cleanCode = backupCode.replace(/\s/g, '');
+            
+            // فك التشفير
+            const jsonStr = decodeURIComponent(escape(atob(cleanCode)));
             const data = JSON.parse(jsonStr);
 
             let count = 0;
@@ -296,12 +362,14 @@
                 alert("✅ تمت استعادة البيانات بنجاح!");
                 location.reload(); 
             } else {
-                alert("⚠️ الكود صالح لكنه لا يحتوي على بيانات.");
+                alert("⚠️ الكود صالح لكنه لا يحتوي على أي بيانات.");
             }
         } catch(err) { 
-            alert("❌ فشلت الاستعادة! الكود غير صحيح أو غير مكتمل."); 
+            console.error(err);
+            alert("❌ الكود غير صحيح أو ناقص!\nتأكد أنك قمت بنسخ الكود بالكامل ولصقه بدون مسح أي حرف منه."); 
         }
     }
+    // -----------------------------------------------------
 
     window.onload = function() {
         checkAppStatusFromTelegram(); 
