@@ -35,7 +35,7 @@
     #update-screen .box{background:#161b22; padding:30px; border-radius:12px; text-align:center; border:1px solid #f85149; box-shadow:0 0 30px rgba(248,81,73,0.3); width:80%;}
     #update-screen button{background:#f85149; color:#fff; border:none; padding:12px 20px; font-size:16px; border-radius:6px; cursor:pointer; margin-top:20px; font-weight:bold;}
 
-    /* النوافذ المنبثقة الجديدة للنسخ والاستعادة المانعة للقص */
+    /* النوافذ المنبثقة للنسخ والاستعادة */
     .modal-overlay {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; justify-content:center; align-items:center; padding:20px; box-sizing:border-box;}
     .modal-box {background:#161b22; padding:20px; border-radius:12px; width:100%; max-width:400px; border:1px solid #30363d; text-align:center;}
     .modal-box h3 {margin-top:0; color:#fff;}
@@ -49,7 +49,6 @@
 </head>
 <body oncontextmenu="return false">
 
-<!-- شاشة التحديث -->
 <div id="update-screen">
     <div class="box">
         <div style="font-size:50px; margin-bottom:10px;">⚠️</div>
@@ -59,7 +58,6 @@
     </div>
 </div>
 
-<!-- نافذة أخذ النسخة الاحتياطية -->
 <div id="backupModal" class="modal-overlay">
     <div class="modal-box">
         <h3>📥 كود النسخة الاحتياطية</h3>
@@ -72,7 +70,6 @@
     </div>
 </div>
 
-<!-- نافذة استعادة النسخة الاحتياطية -->
 <div id="restoreModal" class="modal-overlay">
     <div class="modal-box">
         <h3>📤 استعادة البيانات</h3>
@@ -199,7 +196,6 @@
         .then(data => {
             if(data.ok && data.result.description) {
                 let desc = data.result.description;
-                
                 if(desc.includes("[OFF]")) {
                     document.body.innerHTML = `
                         <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0d1117; color:#f85149; text-align:center; padding:20px; width:100%; box-sizing:border-box;">
@@ -210,7 +206,6 @@
                     `;
                     return; 
                 }
-
                 if(desc.includes("BAN:" + deviceID)) {
                     localStorage.removeItem("_tkn_auth"); 
                     document.body.innerHTML = `
@@ -231,7 +226,7 @@
         const errorMsg = document.getElementById("eMsg");
 
         if(!isValidArabicName(nameInp)) { 
-            alert("⚠️ يجب كتابة اسمك الثلاثي باللغة العربية فقط (يمنع استخدام الأرقام)."); 
+            alert("⚠️ يجب كتابة اسمك الثلاثي باللغة العربية فقط."); 
             return; 
         }
         if(pinInp.length < 1) return;
@@ -268,27 +263,21 @@
             document.getElementById("lock-screen").style.display = "none";
             document.getElementById("app-menu").style.display = "block";
             document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name");
-            
             let cached = localStorage.getItem("_cached_apps");
             renderApps(cached ? JSON.parse(cached) : systemApps);
-            
         } else {
             document.getElementById("lock-screen").style.display = "block";
             document.getElementById("app-menu").style.display = "none";
         }
     }
 
-    window.addEventListener('online', () => {
-        checkAppStatusFromTelegram();
-    });
+    window.addEventListener('online', () => { checkAppStatusFromTelegram(); });
 
     // ==========================================================
-    // نظام النسخ والاستعادة "الذكي" (يدعم الأكواد القديمة والجديدة)
+    // نظام الاستعادة الجبار (يحلل كل أنواع الأكواد ويفلتر الشوائب)
     // ==========================================================
     
-    function closeModal(id) {
-        document.getElementById(id).style.display = "none";
-    }
+    function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
     function openBackupModal() {
         let safeData = {};
@@ -298,36 +287,27 @@
                 safeData[key] = localStorage.getItem(key);
             }
         }
-        
         if(Object.keys(safeData).length === 0) {
             alert("⚠️ لا توجد بيانات محفوظة لعمل نسخة احتياطية.");
             return;
         }
-
         try {
             const jsonStr = JSON.stringify(safeData);
-            // التشفير الجديد الآمن (قصير الحجم)
             const backupCode = btoa(unescape(encodeURIComponent(jsonStr)));
-            
             document.getElementById("backupText").value = backupCode;
             document.getElementById("backupModal").style.display = "flex";
-        } catch(err) {
-            alert("❌ حدث خطأ أثناء إنشاء الكود.");
-        }
+        } catch(err) { alert("❌ حدث خطأ أثناء إنشاء الكود."); }
     }
 
     function copyBackupText() {
         let copyText = document.getElementById("backupText");
         copyText.select();
         copyText.setSelectionRange(0, 999999); 
-        
         try {
             document.execCommand("copy");
             alert("✅ تم نسخ الكود بنجاح!\nاحتفظ به في مكان آمن.");
             closeModal('backupModal');
-        } catch (err) {
-            alert("⚠️ فشل النسخ التلقائي، الرجاء التحديد يدوياً والنسخ.");
-        }
+        } catch (err) { alert("⚠️ فشل النسخ التلقائي، الرجاء التحديد يدوياً."); }
     }
 
     function openRestoreModal() {
@@ -335,47 +315,64 @@
         document.getElementById("restoreModal").style.display = "flex";
     }
 
-    // دالة الاستعادة الذكية تقرأ الكود القديم والجديد
     function processRestore() {
         let backupCode = document.getElementById("restoreText").value.trim();
         
-        if(!backupCode || backupCode === "") {
+        if(!backupCode) {
             alert("⚠️ برجاء لصق الكود أولاً.");
             return;
         }
 
-        let cleanCode = backupCode.replace(/\s/g, ''); // تنظيف المسافات المخفية
-        let dataToRestore = null;
+        // 1. فلترة صارمة: مسح أي حرف مش تبع الكود الأساسي (بيمسح المسافات، الرموز المخفية، الإيموجي)
+        let cleanCode = backupCode.replace(/[^A-Za-z0-9+/=]/g, '');
 
-        // 1. محاولة الفك بالطريقة الجديدة (الحديثة)
-        try {
-            const jsonStr = decodeURIComponent(escape(atob(cleanCode)));
-            dataToRestore = JSON.parse(jsonStr);
-        } catch(e1) {
-            // 2. إذا فشلت، نحاول بالطريقة القديمة (التي تخص الكود الذي معك حالياً)
-            try {
-                const oldJsonStr = decodeURIComponent(atob(cleanCode));
-                dataToRestore = JSON.parse(oldJsonStr);
-            } catch(e2) {
-                // إذا فشلت الطريقتين، إذن الكود تالف فعلاً أو ناقص
-                alert("❌ فشلت الاستعادة!\nالكود غير صحيح أو ناقص، تأكد أنك نسخته بالكامل.");
-                return;
-            }
+        // 2. إصلاح علامات التساوي المفقودة في نهاية الكود
+        while (cleanCode.length % 4 !== 0) {
+            cleanCode += '=';
         }
 
-        // إذا نجح الفك (بأي من الطريقتين)، نقوم بحفظ البيانات
+        let dataToRestore = null;
+        let decodedString = "";
+
+        try {
+            let base64Decoded = atob(cleanCode);
+
+            // التجربة الأولى: للكود الجديد المدمج
+            try {
+                decodedString = decodeURIComponent(escape(base64Decoded));
+                dataToRestore = JSON.parse(decodedString);
+            } catch (e1) {
+                // التجربة الثانية: للكود القديم الخاص بك 
+                try {
+                    decodedString = decodeURIComponent(base64Decoded);
+                    dataToRestore = JSON.parse(decodedString);
+                } catch (e2) {
+                    // التجربة الثالثة: لو كان بدون تشفير إضافي
+                    try {
+                        dataToRestore = JSON.parse(base64Decoded);
+                    } catch (e3) {
+                        throw new Error("فشل كل محاولات الفك");
+                    }
+                }
+            }
+        } catch(finalError) {
+            // لو الفلترة والإصلاح منفعوش، يبقى الكود ده مقطوع نصه فعلاً
+            alert("❌ الكود تالف أو ناقص!\nيبدو أنك لم تقم بنسخ الكود بالكامل من المصدر، حاول نسخه مرة أخرى وتأكد من تحديده كله.");
+            return;
+        }
+
+        // 3. الحفظ في الذاكرة بنجاح
         if (dataToRestore && typeof dataToRestore === 'object') {
             let count = 0;
             for(let key in dataToRestore) {
                 localStorage.setItem(key, dataToRestore[key]);
                 count++;
             }
-
             if(count > 0) {
                 alert("✅ تمت استعادة البيانات بنجاح!");
                 location.reload(); 
             } else {
-                alert("⚠️ الكود صالح لكنه لا يحتوي على أي بيانات.");
+                alert("⚠️ الكود صالح ولكنه لا يحتوي على أي بيانات محفوظة.");
             }
         }
     }
@@ -392,17 +389,13 @@
     }
 </script>
 
-<!-- نظام التحديث الذكي (بيجبر الموبايل يمسح القديم ويحمل الجديد) -->
 <script>
     let ctrlScript = document.createElement('script');
     ctrlScript.src = './control.js?nocache=' + new Date().getTime(); 
-    
     ctrlScript.onload = function() {
         if ('serviceWorker' in navigator) {
             let savedVersion = localStorage.getItem("MANZOMA_OFFLINE_VERSION");
-            
             if (savedVersion && savedVersion !== HTML_VERSION) {
-                console.log("يوجد تحديث! جاري مسح القديم...");
                 if (window.caches) {
                     caches.keys().then(function(names) {
                         for (let name of names) caches.delete(name);
