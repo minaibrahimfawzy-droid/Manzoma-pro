@@ -8,7 +8,7 @@ var APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/wavgumgx0e4xrk5/Manzoma+
 
 // 🟢 2. رقم إصدار البرامج (التحديث الهوائي الداخلي - OTA)
 // ⚠️ كلما قمت بتعديل أي شيء في التطبيق على Github، اجعل هذا الرقم أكبر (مثلاً 116، ثم 117 وهكذا)
-var HTML_VERSION = "115"; 
+var HTML_VERSION = "116"; 
 
 // 🔵 3. روابط البرامج (يجب أن تظل كما هي للعمل أوفلاين)
 var remoteApps = [
