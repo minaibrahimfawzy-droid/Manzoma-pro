@@ -14,7 +14,7 @@
     /* ========================================= */
     body {
         font-family: 'Cairo', sans-serif;
-        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); /* خلفية احترافية متدرجة */
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
         color: #ffffff;
         margin: 0;
         display: flex;
@@ -31,7 +31,7 @@
     /* ========================================= */
     #lock-screen {
         background: rgba(20, 30, 45, 0.6);
-        backdrop-filter: blur(15px); /* تأثير الزجاج */
+        backdrop-filter: blur(15px); 
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 40px 30px;
         border-radius: 20px;
@@ -65,7 +65,7 @@
         color: #8b949e;
     }
     button.main-btn {
-        background: linear-gradient(45deg, #11998e, #38ef7d); /* زرار دخول متدرج أخضر */
+        background: linear-gradient(45deg, #11998e, #38ef7d); 
         color: #fff;
         border: none;
         padding: 14px 0;
@@ -173,7 +173,7 @@
     }
     
     /* ========================================= */
-    /* 4. تصميم أزرار التطبيقات (الشكل الجديد) */
+    /* 4. تصميم أزرار التطبيقات */
     /* ========================================= */
     .grid {
         display: grid;
@@ -182,10 +182,10 @@
         padding-bottom: 30px;
     }
     .app-btn {
-        background: rgba(255, 255, 255, 0.05); /* زجاج شفاف */
+        background: rgba(255, 255, 255, 0.05); 
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px; /* حواف ناعمة بدلاً من الشكل المايل */
+        border-radius: 20px; 
         padding: 20px 10px;
         text-decoration: none;
         color: #ffffff;
@@ -206,7 +206,7 @@
         border-color: rgba(255, 255, 255, 0.3);
     }
     .app-btn:active {
-        transform: scale(0.93); /* حركة ناعمة عند اللمس */
+        transform: scale(0.93); 
         background: rgba(255, 255, 255, 0.15);
     }
     .icon {
@@ -338,7 +338,10 @@
     <div class="tools-grid">
         <button class="tool-btn" onclick="downloadBackupFile()">📥 تحميل ملف البيانات</button>
         <button class="tool-btn restore" onclick="document.getElementById('fileInput').click()">📤 استعادة من ملف</button>
-        <button class="tool-btn update-apk" onclick="downloadNewAPK()">🔄 تحديث التطبيق (إصدار جديد)</button>
+        
+        <!-- تعديل زر التحديث ليرتبط بـ GitHub -->
+        <button class="tool-btn update-apk" onclick="manualCheckUpdate()">🔄 البحث عن تحديثات النظام وتثبيتها</button>
+        
         <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileRestore(event)">
     </div>
 </div>
@@ -519,16 +522,6 @@
         event.target.value = ''; 
     }
 
-    function downloadNewAPK() {
-        if (typeof APK_DOWNLOAD_LINK !== "undefined" && APK_DOWNLOAD_LINK.trim() !== "") {
-            if (confirm("سيتم تحميل التحديث الجديد للبرنامج. هل تريد المتابعة؟")) {
-                window.location.href = APK_DOWNLOAD_LINK; 
-            }
-        } else {
-            alert("⚠️ لم يتم تعيين رابط التحديث من قبل الإدارة بعد.");
-        }
-    }
-
     function logout() { localStorage.removeItem("_tkn_auth"); location.reload(); }
 
     window.onload = function() {
@@ -536,83 +529,125 @@
     };
 </script>
 
-<!-- سكريبت التحديث الهوائي (OTA) المربوط بـ Github -->
+<!-- سكريبت التحديث الهوائي المطور (OTA) -->
 <script>
     const GITHUB_BASE_URL = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
     
-    // أسماء الملفات التي سيتم سحبها للعمل أوفلاين
+    // أسماء الملفات التي سيتم سحبها وتحديثها
     const filesToUpdate = [
         "index.html", "control.js", "sw.js",
         "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html"
     ];
 
-    function checkGithubForUpdates() {
-        if (!navigator.onLine) return; // يعمل أوفلاين إذا لا يوجد إنترنت
+    // دالة البحث اليدوي عن تحديث (لما تضغط على الزرار)
+    function manualCheckUpdate() {
+        if (!navigator.onLine) {
+            alert("⚠️ لا يوجد اتصال بالإنترنت للبحث عن تحديثات.");
+            return;
+        }
+        alert("⏳ جاري فحص سيرفر Github للبحث عن تحديثات جديدة...");
+        checkGithubForUpdates(true); 
+    }
 
+    // دالة الفحص الأوتوماتيكي واليدوي
+    function checkGithubForUpdates(isManual = false) {
+        if (!navigator.onLine) return;
+
+        // إضافة nocache لضمان عدم قراءة نسخة قديمة من سيرفر Github
         fetch(GITHUB_BASE_URL + "control.js?nocache=" + new Date().getTime())
         .then(res => res.text())
         .then(text => {
-            // فحص تحديث الـ APK 
-            let apkVerMatch = text.match(/var APK_REQUIRED_VERSION = "([\d.]+)";/);
-            let apkLinkMatch = text.match(/var APK_DOWNLOAD_LINK = "(.*?)";/);
+            // 1. فحص تحديث الـ APK (لو غيرت رقم APK_REQUIRED_VERSION)
+            let apkVerMatch = text.match(/var\s+APK_REQUIRED_VERSION\s*=\s*"([\d.]+)"/);
+            let apkLinkMatch = text.match(/var\s+APK_DOWNLOAD_LINK\s*=\s*"(.*?)"/);
             
             if (apkVerMatch && parseFloat(apkVerMatch[1]) > parseFloat(CURRENT_VERSION)) {
-                document.getElementById("update-screen").style.display = "flex";
-                document.getElementById("update-title").innerText = "تحديث هام للتطبيق!";
-                document.getElementById("update-desc").innerText = "يوجد إصدار جديد للتطبيق (APK)، يجب التحديث للمتابعة.";
-                let updateBtn = document.getElementById("updateBtn");
-                updateBtn.innerText = "تحميل التطبيق الآن";
-                updateBtn.onclick = function() { if(apkLinkMatch) window.location.href = apkLinkMatch[1]; };
+                showUpdateUI("تحديث جذري مطلوب!", "يجب تحميل النسخة الجديدة (APK) لضمان عمل النظام.", "تحميل التحديث", function() {
+                    if(apkLinkMatch) window.location.href = apkLinkMatch[1];
+                });
                 return; 
             }
 
-            // فحص التحديث الهوائي (OTA) للملفات الداخلية
-            let htmlVerMatch = text.match(/var HTML_VERSION = "(\d+)";/);
+            // 2. فحص التحديث الهوائي (HTML/JS) للملفات الداخلية
+            let htmlVerMatch = text.match(/var\s+HTML_VERSION\s*=\s*"(\d+)"/);
             if(htmlVerMatch && htmlVerMatch[1]) {
                 let onlineVersion = parseInt(htmlVerMatch[1]);
                 let localVersion = parseInt(localStorage.getItem("MANZOMA_OFFLINE_VERSION") || "0");
 
                 if(onlineVersion > localVersion) {
-                    document.getElementById("update-screen").style.display = "flex";
-                    document.getElementById("update-title").innerText = "تحديث جديد للملفات!";
-                    document.getElementById("update-desc").innerText = "تم إطلاق تحديث جديد للبرامج، يجب سحب الملفات للمتابعة.";
-                    let updateBtn = document.getElementById("updateBtn");
-                    updateBtn.innerText = "تحميل وتثبيت التحديث الآن";
-                    updateBtn.onclick = function() { downloadFilesFromGithub(onlineVersion); };
+                    showUpdateUI("تحديث جديد للملفات!", "تم اكتشاف إصدار جديد للبرامج، جاري تجهيز التحديث...", "بدء التحديث الآن", function() { 
+                        downloadFilesFromGithub(onlineVersion); 
+                    });
+                } else {
+                    if(isManual) alert(`✅ أنت تستخدم أحدث إصدار بالفعل.\n(رقم الإصدار الحالي: ${localVersion})`);
                 }
             }
-        }).catch(err => console.log("خطأ:", err));
+        }).catch(err => {
+            if(isManual) alert("❌ حدث خطأ أثناء الاتصال بالسيرفر. تأكد من الإنترنت.");
+            console.log("Error:", err);
+        });
     }
 
+    // دالة إظهار شاشة التحديث
+    function showUpdateUI(title, desc, btnText, btnAction) {
+        document.getElementById("update-screen").style.display = "flex";
+        document.getElementById("update-title").innerText = title;
+        document.getElementById("update-desc").innerText = desc;
+        let updateBtn = document.getElementById("updateBtn");
+        updateBtn.innerText = btnText;
+        updateBtn.onclick = btnAction;
+    }
+
+    // الدالة الأهم: سحب الملفات وحفظها في المسار الصحيح للموبايل
     async function downloadFilesFromGithub(newVersion) {
         let btn = document.getElementById("updateBtn");
         btn.disabled = true;
+        
         try {
             const cache = await caches.open("manzoma-cache-v1");
+            
+            // معرفة المسار الفعلي للتطبيق على الموبايل عشان الكاش يشتغل صح
+            let appLocalBaseUrl = window.location.href.split('?')[0].split('#')[0];
+            appLocalBaseUrl = appLocalBaseUrl.substring(0, appLocalBaseUrl.lastIndexOf('/') + 1);
+
             for(let i = 0; i < filesToUpdate.length; i++) {
                 let file = filesToUpdate[i];
                 let percent = Math.round(((i + 1) / filesToUpdate.length) * 100);
-                btn.innerText = `جاري التحديث... ${percent}%`;
+                btn.innerText = `جاري سحب الملفات... ${percent}%`;
                 
-                let response = await fetch(GITHUB_BASE_URL + file + "?nocache=" + new Date().getTime());
+                let onlineUrl = GITHUB_BASE_URL + file + "?nocache=" + new Date().getTime();
+                let response = await fetch(onlineUrl);
+                
                 if(response.ok) {
-                    let cacheRequest = new Request('./' + file); 
-                    await cache.put(cacheRequest, response.clone());
+                    // حفظ الملف في الكاش بنفس المسار اللي الموبايل بيقرأ منه
+                    let localUrl = appLocalBaseUrl + file;
+                    await cache.put(localUrl, response.clone());
                 }
             }
+            
             localStorage.setItem("MANZOMA_OFFLINE_VERSION", newVersion);
-            alert("✅ تم تثبيت التحديث بنجاح! سيتم إعادة تشغيل النظام.");
-            window.location.reload(true); 
+            btn.innerText = "✅ اكتمل التحديث!";
+            
+            setTimeout(() => {
+                alert("✅ تم تثبيت التحديث الداخلي بنجاح! سيتم إعادة تشغيل النظام.");
+                window.location.reload(true); 
+            }, 500);
+
         } catch(e) {
-            alert("❌ حدث خطأ أثناء تحميل التحديث، تأكد من قوة الإنترنت.");
-            btn.disabled = false; btn.innerText = "إعادة المحاولة";
+            alert("❌ حدث خطأ أثناء سحب التحديث، تأكد من قوة الإنترنت.");
+            btn.disabled = false; 
+            btn.innerText = "إعادة المحاولة";
         }
     }
 
+    // تشغيل الفحص التلقائي عند فتح التطبيق وتسجيل الـ Service Worker
     window.addEventListener('load', () => {
-        checkGithubForUpdates();
+        checkGithubForUpdates(false); // الفحص التلقائي في الخلفية
+        
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js');
+            navigator.serviceWorker.register('./sw.js').then(() => {
+                console.log("Service Worker Registered.");
+            });
         }
     });
 </script>
