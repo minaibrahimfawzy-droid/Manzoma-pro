@@ -7,8 +7,8 @@ var APK_REQUIRED_VERSION = "1.0";
 var APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/wavgumgx0e4xrk5/Manzoma+Pro33.apk/file"; 
 
 // 🟢 2. رقم إصدار البرامج (التحديث الهوائي الداخلي - OTA)
-// ⚠️ تم التحديث إلى 125 لسحب التعديلات الجديدة (ميزة المشاركة Share API)
-var HTML_VERSION = "125"; 
+// ⚠️ تم التحديث إلى 128 لسحب ميزة النسخ الاحتياطي النصي
+var HTML_VERSION = "128"; 
 
 // 🔵 3. روابط البرامج (يجب أن تظل كما هي للعمل أوفلاين)
 var remoteApps = [

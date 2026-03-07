@@ -11,9 +11,9 @@
 <style>
     body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #ffffff; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; user-select: none; overflow: hidden; }
     #lock-screen { background: rgba(20, 30, 45, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px 30px; border-radius: 20px; text-align: center; width: 85%; max-width: 340px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); position: relative; z-index: 10; }
-    input { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); color: #00d2ff; padding: 14px; width: 100%; text-align: center; font-size: 16px; font-family: 'Cairo', sans-serif; border-radius: 12px; margin: 12px 0; outline: none; box-sizing: border-box; transition: 0.3s; }
-    input:focus { border-color: #00d2ff; box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
-    input::placeholder { color: #8b949e; }
+    input, textarea { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); color: #00d2ff; padding: 14px; width: 100%; text-align: center; font-size: 16px; font-family: 'Cairo', sans-serif; border-radius: 12px; margin: 12px 0; outline: none; box-sizing: border-box; transition: 0.3s; }
+    input:focus, textarea:focus { border-color: #00d2ff; box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
+    input::placeholder, textarea::placeholder { color: #8b949e; }
     button.main-btn { background: linear-gradient(45deg, #11998e, #38ef7d); color: #fff; border: none; padding: 14px 0; width: 100%; font-size: 18px; font-weight: 800; font-family: 'Cairo', sans-serif; border-radius: 12px; cursor: pointer; margin-top: 15px; box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4); transition: all 0.3s ease; }
     button.main-btn:active { transform: scale(0.95); }
     button.main-btn:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
@@ -31,16 +31,14 @@
     .app-btn { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px 10px; text-decoration: none; color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px; text-align: center; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
     .app-btn:active { transform: scale(0.93); background: rgba(255, 255, 255, 0.15); }
     .icon { font-size: 35px; margin-bottom: 12px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
-    .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; padding-bottom: 20px; }
-    .tool-btn { background: rgba(31, 111, 235, 0.2); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 12px; border-radius: 12px; font-size: 13px; font-family: 'Cairo', sans-serif; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    .tools-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; padding-bottom: 20px; }
+    .tool-btn { background: rgba(31, 111, 235, 0.2); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 15px; border-radius: 12px; font-size: 15px; font-family: 'Cairo', sans-serif; cursor: pointer; font-weight: bold; transition: 0.3s; }
     .tool-btn:active { transform: scale(0.95); }
-    .tool-btn.restore { background: rgba(210, 153, 34, 0.2); color: #e3b341; border-color: rgba(227, 179, 65, 0.3); }
-    .tool-btn.update-apk { grid-column: span 2; background: linear-gradient(45deg, #8e2de2, #4a00e0); color: white; border: none; font-size: 15px; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(142, 45, 226, 0.4); } 
+    .tool-btn.update-apk { background: linear-gradient(45deg, #8e2de2, #4a00e0); color: white; border: none; box-shadow: 0 5px 15px rgba(142, 45, 226, 0.4); } 
     
-    #update-screen, #restore-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.95); backdrop-filter: blur(10px); z-index: 999; flex-direction: column; align-items: center; justify-content: center; }
+    #update-screen, #sync-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.95); backdrop-filter: blur(10px); z-index: 999; flex-direction: column; align-items: center; justify-content: center; }
     .box { background: rgba(30, 40, 55, 0.9); padding: 40px 30px; border-radius: 20px; text-align: center; border: 1px solid #ff4b4b; box-shadow: 0 0 40px rgba(255, 75, 75, 0.3); width: 85%; max-width: 350px; }
     .box button { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: #fff; border: none; padding: 14px 20px; font-size: 16px; font-family: 'Cairo', sans-serif; border-radius: 12px; cursor: pointer; margin-top: 15px; font-weight: bold; width: 100%; box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4); }
-    .box button.green { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4); }
 
     /* الإشعارات */
     #custom-toast { visibility: hidden; min-width: 250px; background-color: rgba(30, 40, 55, 0.95); color: #fff; text-align: center; border-radius: 15px; padding: 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 15px; font-family: 'Cairo', sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); opacity: 0; transition: opacity 0.4s, bottom 0.4s; }
@@ -63,12 +61,19 @@
     </div>
 </div>
 
-<!-- شاشة الاستعادة الجديدة -->
-<div id="restore-modal">
-    <div class="box" style="border-color: #e3b341; box-shadow: 0 0 40px rgba(227, 179, 65, 0.3);">
-        <h2 style="color:#fff; margin-bottom: 20px;">استعادة البيانات</h2>
-        <button class="green" onclick="document.getElementById('fileInput').click()">📁 اختيار ملف Backup</button>
-        <button onclick="document.getElementById('restore-modal').style.display='none'" style="background: transparent; border: 1px solid #ff4b4b; color: #ff4b4b; box-shadow: none;">إلغاء</button>
+<!-- شاشة النسخ الاحتياطي النصي (لتخطي قيود التطبيق) -->
+<div id="sync-modal">
+    <div class="box" style="border-color: #58a6ff; box-shadow: 0 0 40px rgba(88, 166, 255, 0.3); max-width: 400px;">
+        <h2 style="color:#fff; margin-bottom: 5px;">النسخة الاحتياطية</h2>
+        <p style="color:#b0b3b8; font-size: 12px; margin-bottom: 15px;">انقر (إنشاء ونسخ) وأرسل الكود لنفسك لحفظه، أو الصق كوداً قديماً لاستعادته.</p>
+        
+        <textarea id="backupTextData" style="height: 120px; font-family: monospace; font-size: 11px; direction: ltr; padding: 10px;" placeholder="الصق كود النسخة الاحتياطية هنا لاستعادة بياناتك..."></textarea>
+        
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button onclick="generateAndCopyText()" style="background: linear-gradient(45deg, #11998e, #38ef7d); margin: 0; font-size: 14px; box-shadow: 0 4px 10px rgba(56, 239, 125, 0.3);">📋 إنشاء ونسخ للحفظ</button>
+            <button onclick="restoreFromText()" style="background: rgba(210, 153, 34, 0.8); border: 1px solid #e3b341; margin: 0; font-size: 14px; box-shadow: 0 4px 10px rgba(227, 179, 65, 0.3);">📥 استعادة الآن</button>
+        </div>
+        <button onclick="document.getElementById('sync-modal').style.display='none'" style="background: transparent; border: 1px solid #ff4b4b; color: #ff4b4b; box-shadow: none; margin-top: 15px; padding: 10px;">إلغاء وإغلاق</button>
     </div>
 </div>
 
@@ -97,10 +102,8 @@
     <div class="grid" id="apps-container"></div>
     
     <div class="tools-grid">
-        <button class="tool-btn" onclick="downloadBackupFile()">📥 تصدير/حفظ البيانات</button>
-        <button class="tool-btn restore" onclick="document.getElementById('restore-modal').style.display='flex'">📤 استعادة البيانات</button>
+        <button class="tool-btn" onclick="document.getElementById('sync-modal').style.display='flex'">⚙️ إدارة النسخ الاحتياطي (حفظ واستعادة)</button>
         <button class="tool-btn update-apk" onclick="manualCheckUpdate()">🔄 البحث عن تحديثات النظام وتثبيتها</button>
-        <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileRestore(event)">
     </div>
 </div>
 
@@ -218,9 +221,9 @@
     }
 
     // =========================================================
-    // استخراج البيانات باستخدام Share API لتخطي مشكلة أذونات التطبيق
+    // نظام الحفظ النصي للبيانات (يخترق كل قيود التطبيقات)
     // =========================================================
-    function downloadBackupFile() {
+    function generateAndCopyText() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
             let key = localStorage.key(i);
@@ -229,64 +232,44 @@
             }
         }
         if(Object.keys(safeData).length === 0) { 
-            showToast("⚠️ لا توجد بيانات محفوظة لاستخراجها.", "error"); 
-            return; 
+            showToast("⚠️ لا توجد بيانات محفوظة.", "error"); return; 
         }
-
-        const jsonStr = JSON.stringify(safeData, null, 2);
-        const fileName = `Manzoma_Backup_${new Date().toISOString().split('T')[0]}.json`;
-
-        try {
-            // تحويل البيانات لملف حقيقي
-            const blob = new Blob([jsonStr], { type: "application/json" });
-            const file = new File([blob], fileName, { type: "application/json" });
-
-            // التحقق مما إذا كان التطبيق/النظام يدعم قائمة المشاركة
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                showToast("⏳ جاري فتح قائمة المشاركة للحفظ...");
-                
-                navigator.share({
-                    title: 'بيانات نظام 2026',
-                    text: 'تفضل ملف النسخة الاحتياطية لبياناتك.',
-                    files: [file]
-                }).then(() => {
-                    showToast("✅ تمت العملية بنجاح!", "success");
-                }).catch((error) => {
-                    console.log("تم إلغاء المشاركة أو حدث خطأ:", error);
-                });
-            } else {
-                // إذا كان لا يدعم المشاركة، نستخدم الطريقة العادية
-                showToast("⏳ يتم الآن تنزيل الملف...");
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }
-        } catch (error) {
-            // كحل أخير تماماً لو فشل كل شيء، ننسخ البيانات للحافظة
-            navigator.clipboard.writeText(jsonStr);
-            showToast("❌ التطبيق يمنع التحميل. تم نسخ البيانات (نص) للحافظة كحل بديل.", "error");
-        }
+        
+        let jsonStr = JSON.stringify(safeData);
+        // تشفير البيانات لنص Base64 ليكون آمناً للإرسال عبر واتساب بدون أن تتلف الحروف
+        let encodedData = btoa(unescape(encodeURIComponent(jsonStr)));
+        
+        let textArea = document.getElementById('backupTextData');
+        textArea.value = encodedData;
+        
+        // نسخ النص للحافظة تلقائياً
+        textArea.select();
+        textArea.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+        
+        showToast("✅ تم نسخ كود البيانات! اذهب للصقه وإرساله لنفسك في الواتساب.", "success");
     }
 
-    function handleFileRestore(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                for(let key in data) localStorage.setItem(key, data[key]);
-                document.getElementById('restore-modal').style.display='none';
-                showToast("✅ تمت استعادة البيانات بنجاح!", "success"); 
-                setTimeout(() => location.reload(), 1500);
-            } catch(err) { showToast("❌ فشلت الاستعادة! تأكد من أن الملف صحيح.", "error"); }
-        };
-        reader.readAsText(file); event.target.value = ''; 
+    function restoreFromText() {
+        let textData = document.getElementById('backupTextData').value.trim();
+        if(!textData) {
+            showToast("⚠️ الرجاء لصق كود البيانات أولاً في المربع.", "error"); return;
+        }
+        
+        try {
+            let decodedStr = decodeURIComponent(escape(atob(textData)));
+            let data = JSON.parse(decodedStr);
+            
+            for(let key in data) {
+                localStorage.setItem(key, data[key]);
+            }
+            
+            document.getElementById('sync-modal').style.display='none';
+            showToast("✅ تمت الاستعادة بنجاح! جاري التحديث...", "success");
+            setTimeout(() => location.reload(), 1500);
+        } catch(e) {
+            showToast("❌ الكود غير صحيح أو تالف!", "error");
+        }
     }
 
     function logout() { localStorage.removeItem("_tkn_auth"); location.reload(); }
@@ -294,9 +277,6 @@
     window.onload = function() { showApp(localStorage.getItem("_tkn_auth") === getTruePass()); };
 </script>
 
-<!-- ============================================== -->
-<!-- نظام التحديث الهوائي (بدون Alerts) -->
-<!-- ============================================== -->
 <script>
     const GITHUB_BASE_URL = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
     const filesToUpdate = ["index.html", "control.js", "sw.js", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html"];
@@ -338,8 +318,7 @@
         
         try {
             if (!('caches' in window)) { showToast("❌ التطبيق لا يدعم الحفظ المؤقت.", "error"); btn.disabled = false; btn.innerText = "فشل التحديث"; return; }
-            // تحديث اسم الكاش هنا ليطابق sw.js
-            const cache = await caches.open("manzoma-cache-v6"); const keys = await cache.keys();
+            const cache = await caches.open("manzoma-cache-v7"); const keys = await cache.keys();
             for (let request of keys) { await cache.delete(request); }
             let currentPath = window.location.href.split('?')[0].split('#')[0]; let basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
 
