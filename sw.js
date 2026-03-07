@@ -1,21 +1,25 @@
 const CACHE_NAME = 'manzoma-cache-v1';
 
-// 1. التثبيت الإجباري للتحديثات الجديدة فوراً (عشان ميعلقش على النسخة القديمة)
+// إجبار التحديث الفوري بمجرد نزوله
 self.addEventListener("install", (event) => {
-    self.skipWaiting();
+    self.skipWaiting(); 
 });
 
-// 2. تفعيل السيطرة على التطبيق فوراً بمجرد فتح البرنامج
+// السيطرة على التطبيق فوراً
 self.addEventListener("activate", (event) => {
     event.waitUntil(clients.claim()); 
 });
 
-// 3. لما التطبيق يطلب أي ملف، هنجيبه من الكاش الأول عشان يشتغل أوفلاين
+// لما الموبايل يطلب ملف، هنجيبه من الكاش حتى لو مساره متغير
 self.addEventListener('fetch', event => {
+    if (event.request.method !== 'GET') return;
+
     event.respondWith(
-        caches.match(event.request).then(response => {
-            // لو الملف موجود في الجهاز (الكاش) هاته، لو مش موجود هاته من النت
-            return response || fetch(event.request);
+        caches.open(CACHE_NAME).then(cache => {
+            // ignoreSearch: true هو السر لتجاهل أي اختلافات في روابط الموبايل
+            return cache.match(event.request, { ignoreSearch: true }).then(response => {
+                return response || fetch(event.request);
+            });
         })
     );
 });
