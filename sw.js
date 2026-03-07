@@ -1,5 +1,5 @@
-// ⚠️ تم تغيير اسم الكاش إلى v4 لمسح الملفات القديمة من هواتف المستخدمين
-const CACHE_NAME = 'manzoma-cache-v4';
+// ⚠️ تم تغيير الكاش إلى v5 لضمان مسح الذاكرة القديمة وسحب التحديث
+const CACHE_NAME = 'manzoma-cache-v5';
 
 // قائمة بالملفات التي يجب حفظها فوراً لتعمل أوفلاين
 const FILES_TO_CACHE = [
@@ -14,7 +14,6 @@ const FILES_TO_CACHE = [
     './6.html'
 ];
 
-// إجبار التحديث وحفظ الملفات في الكاش عند التثبيت
 self.addEventListener("install", (event) => {
     self.skipWaiting(); 
     event.waitUntil(
@@ -25,7 +24,6 @@ self.addEventListener("install", (event) => {
     );
 });
 
-// السيطرة على التطبيق ومسح الكاش القديم إن وجد
 self.addEventListener("activate", (event) => {
     event.waitUntil(clients.claim()); 
     event.waitUntil(
@@ -41,13 +39,11 @@ self.addEventListener("activate", (event) => {
     );
 });
 
-// جلب الملفات من الكاش عند انقطاع الإنترنت
 self.addEventListener('fetch', event => {
     if (event.request.method !== 'GET') return;
 
     event.respondWith(
         caches.match(event.request, { ignoreSearch: true }).then(response => {
-            // إذا وجد الملف في الكاش يعرضه، وإذا لم يجده يحاول جلبه من النت ثم يحفظه
             return response || fetch(event.request).then(fetchRes => {
                 return caches.open(CACHE_NAME).then(cache => {
                     cache.put(event.request, fetchRes.clone());
@@ -55,7 +51,6 @@ self.addEventListener('fetch', event => {
                 });
             });
         }).catch(() => {
-            // إذا لم يكن هناك نت ولم يجد الملف في الكاش (احتياطي)
             return caches.match('./index.html'); 
         })
     );

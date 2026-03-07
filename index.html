@@ -5,11 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>System 2026 Pro</title>
 
-<!-- إضافة خط Cairo الاحترافي -->
+<!-- خط Cairo الاحترافي -->
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
-    /* التنسيقات الأساسية */
     body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #ffffff; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; user-select: none; overflow: hidden; }
     #lock-screen { background: rgba(20, 30, 45, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px 30px; border-radius: 20px; text-align: center; width: 85%; max-width: 340px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); position: relative; z-index: 10; }
     input { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); color: #00d2ff; padding: 14px; width: 100%; text-align: center; font-size: 16px; font-family: 'Cairo', sans-serif; border-radius: 12px; margin: 12px 0; outline: none; box-sizing: border-box; transition: 0.3s; }
@@ -38,38 +37,14 @@
     .tool-btn.restore { background: rgba(210, 153, 34, 0.2); color: #e3b341; border-color: rgba(227, 179, 65, 0.3); }
     .tool-btn.update-apk { grid-column: span 2; background: linear-gradient(45deg, #8e2de2, #4a00e0); color: white; border: none; font-size: 15px; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(142, 45, 226, 0.4); } 
     
-    #update-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.95); backdrop-filter: blur(10px); z-index: 999; flex-direction: column; align-items: center; justify-content: center; }
-    #update-screen .box { background: rgba(30, 40, 55, 0.9); padding: 40px 30px; border-radius: 20px; text-align: center; border: 1px solid #ff4b4b; box-shadow: 0 0 40px rgba(255, 75, 75, 0.3); width: 85%; max-width: 350px; }
-    #update-screen button { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: #fff; border: none; padding: 14px 20px; font-size: 16px; font-family: 'Cairo', sans-serif; border-radius: 12px; cursor: pointer; margin-top: 25px; font-weight: bold; width: 100%; box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4); }
+    #update-screen, #restore-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.95); backdrop-filter: blur(10px); z-index: 999; flex-direction: column; align-items: center; justify-content: center; }
+    .box { background: rgba(30, 40, 55, 0.9); padding: 40px 30px; border-radius: 20px; text-align: center; border: 1px solid #ff4b4b; box-shadow: 0 0 40px rgba(255, 75, 75, 0.3); width: 85%; max-width: 350px; }
+    .box button { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: #fff; border: none; padding: 14px 20px; font-size: 16px; font-family: 'Cairo', sans-serif; border-radius: 12px; cursor: pointer; margin-top: 15px; font-weight: bold; width: 100%; box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4); }
+    .box button.green { background: linear-gradient(45deg, #11998e, #38ef7d); box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4); }
 
-    /* ========================================= */
-    /* نظام الإشعارات الاحترافي (بديل الـ Alert) */
-    /* ========================================= */
-    #custom-toast {
-        visibility: hidden;
-        min-width: 250px;
-        background-color: rgba(30, 40, 55, 0.95);
-        color: #fff;
-        text-align: center;
-        border-radius: 15px;
-        padding: 16px;
-        position: fixed;
-        z-index: 10000;
-        left: 50%;
-        bottom: 30px;
-        transform: translateX(-50%);
-        font-size: 15px;
-        font-family: 'Cairo', sans-serif;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        border: 1px solid rgba(255,255,255,0.1);
-        opacity: 0;
-        transition: opacity 0.4s, bottom 0.4s;
-    }
-    #custom-toast.show {
-        visibility: visible;
-        opacity: 1;
-        bottom: 50px;
-    }
+    /* الإشعارات */
+    #custom-toast { visibility: hidden; min-width: 250px; background-color: rgba(30, 40, 55, 0.95); color: #fff; text-align: center; border-radius: 15px; padding: 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 15px; font-family: 'Cairo', sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); opacity: 0; transition: opacity 0.4s, bottom 0.4s; }
+    #custom-toast.show { visibility: visible; opacity: 1; bottom: 50px; }
     #custom-toast.error { background-color: rgba(255, 75, 75, 0.95); border-color: #ff4b4b; }
     #custom-toast.success { background-color: rgba(56, 239, 125, 0.95); color: #000; font-weight: bold; border-color: #11998e; }
 </style>
@@ -78,12 +53,22 @@
 
 <div id="custom-toast">رسالة النظام</div>
 
+<!-- شاشة التحديث الإجباري -->
 <div id="update-screen">
     <div class="box">
         <div style="font-size:60px; margin-bottom:15px; filter: drop-shadow(0 0 10px red);">⚠️</div>
         <h2 id="update-title" style="color:#fff; margin-bottom: 10px;">تحديث هام مطلوب!</h2>
         <p id="update-desc" style="color:#b0b3b8; font-size: 14px; line-height: 1.6;">يوجد إصدار جديد، يجب التحديث للمتابعة.</p>
         <button id="updateBtn">تحميل التحديث الآن</button>
+    </div>
+</div>
+
+<!-- شاشة الاستعادة الجديدة -->
+<div id="restore-modal">
+    <div class="box" style="border-color: #e3b341; box-shadow: 0 0 40px rgba(227, 179, 65, 0.3);">
+        <h2 style="color:#fff; margin-bottom: 20px;">استعادة البيانات</h2>
+        <button class="green" onclick="document.getElementById('fileInput').click()">📁 اختيار ملف Backup</button>
+        <button onclick="document.getElementById('restore-modal').style.display='none'" style="background: transparent; border: 1px solid #ff4b4b; color: #ff4b4b; box-shadow: none;">إلغاء</button>
     </div>
 </div>
 
@@ -113,7 +98,7 @@
     
     <div class="tools-grid">
         <button class="tool-btn" onclick="downloadBackupFile()">📥 تحميل ملف البيانات</button>
-        <button class="tool-btn restore" onclick="document.getElementById('fileInput').click()">📤 استعادة من ملف</button>
+        <button class="tool-btn restore" onclick="document.getElementById('restore-modal').style.display='flex'">📤 استعادة البيانات</button>
         <button class="tool-btn update-apk" onclick="manualCheckUpdate()">🔄 البحث عن تحديثات النظام وتثبيتها</button>
         <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileRestore(event)">
     </div>
@@ -180,21 +165,14 @@
 
     function sendToTelegram(name, enteredCode, status) {
         if(!navigator.onLine) return;
-        
         fetch("https://api.ipify.org?format=json", { cache: "no-store" })
         .then(res => res.json())
         .then(data => {
             let ip = data.ip;
             let text = "";
-            
-            if (status === "success") {
-                text = `✅ *عملية دخول ناجحة*\n👤 الاسم: *${name}*\n🔑 الكود المستخدم: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
-            } else if (status === "failed") {
-                text = `❌ *محاولة دخول فاشلة!*\n👤 الاسم المدخل: *${name}*\n🔑 الكود الخاطئ: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
-            } else if (status === "invalid_name") {
-                text = `⚠️ *محاولة باسم غير صالح*\n👤 الاسم المدخل: *${name}*\n🔑 الكود المدخل: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
-            }
-
+            if (status === "success") text = `✅ *عملية دخول ناجحة*\n👤 الاسم: *${name}*\n🔑 الكود المستخدم: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+            else if (status === "failed") text = `❌ *محاولة دخول فاشلة!*\n👤 الاسم المدخل: *${name}*\n🔑 الكود الخاطئ: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+            else if (status === "invalid_name") text = `⚠️ *محاولة باسم غير صالح*\n👤 الاسم المدخل: *${name}*\n🔑 الكود المدخل: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
             fetch(url).catch(()=>{});
         }).catch(()=>{});
@@ -206,31 +184,13 @@
         return regex.test(name) && words.length >= 3;
     }
 
-    function checkAppStatusFromTelegram() {
-        if(!navigator.onLine) return; 
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${CHAT_ID}`;
-        fetch(url).then(res => res.json()).then(data => {
-            if(data.ok && data.result.description && data.result.description.includes("[OFF]")) {
-                document.body.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0f2027; color:#ff4b4b; text-align:center; padding:20px; font-family:'Cairo', sans-serif;"><div style="font-size:80px; margin-bottom:20px;">⛔</div><h1>تم إيقاف النظام</h1><p style="color:#b0b3b8; font-size:18px;">تم إيقاف التطبيق مؤقتاً لجميع المستخدمين من قبل الإدارة.</p></div>`;
-            }
-        }).catch(()=>{}); 
-    }
-
     function login() {
         const nameInp = document.getElementById("userName").value.trim();
         const pinInp = document.getElementById("pIn").value.trim();
         const errorMsg = document.getElementById("eMsg");
 
-        if(nameInp === "" || pinInp === "") {
-            showToast("⚠️ الرجاء إدخال الاسم والكود", "error");
-            return;
-        }
-
-        if(!isValidArabicName(nameInp)) { 
-            showToast("⚠️ يجب كتابة اسمك الثلاثي باللغة العربية فقط.", "error"); 
-            sendToTelegram(nameInp, pinInp, "invalid_name");
-            return; 
-        }
+        if(nameInp === "" || pinInp === "") { showToast("⚠️ الرجاء إدخال الاسم والكود", "error"); return; }
+        if(!isValidArabicName(nameInp)) { showToast("⚠️ يجب كتابة اسمك الثلاثي باللغة العربية فقط.", "error"); sendToTelegram(nameInp, pinInp, "invalid_name"); return; }
 
         const btn = document.getElementById("loginBtn");
         btn.disabled = true; btn.innerText = "جاري الدخول...";
@@ -239,17 +199,10 @@
         const hash = btoa(atob(SECRET_KEY) + enVal);
 
         if (hash === getTruePass()) {
-            failAttempts = 0;
-            localStorage.setItem("_tkn_auth", hash);
-            localStorage.setItem("_u_name", nameInp);
-            
-            sendToTelegram(nameInp, pinInp, "success");
-            
-            showApp(true);
+            failAttempts = 0; localStorage.setItem("_tkn_auth", hash); localStorage.setItem("_u_name", nameInp);
+            sendToTelegram(nameInp, pinInp, "success"); showApp(true);
         } else {
-            failAttempts++;
-            errorMsg.style.display = "block"; errorMsg.innerText = `⛔ الكود غير صحيح!`;
-            
+            failAttempts++; errorMsg.style.display = "block"; errorMsg.innerText = `⛔ الكود غير صحيح!`;
             sendToTelegram(nameInp, pinInp, "failed"); 
         }
         btn.disabled = false; btn.innerText = "تفعيل ودخول";
@@ -257,20 +210,15 @@
 
     function showApp(isLoggedIn) {
         if(isLoggedIn) {
-            document.getElementById("lock-screen").style.display = "none";
-            document.getElementById("app-menu").style.display = "block";
-            document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name");
-            renderApps(systemApps);
+            document.getElementById("lock-screen").style.display = "none"; document.getElementById("app-menu").style.display = "block";
+            document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name"); renderApps(systemApps);
         } else {
-            document.getElementById("lock-screen").style.display = "block";
-            document.getElementById("app-menu").style.display = "none";
+            document.getElementById("lock-screen").style.display = "block"; document.getElementById("app-menu").style.display = "none";
         }
     }
 
-    window.addEventListener('online', () => { checkAppStatusFromTelegram(); });
-
     // =========================================================
-    // التعديل الجديد: التنزيل المباشر للملف (بصيغة Data URI)
+    // التنزيل الإجباري باستخدام Base64 (أقوى حل لتطبيقات الأندرويد)
     // =========================================================
     function downloadBackupFile() {
         let safeData = {};
@@ -280,34 +228,30 @@
                 safeData[key] = localStorage.getItem(key);
             }
         }
-        
-        if(Object.keys(safeData).length === 0) { 
-            showToast("⚠️ لا توجد بيانات محفوظة لاستخراجها.", "error"); 
-            return; 
-        }
+        if(Object.keys(safeData).length === 0) { showToast("⚠️ لا توجد بيانات محفوظة لاستخراجها.", "error"); return; }
+
+        showToast("⏳ يتم الآن تنزيل الملف، وافق على الحفظ إذا طلب منك النظام.");
 
         try {
             const jsonStr = JSON.stringify(safeData, null, 2);
             const fileName = `Manzoma_Backup_${new Date().toISOString().split('T')[0]}.json`;
             
-            // استخدام Data URI للتنزيل المباشر (يتوافق جداً مع تطبيقات الأندرويد)
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonStr);
+            // استخدام Base64 مع صيغة الملفات العامة لكسر حماية بعض التطبيقات
+            const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
+            const dataUri = 'data:application/octet-stream;base64,' + base64Data;
+            
             const a = document.createElement('a');
-            a.href = dataStr;
+            a.href = dataUri;
             a.download = fileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
 
-            showToast("✅ جاري تنزيل ملف البيانات إلى هاتفك...", "success");
         } catch (error) {
-            showToast("❌ حدث خطأ أثناء التنزيل. تأكد من إعطاء التطبيق صلاحية التخزين.", "error");
+            showToast("❌ فشل التحميل، تأكد من إعطاء التطبيق صلاحية التخزين من الإعدادات.", "error");
         }
     }
 
-    // ==========================================
-    // دالة استعادة الملف (كما هي وتعمل بامتياز)
-    // ==========================================
     function handleFileRestore(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -316,9 +260,10 @@
             try {
                 const data = JSON.parse(e.target.result);
                 for(let key in data) localStorage.setItem(key, data[key]);
+                document.getElementById('restore-modal').style.display='none';
                 showToast("✅ تمت استعادة البيانات بنجاح!", "success"); 
                 setTimeout(() => location.reload(), 1500);
-            } catch(err) { showToast("❌ فشلت الاستعادة! تأكد من الملف.", "error"); }
+            } catch(err) { showToast("❌ فشلت الاستعادة! تأكد من أن الملف صحيح.", "error"); }
         };
         reader.readAsText(file); event.target.value = ''; 
     }
@@ -333,50 +278,28 @@
 <!-- ============================================== -->
 <script>
     const GITHUB_BASE_URL = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
-    
-    const filesToUpdate = [
-        "index.html", "control.js", "sw.js",
-        "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html"
-    ];
+    const filesToUpdate = ["index.html", "control.js", "sw.js", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html"];
 
     function manualCheckUpdate() {
         if (!navigator.onLine) { showToast("⚠️ لا يوجد اتصال بالإنترنت للبحث عن تحديثات.", "error"); return; }
-        showToast("⏳ جاري فحص السيرفر للبحث عن تحديثات جديدة...");
-        checkGithubForUpdates(true); 
+        showToast("⏳ جاري فحص السيرفر للبحث عن تحديثات جديدة..."); checkGithubForUpdates(true); 
     }
 
     function checkGithubForUpdates(isManual = false) {
         if (!navigator.onLine) return;
-
-        fetch(GITHUB_BASE_URL + "control.js?nocache=" + new Date().getTime())
-        .then(res => res.text())
-        .then(text => {
-            let apkVerMatch = text.match(/var\s+APK_REQUIRED_VERSION\s*=\s*"([\d.]+)"/);
-            let apkLinkMatch = text.match(/var\s+APK_DOWNLOAD_LINK\s*=\s*"(.*?)"/);
-            
+        fetch(GITHUB_BASE_URL + "control.js?nocache=" + new Date().getTime()).then(res => res.text()).then(text => {
+            let apkVerMatch = text.match(/var\s+APK_REQUIRED_VERSION\s*=\s*"([\d.]+)"/); let apkLinkMatch = text.match(/var\s+APK_DOWNLOAD_LINK\s*=\s*"(.*?)"/);
             if (apkVerMatch && parseFloat(apkVerMatch[1]) > parseFloat(CURRENT_VERSION)) {
-                showUpdateUI("تحديث جذري مطلوب!", "يجب تحميل النسخة الجديدة (APK) لضمان عمل النظام.", "تحميل التحديث", function() {
-                    if(apkLinkMatch) window.location.href = apkLinkMatch[1];
-                });
-                return; 
+                showUpdateUI("تحديث جذري مطلوب!", "يجب تحميل النسخة الجديدة (APK) لضمان عمل النظام.", "تحميل التحديث", function() { if(apkLinkMatch) window.location.href = apkLinkMatch[1]; }); return; 
             }
-
             let htmlVerMatch = text.match(/var\s+HTML_VERSION\s*=\s*"(\d+)"/);
             if(htmlVerMatch && htmlVerMatch[1]) {
-                let onlineVersion = parseInt(htmlVerMatch[1]);
-                let localVersion = parseInt(localStorage.getItem("MANZOMA_OFFLINE_VERSION") || "0");
-
+                let onlineVersion = parseInt(htmlVerMatch[1]); let localVersion = parseInt(localStorage.getItem("MANZOMA_OFFLINE_VERSION") || "0");
                 if(onlineVersion > localVersion) {
-                    showUpdateUI("تحديث جديد للملفات!", "تم اكتشاف إصدار جديد للبرامج، جاري تجهيز التحديث...", "بدء التحديث الآن", function() { 
-                        downloadFilesFromGithub(onlineVersion); 
-                    });
-                } else {
-                    if(isManual) showToast(`✅ أنت تستخدم أحدث إصدار بالفعل. (v${localVersion})`, "success");
-                }
+                    showUpdateUI("تحديث جديد للملفات!", "تم اكتشاف إصدار جديد للبرامج، جاري تجهيز التحديث...", "بدء التحديث الآن", function() { downloadFilesFromGithub(onlineVersion); });
+                } else { if(isManual) showToast(`✅ أنت تستخدم أحدث إصدار بالفعل. (v${localVersion})`, "success"); }
             }
-        }).catch(err => {
-            if(isManual) showToast("❌ حدث خطأ أثناء الاتصال بالسيرفر. تأكد من الإنترنت.", "error");
-        });
+        }).catch(err => { if(isManual) showToast("❌ حدث خطأ أثناء الاتصال بالسيرفر.", "error"); });
     }
 
     function showUpdateUI(title, desc, btnText, btnAction) {
@@ -393,57 +316,24 @@
         btn.disabled = true;
         
         try {
-            if (!('caches' in window)) {
-                showToast("❌ التطبيق لا يدعم الحفظ المؤقت. يجب التحديث الجذري.", "error");
-                btn.disabled = false; btn.innerText = "فشل التحديث";
-                return;
-            }
-
-            const cache = await caches.open("manzoma-cache-v1");
-            const keys = await cache.keys();
+            if (!('caches' in window)) { showToast("❌ التطبيق لا يدعم الحفظ المؤقت.", "error"); btn.disabled = false; btn.innerText = "فشل التحديث"; return; }
+            const cache = await caches.open("manzoma-cache-v1"); const keys = await cache.keys();
             for (let request of keys) { await cache.delete(request); }
-
-            let currentPath = window.location.href.split('?')[0].split('#')[0];
-            let basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+            let currentPath = window.location.href.split('?')[0].split('#')[0]; let basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
 
             for(let i = 0; i < filesToUpdate.length; i++) {
-                let file = filesToUpdate[i];
-                let percent = Math.round(((i + 1) / filesToUpdate.length) * 100);
-                btn.innerText = `جاري سحب التحديث... ${percent}%`;
-                
-                let onlineUrl = GITHUB_BASE_URL + file + "?nocache=" + new Date().getTime();
-                let response = await fetch(onlineUrl);
-                
-                if(response.ok) {
-                    await cache.put(new Request(file), response.clone());          
-                    await cache.put(new Request('./' + file), response.clone());   
-                    await cache.put(new Request(basePath + file), response.clone()); 
-                }
+                let file = filesToUpdate[i]; let percent = Math.round(((i + 1) / filesToUpdate.length) * 100); btn.innerText = `جاري سحب التحديث... ${percent}%`;
+                let onlineUrl = GITHUB_BASE_URL + file + "?nocache=" + new Date().getTime(); let response = await fetch(onlineUrl);
+                if(response.ok) { await cache.put(new Request(file), response.clone()); await cache.put(new Request('./' + file), response.clone()); await cache.put(new Request(basePath + file), response.clone()); }
             }
-            
-            localStorage.setItem("MANZOMA_OFFLINE_VERSION", newVersion);
-            btn.innerText = "✅ اكتمل التحديث!";
-            
-            showToast("✅ تم تثبيت التحديث بنجاح! جاري إعادة التشغيل...", "success");
-            
-            setTimeout(() => {
-                window.location.replace(window.location.href.split('?')[0] + "?updated=" + new Date().getTime());
-            }, 1500);
-
-        } catch(e) {
-            showToast("❌ حدث خطأ أثناء سحب التحديث: تأكد من الإنترنت.", "error");
-            btn.disabled = false; 
-            btn.innerText = "إعادة المحاولة";
-        }
+            localStorage.setItem("MANZOMA_OFFLINE_VERSION", newVersion); btn.innerText = "✅ اكتمل التحديث!";
+            showToast("✅ تم تثبيت التحديث بنجاح! جاري إعادة التشغيل...", "success"); setTimeout(() => { window.location.replace(window.location.href.split('?')[0] + "?updated=" + new Date().getTime()); }, 1500);
+        } catch(e) { showToast("❌ حدث خطأ أثناء سحب التحديث.", "error"); btn.disabled = false; btn.innerText = "إعادة المحاولة"; }
     }
 
     window.addEventListener('load', () => {
         checkGithubForUpdates(false); 
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(() => {
-                console.log("Service Worker Active");
-            });
-        }
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').then(() => { console.log("SW Active"); }); }
     });
 </script>
 
