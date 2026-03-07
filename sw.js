@@ -1,5 +1,5 @@
-// ⚠️ تم تغيير الكاش إلى v6 لضمان مسح الذاكرة القديمة وسحب التحديث الجديد
-const CACHE_NAME = 'manzoma-cache-v6';
+// تم رفع الكاش إلى v7 ليتطابق مع نظام التحديث الجديد
+const CACHE_NAME = 'manzoma-cache-v7';
 
 // قائمة بالملفات التي يجب حفظها فوراً لتعمل أوفلاين
 const FILES_TO_CACHE = [
@@ -26,6 +26,7 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
     event.waitUntil(clients.claim()); 
+    // السطر ده مهم جداً: بيمسح أي كاش قديم (زي v5 أو v6) عشان التليفون ميهنجش على النسخة القديمة
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
@@ -42,6 +43,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener('fetch', event => {
     if (event.request.method !== 'GET') return;
 
+    // عسكري المرور: بيشوف لو الملف موجود في الكاش الجديد يفتحه، لو مش موجود يحمله
     event.respondWith(
         caches.match(event.request, { ignoreSearch: true }).then(response => {
             return response || fetch(event.request).then(fetchRes => {
@@ -51,6 +53,7 @@ self.addEventListener('fetch', event => {
                 });
             });
         }).catch(() => {
+            // لو النت فاصل ومفيش ملف، يرجع للصفحة الرئيسية
             return caches.match('./index.html'); 
         })
     );
