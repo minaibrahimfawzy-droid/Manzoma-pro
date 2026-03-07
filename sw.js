@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manzoma-cache-v2';
+const CACHE_NAME = 'manzoma-cache-v3';
 
 // قائمة بالملفات التي يجب حفظها فوراً لتعمل أوفلاين
 const FILES_TO_CACHE = [

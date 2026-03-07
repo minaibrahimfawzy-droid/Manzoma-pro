@@ -76,10 +76,8 @@
 </head>
 <body oncontextmenu="return false">
 
-<!-- عنصر الإشعارات المنبثقة السفلية -->
 <div id="custom-toast">رسالة النظام</div>
 
-<!-- شاشة التحديث الإجباري -->
 <div id="update-screen">
     <div class="box">
         <div style="font-size:60px; margin-bottom:15px; filter: drop-shadow(0 0 10px red);">⚠️</div>
@@ -124,7 +122,6 @@
 <script src="control.js"></script>
 
 <script>
-    // دالة الإشعارات الجديدة (بديل Alert)
     function showToast(message, type = "normal") {
         const toast = document.getElementById("custom-toast");
         toast.innerText = message;
@@ -181,15 +178,26 @@
         return PASS_ARRAY[i % 5];
     }
 
-    function sendToTelegram(name, type="login") {
+    // ====================================================
+    // نظام الإرسال للتليجرام الشامل (المعدل الجديد)
+    // ====================================================
+    function sendToTelegram(name, enteredCode, status) {
         if(!navigator.onLine) return;
+        
         fetch("https://api.ipify.org?format=json", { cache: "no-store" })
         .then(res => res.json())
         .then(data => {
             let ip = data.ip;
-            let text = type === "login" 
-                ? `✅ *دخول ناجح للتطبيق*\n👤 الاسم: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``
-                : `🚨 *محاولة اختراق (3 مرات خطأ)*\n👤 الاسم: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+            let text = "";
+            
+            if (status === "success") {
+                text = `✅ *عملية دخول ناجحة*\n👤 الاسم: *${name}*\n🔑 الكود المستخدم: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+            } else if (status === "failed") {
+                text = `❌ *محاولة دخول فاشلة!*\n👤 الاسم المدخل: *${name}*\n🔑 الكود الخاطئ: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+            } else if (status === "invalid_name") {
+                text = `⚠️ *محاولة باسم غير صالح*\n👤 الاسم المدخل: *${name}*\n🔑 الكود المدخل: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+            }
+
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
             fetch(url).catch(()=>{});
         }).catch(()=>{});
@@ -211,13 +219,24 @@
         }).catch(()=>{}); 
     }
 
+    // ====================================================
+    // دالة الدخول (المعدلة لإرسال كل الحالات للتليجرام)
+    // ====================================================
     function login() {
         const nameInp = document.getElementById("userName").value.trim();
         const pinInp = document.getElementById("pIn").value.trim();
         const errorMsg = document.getElementById("eMsg");
 
-        if(!isValidArabicName(nameInp)) { showToast("⚠️ يجب كتابة اسمك الثلاثي باللغة العربية فقط.", "error"); return; }
-        if(pinInp.length < 1) return;
+        if(nameInp === "" || pinInp === "") {
+            showToast("⚠️ الرجاء إدخال الاسم والكود", "error");
+            return;
+        }
+
+        if(!isValidArabicName(nameInp)) { 
+            showToast("⚠️ يجب كتابة اسمك الثلاثي باللغة العربية فقط.", "error"); 
+            sendToTelegram(nameInp, pinInp, "invalid_name"); // تبليغ التليجرام عن الاسم الخاطئ
+            return; 
+        }
 
         const btn = document.getElementById("loginBtn");
         btn.disabled = true; btn.innerText = "جاري الدخول...";
@@ -229,11 +248,15 @@
             failAttempts = 0;
             localStorage.setItem("_tkn_auth", hash);
             localStorage.setItem("_u_name", nameInp);
-            sendToTelegram(nameInp, "login"); 
+            
+            sendToTelegram(nameInp, pinInp, "success"); // تبليغ التليجرام بالنجاح
+            
             showApp(true);
         } else {
             failAttempts++;
             errorMsg.style.display = "block"; errorMsg.innerText = `⛔ الكود غير صحيح!`;
+            
+            sendToTelegram(nameInp, pinInp, "failed"); // تبليغ التليجرام بالفشل والكود الخاطئ
         }
         btn.disabled = false; btn.innerText = "تفعيل ودخول";
     }
@@ -252,19 +275,52 @@
 
     window.addEventListener('online', () => { checkAppStatusFromTelegram(); });
 
-    // نظام النسخ الاحتياطي
     function downloadBackupFile() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
             let key = localStorage.key(i);
             if(!["_tkn_auth", "_u_id", "_u_name", "MANZOMA_OFFLINE_VERSION"].includes(key)) safeData[key] = localStorage.getItem(key);
         }
-        if(Object.keys(safeData).length === 0) { showToast("⚠️ لا توجد بيانات محفوظة.", "error"); return; }
+        
+        if(Object.keys(safeData).length === 0) { 
+            showToast("⚠️ لا توجد بيانات محفوظة لاستخراجها.", "error"); 
+            return; 
+        }
+
         const jsonStr = JSON.stringify(safeData, null, 2);
-        const blob = new Blob([jsonStr], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = `Manzoma_Backup_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        const fileName = `Manzoma_Backup_${new Date().toISOString().split('T')[0]}.json`;
+
+        try {
+            const file = new File([jsonStr], fileName, { type: "application/json" });
+            
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    title: 'نسخة احتياطية - منظومة 2026',
+                    files: [file]
+                }).then(() => {
+                    showToast("✅ تمت المشاركة بنجاح", "success");
+                }).catch((e) => {
+                    console.log("تم إلغاء المشاركة", e);
+                });
+            } else if (navigator.share) {
+                navigator.share({
+                    title: 'بيانات النسخة الاحتياطية',
+                    text: jsonStr
+                }).then(() => {
+                    showToast("✅ تمت المشاركة كنص", "success");
+                }).catch((e) => {
+                    console.log("تم إلغاء المشاركة", e);
+                });
+            } else {
+                throw new Error("Share not supported");
+            }
+        } catch (error) {
+            navigator.clipboard.writeText(jsonStr).then(() => {
+                showToast("✅ تم نسخ البيانات! قم بلصقها في ملف نصي لحفظها.", "success");
+            }).catch(err => {
+                showToast("❌ فشل النظام في حفظ أو نسخ البيانات.", "error");
+            });
+        }
     }
 
     function handleFileRestore(event) {

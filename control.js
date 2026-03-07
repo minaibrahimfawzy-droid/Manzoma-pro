@@ -7,8 +7,8 @@ var APK_REQUIRED_VERSION = "1.0";
 var APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/wavgumgx0e4xrk5/Manzoma+Pro33.apk/file"; 
 
 // 🟢 2. رقم إصدار البرامج (التحديث الهوائي الداخلي - OTA)
-// ⚠️ كلما قمت بتعديل أي شيء في التطبيق على Github، اجعل هذا الرقم أكبر (مثلاً 116، ثم 117 وهكذا)
-var HTML_VERSION = "116"; 
+// ⚠️ كلما قمت بتعديل أي شيء في التطبيق على Github، اجعل هذا الرقم أكبر
+var HTML_VERSION = "120"; 
 
 // 🔵 3. روابط البرامج (يجب أن تظل كما هي للعمل أوفلاين)
 var remoteApps = [
