@@ -3,15 +3,14 @@
 // ==========================================
 
 // 🔴 1. إعدادات الـ APK (ميديا فاير)
-// رجعنا الرقم لـ 1.0 عشان التطبيق ما يطلبش ميديا فاير
 var APK_REQUIRED_VERSION = "1.0"; 
-var APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/cmpkyqefy9mvu82/Manzoma+pro32.apk/file"; 
+var APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/wavgumgx0e4xrk5/Manzoma+Pro33.apk/file"; 
 
 // 🟢 2. رقم إصدار البرامج (التحديث الهوائي)
-// رفعنا الرقم لـ 120 عشان يسحب التصميم الجديد في الخلفية
-var HTML_VERSION = "120"; 
+// كل ما تعدل حاجة في الـ 6 برامج، خلي الرقم ده أكبر (مثلاً 115) عشان التطبيق يسحب التعديل
+var HTML_VERSION = "115"; 
 
-// 🔵 3. روابط البرامج
+// 🔵 3. روابط البرامج (يجب أن تظل كما هي للعمل أوفلاين)
 var remoteApps = [
     {name: "النبطشية", icon: "📅", url: "Nabatshia.html"},
     {name: "الورديات", icon: "🌙", url: "2.html"},
