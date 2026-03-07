@@ -1,4 +1,5 @@
-const CACHE_NAME = 'manzoma-cache-v3';
+// ⚠️ تم تغيير اسم الكاش إلى v4 لمسح الملفات القديمة من هواتف المستخدمين
+const CACHE_NAME = 'manzoma-cache-v4';
 
 // قائمة بالملفات التي يجب حفظها فوراً لتعمل أوفلاين
 const FILES_TO_CACHE = [

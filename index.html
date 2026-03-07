@@ -178,9 +178,6 @@
         return PASS_ARRAY[i % 5];
     }
 
-    // ====================================================
-    // نظام الإرسال للتليجرام الشامل (المعدل الجديد)
-    // ====================================================
     function sendToTelegram(name, enteredCode, status) {
         if(!navigator.onLine) return;
         
@@ -219,9 +216,6 @@
         }).catch(()=>{}); 
     }
 
-    // ====================================================
-    // دالة الدخول (المعدلة لإرسال كل الحالات للتليجرام)
-    // ====================================================
     function login() {
         const nameInp = document.getElementById("userName").value.trim();
         const pinInp = document.getElementById("pIn").value.trim();
@@ -234,7 +228,7 @@
 
         if(!isValidArabicName(nameInp)) { 
             showToast("⚠️ يجب كتابة اسمك الثلاثي باللغة العربية فقط.", "error"); 
-            sendToTelegram(nameInp, pinInp, "invalid_name"); // تبليغ التليجرام عن الاسم الخاطئ
+            sendToTelegram(nameInp, pinInp, "invalid_name");
             return; 
         }
 
@@ -249,14 +243,14 @@
             localStorage.setItem("_tkn_auth", hash);
             localStorage.setItem("_u_name", nameInp);
             
-            sendToTelegram(nameInp, pinInp, "success"); // تبليغ التليجرام بالنجاح
+            sendToTelegram(nameInp, pinInp, "success");
             
             showApp(true);
         } else {
             failAttempts++;
             errorMsg.style.display = "block"; errorMsg.innerText = `⛔ الكود غير صحيح!`;
             
-            sendToTelegram(nameInp, pinInp, "failed"); // تبليغ التليجرام بالفشل والكود الخاطئ
+            sendToTelegram(nameInp, pinInp, "failed"); 
         }
         btn.disabled = false; btn.innerText = "تفعيل ودخول";
     }
@@ -275,11 +269,16 @@
 
     window.addEventListener('online', () => { checkAppStatusFromTelegram(); });
 
+    // =========================================================
+    // التعديل الجديد: التنزيل المباشر للملف (بصيغة Data URI)
+    // =========================================================
     function downloadBackupFile() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
             let key = localStorage.key(i);
-            if(!["_tkn_auth", "_u_id", "_u_name", "MANZOMA_OFFLINE_VERSION"].includes(key)) safeData[key] = localStorage.getItem(key);
+            if(!["_tkn_auth", "_u_id", "_u_name", "MANZOMA_OFFLINE_VERSION"].includes(key)) {
+                safeData[key] = localStorage.getItem(key);
+            }
         }
         
         if(Object.keys(safeData).length === 0) { 
@@ -287,42 +286,28 @@
             return; 
         }
 
-        const jsonStr = JSON.stringify(safeData, null, 2);
-        const fileName = `Manzoma_Backup_${new Date().toISOString().split('T')[0]}.json`;
-
         try {
-            const file = new File([jsonStr], fileName, { type: "application/json" });
+            const jsonStr = JSON.stringify(safeData, null, 2);
+            const fileName = `Manzoma_Backup_${new Date().toISOString().split('T')[0]}.json`;
             
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    title: 'نسخة احتياطية - منظومة 2026',
-                    files: [file]
-                }).then(() => {
-                    showToast("✅ تمت المشاركة بنجاح", "success");
-                }).catch((e) => {
-                    console.log("تم إلغاء المشاركة", e);
-                });
-            } else if (navigator.share) {
-                navigator.share({
-                    title: 'بيانات النسخة الاحتياطية',
-                    text: jsonStr
-                }).then(() => {
-                    showToast("✅ تمت المشاركة كنص", "success");
-                }).catch((e) => {
-                    console.log("تم إلغاء المشاركة", e);
-                });
-            } else {
-                throw new Error("Share not supported");
-            }
+            // استخدام Data URI للتنزيل المباشر (يتوافق جداً مع تطبيقات الأندرويد)
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonStr);
+            const a = document.createElement('a');
+            a.href = dataStr;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            showToast("✅ جاري تنزيل ملف البيانات إلى هاتفك...", "success");
         } catch (error) {
-            navigator.clipboard.writeText(jsonStr).then(() => {
-                showToast("✅ تم نسخ البيانات! قم بلصقها في ملف نصي لحفظها.", "success");
-            }).catch(err => {
-                showToast("❌ فشل النظام في حفظ أو نسخ البيانات.", "error");
-            });
+            showToast("❌ حدث خطأ أثناء التنزيل. تأكد من إعطاء التطبيق صلاحية التخزين.", "error");
         }
     }
 
+    // ==========================================
+    // دالة استعادة الملف (كما هي وتعمل بامتياز)
+    // ==========================================
     function handleFileRestore(event) {
         const file = event.target.files[0];
         if (!file) return;
