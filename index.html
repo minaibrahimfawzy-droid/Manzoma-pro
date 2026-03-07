@@ -97,7 +97,7 @@
     <div class="grid" id="apps-container"></div>
     
     <div class="tools-grid">
-        <button class="tool-btn" onclick="downloadBackupFile()">📥 تحميل ملف البيانات</button>
+        <button class="tool-btn" onclick="downloadBackupFile()">📥 تصدير/حفظ البيانات</button>
         <button class="tool-btn restore" onclick="document.getElementById('restore-modal').style.display='flex'">📤 استعادة البيانات</button>
         <button class="tool-btn update-apk" onclick="manualCheckUpdate()">🔄 البحث عن تحديثات النظام وتثبيتها</button>
         <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileRestore(event)">
@@ -218,7 +218,7 @@
     }
 
     // =========================================================
-    // التنزيل الإجباري باستخدام Base64 (أقوى حل لتطبيقات الأندرويد)
+    // استخراج البيانات باستخدام Share API لتخطي مشكلة أذونات التطبيق
     // =========================================================
     function downloadBackupFile() {
         let safeData = {};
@@ -228,27 +228,48 @@
                 safeData[key] = localStorage.getItem(key);
             }
         }
-        if(Object.keys(safeData).length === 0) { showToast("⚠️ لا توجد بيانات محفوظة لاستخراجها.", "error"); return; }
+        if(Object.keys(safeData).length === 0) { 
+            showToast("⚠️ لا توجد بيانات محفوظة لاستخراجها.", "error"); 
+            return; 
+        }
 
-        showToast("⏳ يتم الآن تنزيل الملف، وافق على الحفظ إذا طلب منك النظام.");
+        const jsonStr = JSON.stringify(safeData, null, 2);
+        const fileName = `Manzoma_Backup_${new Date().toISOString().split('T')[0]}.json`;
 
         try {
-            const jsonStr = JSON.stringify(safeData, null, 2);
-            const fileName = `Manzoma_Backup_${new Date().toISOString().split('T')[0]}.json`;
-            
-            // استخدام Base64 مع صيغة الملفات العامة لكسر حماية بعض التطبيقات
-            const base64Data = btoa(unescape(encodeURIComponent(jsonStr)));
-            const dataUri = 'data:application/octet-stream;base64,' + base64Data;
-            
-            const a = document.createElement('a');
-            a.href = dataUri;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            // تحويل البيانات لملف حقيقي
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const file = new File([blob], fileName, { type: "application/json" });
 
+            // التحقق مما إذا كان التطبيق/النظام يدعم قائمة المشاركة
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                showToast("⏳ جاري فتح قائمة المشاركة للحفظ...");
+                
+                navigator.share({
+                    title: 'بيانات نظام 2026',
+                    text: 'تفضل ملف النسخة الاحتياطية لبياناتك.',
+                    files: [file]
+                }).then(() => {
+                    showToast("✅ تمت العملية بنجاح!", "success");
+                }).catch((error) => {
+                    console.log("تم إلغاء المشاركة أو حدث خطأ:", error);
+                });
+            } else {
+                // إذا كان لا يدعم المشاركة، نستخدم الطريقة العادية
+                showToast("⏳ يتم الآن تنزيل الملف...");
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
         } catch (error) {
-            showToast("❌ فشل التحميل، تأكد من إعطاء التطبيق صلاحية التخزين من الإعدادات.", "error");
+            // كحل أخير تماماً لو فشل كل شيء، ننسخ البيانات للحافظة
+            navigator.clipboard.writeText(jsonStr);
+            showToast("❌ التطبيق يمنع التحميل. تم نسخ البيانات (نص) للحافظة كحل بديل.", "error");
         }
     }
 
@@ -317,7 +338,8 @@
         
         try {
             if (!('caches' in window)) { showToast("❌ التطبيق لا يدعم الحفظ المؤقت.", "error"); btn.disabled = false; btn.innerText = "فشل التحديث"; return; }
-            const cache = await caches.open("manzoma-cache-v1"); const keys = await cache.keys();
+            // تحديث اسم الكاش هنا ليطابق sw.js
+            const cache = await caches.open("manzoma-cache-v6"); const keys = await cache.keys();
             for (let request of keys) { await cache.delete(request); }
             let currentPath = window.location.href.split('?')[0].split('#')[0]; let basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
 
