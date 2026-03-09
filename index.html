@@ -130,7 +130,8 @@
         {name: "التصفيات", icon: "⚖️", url: "3.html"},
         {name: "اللمات", icon: "📝", url: "4.html"},
         {name: "التدفق", icon: "🌊", url: "5.html"},
-        {name: "المهيئ والمواسير", icon: "🏗️", url: "6.html"}
+        {name: "المهيئ والمواسير", icon: "🏗️", url: "6.html"},
+        {name: "سجل الأماكن", icon: "📍", url: "7.html"} // تمت إضافة 7 هنا
     ];
 
     let deviceID = localStorage.getItem("_u_id");
@@ -279,7 +280,7 @@
 
 <script>
     const GITHUB_BASE_URL = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
-    const filesToUpdate = ["index.html", "control.js", "sw.js", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html"];
+    const filesToUpdate = ["index.html", "control.js", "sw.js", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html", "7.html"]; // تمت إضافة 7.html هنا
 
     function manualCheckUpdate() {
         if (!navigator.onLine) { showToast("⚠️ لا يوجد اتصال بالإنترنت للبحث عن تحديثات.", "error"); return; }
@@ -318,7 +319,7 @@
         
         try {
             if (!('caches' in window)) { showToast("❌ التطبيق لا يدعم الحفظ المؤقت.", "error"); btn.disabled = false; btn.innerText = "فشل التحديث"; return; }
-            const cache = await caches.open("manzoma-cache-v7"); const keys = await cache.keys();
+            const cache = await caches.open("manzoma-cache-v8"); const keys = await cache.keys(); // تعديل لـ v8
             for (let request of keys) { await cache.delete(request); }
             let currentPath = window.location.href.split('?')[0].split('#')[0]; let basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
 

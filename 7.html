@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>سجل العمل والأماكن</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+    body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #ffffff; margin: 0; padding: 20px; box-sizing: border-box; min-height: 100vh; }
+    
+    /* الهيدر وزر الرجوع */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+    .back-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 15px; border-radius: 10px; text-decoration: none; font-weight: bold; transition: 0.3s; display: flex; align-items: center; gap: 5px;}
+    .back-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }
+    
+    /* الكروت الزجاجية */
+    .card { background: rgba(20, 30, 45, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .card h3 { margin-top: 0; color: #00d2ff; font-weight: 800; border-bottom: 1px dashed rgba(0, 210, 255, 0.3); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    
+    /* المدخلات والأزرار */
+    input, select { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 12px; width: 100%; font-size: 15px; font-family: 'Cairo', sans-serif; border-radius: 10px; margin-bottom: 15px; outline: none; box-sizing: border-box; transition: 0.3s; }
+    input:focus, select:focus { border-color: #00d2ff; box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); }
+    
+    .btn { background: linear-gradient(45deg, #11998e, #38ef7d); color: #fff; border: none; padding: 12px; width: 100%; font-size: 16px; font-weight: bold; font-family: 'Cairo', sans-serif; border-radius: 10px; cursor: pointer; box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4); transition: 0.3s; margin-bottom: 10px; }
+    .btn:active { transform: scale(0.95); }
+    .btn-blue { background: linear-gradient(45deg, #2193b0, #6dd5ed); box-shadow: 0 5px 15px rgba(33, 147, 176, 0.4); }
+    .btn-red { background: linear-gradient(45deg, #ff416c, #ff4b2b); box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4); padding: 8px; font-size: 13px; width: auto; }
+    
+    /* جدول التقارير */
+    .report-item { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .report-info span { display: block; margin-bottom: 5px; font-size: 14px; }
+    .loc-tag { color: #38ef7d; font-weight: bold; font-size: 16px; }
+    .date-tag { color: #00d2ff; }
+    
+    /* معلومات النبطشية القادمة */
+    #nextShiftInfo { background: rgba(88, 166, 255, 0.1); border: 1px solid #58a6ff; padding: 15px; border-radius: 10px; text-align: center; display: none; margin-top: 15px; }
+    #nextShiftInfo span { display: block; color: #fff; font-size: 18px; font-weight: bold; margin-top: 5px; }
+
+    /* الإشعارات */
+    #custom-toast { visibility: hidden; min-width: 250px; background-color: rgba(30, 40, 55, 0.95); color: #fff; text-align: center; border-radius: 15px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 15px; font-family: 'Cairo', sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); opacity: 0; transition: opacity 0.4s, bottom 0.4s; }
+    #custom-toast.show { visibility: visible; opacity: 1; bottom: 50px; }
+    #custom-toast.error { background-color: rgba(255, 75, 75, 0.95); border-color: #ff4b4b; }
+    #custom-toast.success { background-color: rgba(56, 239, 125, 0.95); color: #000; font-weight: bold; border-color: #11998e; }
+</style>
+</head>
+<body>
+
+<div id="custom-toast">رسالة النظام</div>
+
+<div class="header">
+    <h2 style="margin:0; font-size:20px; font-weight: 800;">سجل أماكن النبطشية</h2>
+    <a href="index.html" class="back-btn">رجوع ↩️</a>
+</div>
+
+<!-- الكارت الأول: إدارة الأماكن -->
+<div class="card">
+    <h3>📍 إضافة مكان عمل جديد</h3>
+    <input type="text" id="newLocation" placeholder="مثال: بوابة حلوان...">
+    <button class="btn btn-blue" onclick="addLocation()">➕ حفظ المكان</button>
+</div>
+
+<!-- الكارت الثاني: تسجيل اليومية ونظام 24/48 -->
+<div class="card">
+    <h3>📝 تسجيل نبطشية اليوم</h3>
+    <label style="font-size: 14px; color: #b0b3b8; display: block; margin-bottom: 5px;">تاريخ النبطشية:</label>
+    <input type="date" id="shiftDate">
+    
+    <label style="font-size: 14px; color: #b0b3b8; display: block; margin-bottom: 5px;">اختر المكان:</label>
+    <select id="locationSelect">
+        <option value="">-- يرجى إضافة أماكن أولاً --</option>
+    </select>
+    
+    <button class="btn" onclick="saveShift()">💾 تسجيل النبطشية</button>
+
+    <!-- يظهر هنا موعد النبطشية القادمة تلقائياً -->
+    <div id="nextShiftInfo">
+        موعد النبطشية القادمة (نظام 24/48):
+        <span id="nextShiftDateText">--</span>
+    </div>
+</div>
+
+<!-- الكارت الثالث: التقارير -->
+<div class="card">
+    <h3>📊 تقرير الأماكن والتاريخ</h3>
+    <div style="display: flex; gap: 10px;">
+        <div style="flex: 1;">
+            <label style="font-size: 12px; color: #b0b3b8;">من تاريخ:</label>
+            <input type="date" id="reportFrom">
+        </div>
+        <div style="flex: 1;">
+            <label style="font-size: 12px; color: #b0b3b8;">إلى تاريخ:</label>
+            <input type="date" id="reportTo">
+        </div>
+    </div>
+    <button class="btn btn-blue" onclick="generateReport()">🔍 عرض التقرير</button>
+    
+    <div id="reportResults" style="margin-top: 15px;">
+        <!-- نتائج التقرير تظهر هنا -->
+    </div>
+</div>
+
+<script>
+    // الإشعارات
+    function showToast(message, type = "normal") {
+        const toast = document.getElementById("custom-toast");
+        toast.innerText = message;
+        toast.className = type === "error" ? "error show" : (type === "success" ? "success show" : "show");
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    // تهيئة التاريخ الافتراضي لليوم
+    document.getElementById('shiftDate').valueAsDate = new Date();
+    
+    // قواعد البيانات المحلية
+    let savedLocations = JSON.parse(localStorage.getItem('_work_locations')) || [];
+    let shiftLogs = JSON.parse(localStorage.getItem('_shift_logs')) || [];
+
+    // تحديث قائمة الأماكن (Dropdown)
+    function updateLocationSelect() {
+        const select = document.getElementById("locationSelect");
+        if(savedLocations.length === 0) {
+            select.innerHTML = '<option value="">-- يرجى إضافة أماكن أولاً --</option>';
+            return;
+        }
+        select.innerHTML = '<option value="">-- اختر المكان --</option>';
+        savedLocations.forEach(loc => {
+            select.innerHTML += `<option value="${loc}">${loc}</option>`;
+        });
+    }
+    updateLocationSelect();
+
+    // دالة إضافة مكان جديد
+    function addLocation() {
+        const locInput = document.getElementById("newLocation").value.trim();
+        if(!locInput) { showToast("⚠️ يرجى كتابة اسم المكان!", "error"); return; }
+        if(savedLocations.includes(locInput)) { showToast("⚠️ هذا المكان مضاف مسبقاً!", "error"); return; }
+        
+        savedLocations.push(locInput);
+        localStorage.setItem('_work_locations', JSON.stringify(savedLocations));
+        document.getElementById("newLocation").value = "";
+        updateLocationSelect();
+        showToast("✅ تم إضافة المكان بنجاح", "success");
+    }
+
+    // دالة تسجيل النبطشية (نظام 24/48)
+    function saveShift() {
+        const dateStr = document.getElementById("shiftDate").value;
+        const location = document.getElementById("locationSelect").value;
+
+        if(!dateStr || !location) { showToast("⚠️ يرجى تحديد التاريخ والمكان!", "error"); return; }
+
+        // حساب النبطشية القادمة (يوم عمل + يومين راحة = النبطشية بعد 3 أيام)
+        let workDate = new Date(dateStr);
+        let nextWorkDate = new Date(workDate);
+        nextWorkDate.setDate(workDate.getDate() + 3);
+
+        const logEntry = {
+            id: Date.now(),
+            workDate: dateStr,
+            location: location,
+            nextShift: nextWorkDate.toISOString().split('T')[0]
+        };
+
+        // التحقق من عدم تسجيل نفس اليوم مرتين
+        const existsIndex = shiftLogs.findIndex(log => log.workDate === dateStr);
+        if(existsIndex !== -1) {
+            shiftLogs[existsIndex] = logEntry; // تحديث إذا كان موجود
+        } else {
+            shiftLogs.push(logEntry);
+        }
+
+        // ترتيب السجل حسب التاريخ الأحدث
+        shiftLogs.sort((a, b) => new Date(b.workDate) - new Date(a.workDate));
+        
+        localStorage.setItem('_shift_logs', JSON.stringify(shiftLogs));
+        showToast("✅ تم تسجيل النبطشية بنجاح", "success");
+
+        // إظهار موعد النبطشية القادمة
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById("nextShiftDateText").innerText = nextWorkDate.toLocaleDateString('ar-EG', options);
+        document.getElementById("nextShiftInfo").style.display = "block";
+    }
+
+    // دالة عرض التقرير
+    function generateReport() {
+        const fromDate = document.getElementById("reportFrom").value;
+        const toDate = document.getElementById("reportTo").value;
+        const container = document.getElementById("reportResults");
+        
+        container.innerHTML = "";
+
+        if(!fromDate || !toDate) { showToast("⚠️ يرجى تحديد فترة التقرير!", "error"); return; }
+
+        let start = new Date(fromDate);
+        let end = new Date(toDate);
+
+        let filteredLogs = shiftLogs.filter(log => {
+            let logDate = new Date(log.workDate);
+            return logDate >= start && logDate <= end;
+        });
+
+        if(filteredLogs.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:10px; color:#ff4b4b;">لا توجد سجلات في هذه الفترة.</div>';
+            return;
+        }
+
+        let html = "";
+        const options = { weekday: 'long', month: 'short', day: 'numeric' };
+        
+        filteredLogs.forEach(log => {
+            let displayDate = new Date(log.workDate).toLocaleDateString('ar-EG', options);
+            html += `
+            <div class="report-item" id="log-${log.id}">
+                <div class="report-info">
+                    <span class="loc-tag">📍 ${log.location}</span>
+                    <span class="date-tag">📅 التاريخ: ${displayDate}</span>
+                </div>
+                <button class="btn btn-red" onclick="deleteLog(${log.id})">حذف</button>
+            </div>`;
+        });
+
+        container.innerHTML = html;
+        showToast(`✅ تم العثور على ${filteredLogs.length} يوم عمل.`, "success");
+    }
+
+    // دالة الحذف (إذا أخطأت في التسجيل)
+    function deleteLog(id) {
+        if(confirm("هل أنت متأكد من حذف هذا السجل؟")) {
+            shiftLogs = shiftLogs.filter(log => log.id !== id);
+            localStorage.setItem('_shift_logs', JSON.stringify(shiftLogs));
+            generateReport(); // تحديث التقرير
+            showToast("🗑️ تم الحذف", "success");
+        }
+    }
+</script>
+
+</body>
+</html>

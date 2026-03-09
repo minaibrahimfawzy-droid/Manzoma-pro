@@ -1,5 +1,5 @@
-// تم رفع الكاش إلى v7 ليتطابق مع نظام التحديث الجديد
-const CACHE_NAME = 'manzoma-cache-v7';
+// تم رفع الكاش إلى v8 ليتطابق مع إضافة تطبيق سجل الأماكن (7.html)
+const CACHE_NAME = 'manzoma-cache-v8';
 
 // قائمة بالملفات التي يجب حفظها فوراً لتعمل أوفلاين
 const FILES_TO_CACHE = [
@@ -11,7 +11,8 @@ const FILES_TO_CACHE = [
     './3.html',
     './4.html',
     './5.html',
-    './6.html'
+    './6.html',
+    './7.html' // تم إضافة الملف الجديد هنا
 ];
 
 self.addEventListener("install", (event) => {
@@ -26,7 +27,7 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
     event.waitUntil(clients.claim()); 
-    // السطر ده مهم جداً: بيمسح أي كاش قديم (زي v5 أو v6) عشان التليفون ميهنجش على النسخة القديمة
+    // يمسح أي كاش قديم عشان التليفون ميهنجش على النسخة القديمة
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(

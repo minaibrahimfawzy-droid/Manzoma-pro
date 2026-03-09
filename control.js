@@ -7,8 +7,8 @@ var APK_REQUIRED_VERSION = "1.0";
 var APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/wavgumgx0e4xrk5/Manzoma+Pro33.apk/file"; 
 
 // 🟢 2. رقم إصدار البرامج (التحديث الهوائي الداخلي - OTA)
-// ⚠️ تم التحديث إلى 128 لسحب ميزة النسخ الاحتياطي النصي
-var HTML_VERSION = "128"; 
+// ⚠️ تم التحديث إلى 129 لإضافة "سجل الأماكن" والنبطشيات 24/48
+var HTML_VERSION = "129"; 
 
 // 🔵 3. روابط البرامج (يجب أن تظل كما هي للعمل أوفلاين)
 var remoteApps = [
@@ -17,5 +17,6 @@ var remoteApps = [
     {name: "التصفيات", icon: "⚖️", url: "3.html"},
     {name: "اللمات", icon: "📝", url: "4.html"},
     {name: "التدفق", icon: "🌊", url: "5.html"},
-    {name: "المهيئ والمواسير", icon: "🏗️", url: "6.html"}
+    {name: "المهيئ والمواسير", icon: "🏗️", url: "6.html"},
+    {name: "سجل الأماكن", icon: "📍", url: "7.html"} // الملف الجديد
 ];
