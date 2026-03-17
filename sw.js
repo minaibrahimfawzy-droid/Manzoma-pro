@@ -1,5 +1,5 @@
-// تم رفع الكاش إلى v8 ليتطابق مع إضافة تطبيق سجل الأماكن (7.html)
-const CACHE_NAME = 'manzoma-cache-v8';
+// تم رفع الكاش إلى v9 ليتطابق مع حل مشكلة الفيزا في تطبيق اللمات (4.html)
+const CACHE_NAME = 'manzoma-cache-v9';
 
 // قائمة بالملفات التي يجب حفظها فوراً لتعمل أوفلاين
 const FILES_TO_CACHE = [

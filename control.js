@@ -7,8 +7,8 @@ var APK_REQUIRED_VERSION = "1.0";
 var APK_DOWNLOAD_LINK = "https://www.mediafire.com/file/wavgumgx0e4xrk5/Manzoma+Pro33.apk/file"; 
 
 // 🟢 2. رقم إصدار البرامج (التحديث الهوائي الداخلي - OTA)
-// ⚠️ تم التحديث إلى 129 لإضافة "سجل الأماكن" والنبطشيات 24/48
-var HTML_VERSION = "129"; 
+// ⚠️ تم التحديث إلى 130 لحل مشكلة الإجمالي والفيزا في تطبيق اللمات
+var HTML_VERSION = "130"; 
 
 // 🔵 3. روابط البرامج (يجب أن تظل كما هي للعمل أوفلاين)
 var remoteApps = [

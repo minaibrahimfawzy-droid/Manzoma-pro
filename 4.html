@@ -305,7 +305,7 @@
         <div class="d-flex justify-content-between align-items-center mb-2 bg-white p-2 rounded shadow-sm border-top" style="border-top-width: 5px !important; border-color: var(--primary) !important;">
             <div>
                 <!-- علامة التحديث -->
-                <h5 class="m-0 fw-bold text-primary" id="activeGateLabel">... <span style="color:red; font-size: 12px;">(نسخة 30)</span></h5>
+                <h5 class="m-0 fw-bold text-primary" id="activeGateLabel">... <span style="color:red; font-size: 12px;">(نسخة 31 - تم حل مشكلة الفيزا)</span></h5>
                 <div class="d-flex align-items-center gap-1 mt-2">
                     <button onclick="changeDay(-1)" class="btn btn-outline-secondary btn-sm">&gt;</button>
                     <input type="date" id="dateInput" class="form-control" style="width: 130px; padding: 2px;" onchange="loadDataForSelectedDate()">
@@ -573,7 +573,7 @@
             activeGateId = id; localStorage.setItem(ACTIVE_GATE_KEY, id);
             renderGateTabs();
             const g = gates.find(x => x.id === id);
-            document.getElementById('activeGateLabel').innerHTML = (g ? g.name : 'Unknown') + ' <span style="color:red; font-size:12px;">(نسخة 30)</span>';
+            document.getElementById('activeGateLabel').innerHTML = (g ? g.name : 'Unknown') + ' <span style="color:red; font-size:12px;">(نسخة 31 - تم حل مشكلة الفيزا)</span>';
             document.getElementById('settingsGateName').innerText = g ? g.name : '';
             loadGateConfig(); 
             loadDataForSelectedDate();
@@ -666,14 +666,14 @@
                     rowSum += totalVal;
                     
                     bHTML += `<td class="p-0">
-                        <div class="cell-clickable ${totalVal > 0 ? 'has-value' : ''}" onclick="openInputModalEntry(${i}, '${lane.name}')">
-                            <span class="cell-amount">${val > 0 ? val : ''}</span>
-                            ${vVal > 0 ? `<span class="cell-visa">${vVal} فيزا</span>` : ''}
+                        <div class="cell-clickable ${totalVal !== 0 ? 'has-value' : ''}" onclick="openInputModalEntry(${i}, '${lane.name}')">
+                            <span class="cell-amount">${val !== 0 ? val : ''}</span>
+                            ${vVal !== 0 ? `<span class="cell-visa" style="${vVal < 0 ? 'color:red;' : ''}">${vVal} فيزا</span>` : ''}
                             <span class="cell-total">${running[lane.name]}</span>
                         </div>
                     </td>`;
                 });
-                bHTML += `<td class="row-total-col">${rowSum > 0 ? rowSum.toLocaleString() : '-'}</td></tr>`;
+                bHTML += `<td class="row-total-col">${rowSum !== 0 ? rowSum.toLocaleString() : '-'}</td></tr>`;
             }
             body.innerHTML = bHTML;
 
@@ -712,12 +712,12 @@
             const tx = currentTransactions.find(t => t.lemma == lemma && t.lane === lane);
             
             let label = `لمة ${lemma} - ${lane}`;
-            if (tx && (tx.amount > 0 || tx.visa > 0)) label = "تعديل: " + label;
+            if (tx && (tx.amount !== 0 || tx.visa !== 0)) label = "تعديل: " + label;
             else label = "تسجيل: " + label;
 
             document.getElementById('modalTitle').innerText = label;
-            document.getElementById('modalAmount').value = (tx && tx.amount) ? tx.amount : '';
-            document.getElementById('modalVisa').value = (tx && tx.visa) ? tx.visa : '';
+            document.getElementById('modalAmount').value = (tx && tx.amount !== undefined && tx.amount !== 0) ? tx.amount : '';
+            document.getElementById('modalVisa').value = (tx && tx.visa !== undefined && tx.visa !== 0) ? tx.visa : '';
             
             openModal('inputModal');
         }
@@ -729,7 +729,7 @@
             const amt = parseFloat(document.getElementById('modalAmount').value) || 0;
             const visa = parseFloat(document.getElementById('modalVisa').value) || 0;
             
-            if (amt > 0 || visa > 0) {
+            if (amt !== 0 || visa !== 0) {
                 currentTransactions = currentTransactions.filter(t => !(t.lemma == lemma && t.lane === lane));
                 currentTransactions.push({ id: Date.now(), lane, lemma, amount: amt, visa: visa });
             } else {
@@ -768,10 +768,10 @@
             document.getElementById('dispCurrCash').innerText = currCash.toLocaleString();
             document.getElementById('dispCurrVisa').innerText = currVisa.toLocaleString();
             
-            document.getElementById('targetTotalInput').value = '';
-            document.getElementById('targetVisaInput').value = '';
-            document.getElementById('diffCashDisplay').innerText = '0';
-            document.getElementById('diffVisaDisplay').innerText = '0';
+            document.getElementById('targetTotalInput').value = (currCash + currVisa) !== 0 ? (currCash + currVisa) : '';
+            document.getElementById('targetVisaInput').value = currVisa !== 0 ? currVisa : '';
+            
+            calcDiff();
             
             openModal('adjustTotalModal');
         }
