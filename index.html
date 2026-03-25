@@ -5,46 +5,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>System 2026 Pro</title>
 
-<!-- خط Cairo الاحترافي -->
+<!-- الخطوط والأيقونات -->
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
 <style>
+    /* التنسيق العام والاحترافي */
     body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #ffffff; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; user-select: none; overflow: hidden; }
-    #lock-screen { background: rgba(20, 30, 45, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px 30px; border-radius: 20px; text-align: center; width: 85%; max-width: 340px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); position: relative; z-index: 10; }
-    input, textarea { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.15); color: #00d2ff; padding: 14px; width: 100%; text-align: center; font-size: 16px; font-family: 'Cairo', sans-serif; border-radius: 12px; margin: 12px 0; outline: none; box-sizing: border-box; transition: 0.3s; }
-    input:focus, textarea:focus { border-color: #00d2ff; box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
-    input::placeholder, textarea::placeholder { color: #8b949e; }
-    button.main-btn { background: linear-gradient(45deg, #11998e, #38ef7d); color: #fff; border: none; padding: 14px 0; width: 100%; font-size: 18px; font-weight: 800; font-family: 'Cairo', sans-serif; border-radius: 12px; cursor: pointer; margin-top: 15px; box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4); transition: all 0.3s ease; }
-    button.main-btn:active { transform: scale(0.95); }
-    button.main-btn:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
-    #devID { font-size: 13px; color: #00d2ff; font-family: monospace; margin-top: 20px; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px; border: 1px dashed rgba(0, 210, 255, 0.3); }
-    .error { color: #ff4b4b; margin-top: 15px; display: none; font-weight: bold; font-size: 14px; background: rgba(255, 75, 75, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 75, 75, 0.3); }
     
-    #app-menu { display: none; width: 100%; height: 100vh; padding: 25px 20px; box-sizing: border-box; overflow-y: auto; }
-    .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-    .user-info { text-align: right; font-size: 15px; color: #d1d5db; }
-    .user-info span { color: #00d2ff; font-weight: 800; font-size: 17px; }
-    .logout-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; border: none; padding: 8px 15px; font-size: 14px; font-family: 'Cairo', sans-serif; font-weight: bold; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(255, 75, 43, 0.3); transition: 0.3s; }
-    .logout-btn:active { transform: scale(0.9); }
-    .datetime { text-align: center; font-size: 14px; color: #38ef7d; margin-bottom: 25px; font-weight: 600; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(5px); }
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding-bottom: 30px; }
-    .app-btn { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px 10px; text-decoration: none; color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px; text-align: center; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-    .app-btn:active { transform: scale(0.93); background: rgba(255, 255, 255, 0.15); }
-    .icon { font-size: 35px; margin-bottom: 12px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
-    .tools-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; padding-bottom: 20px; }
-    .tool-btn { background: rgba(31, 111, 235, 0.2); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 15px; border-radius: 12px; font-size: 15px; font-family: 'Cairo', sans-serif; cursor: pointer; font-weight: bold; transition: 0.3s; }
-    .tool-btn:active { transform: scale(0.95); }
-    .tool-btn.update-apk { background: linear-gradient(45deg, #8e2de2, #4a00e0); color: white; border: none; box-shadow: 0 5px 15px rgba(142, 45, 226, 0.4); } 
+    #lock-screen { background: rgba(20, 30, 45, 0.65); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px 30px; border-radius: 25px; text-align: center; width: 85%; max-width: 350px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; z-index: 10; transition: 0.5s; }
     
-    #update-screen, #sync-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.95); backdrop-filter: blur(10px); z-index: 999; flex-direction: column; align-items: center; justify-content: center; }
-    .box { background: rgba(30, 40, 55, 0.9); padding: 40px 30px; border-radius: 20px; text-align: center; border: 1px solid #ff4b4b; box-shadow: 0 0 40px rgba(255, 75, 75, 0.3); width: 85%; max-width: 350px; }
-    .box button { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: #fff; border: none; padding: 14px 20px; font-size: 16px; font-family: 'Cairo', sans-serif; border-radius: 12px; cursor: pointer; margin-top: 15px; font-weight: bold; width: 100%; box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4); }
+    input { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.2); color: #00d2ff; padding: 15px; width: 100%; text-align: center; font-size: 16px; font-family: 'Cairo', sans-serif; border-radius: 12px; margin: 12px 0; outline: none; box-sizing: border-box; transition: 0.3s; }
+    input:focus { border-color: #00d2ff; box-shadow: 0 0 15px rgba(0, 210, 255, 0.4); }
 
-    /* الإشعارات */
-    #custom-toast { visibility: hidden; min-width: 250px; background-color: rgba(30, 40, 55, 0.95); color: #fff; text-align: center; border-radius: 15px; padding: 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 15px; font-family: 'Cairo', sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); opacity: 0; transition: opacity 0.4s, bottom 0.4s; }
+    /* الإقرار القانوني - منسق وغير مشوه */
+    .legal-agreement { display: flex; align-items: flex-start; gap: 10px; margin: 10px 0 15px 0; text-align: right; cursor: pointer; background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05); }
+    .legal-agreement input { width: 20px !important; height: 20px !important; margin: 0 !important; cursor: pointer; accent-color: #38ef7d; flex-shrink: 0; }
+    .legal-agreement span { font-size: 11px; color: #cbd5e0; line-height: 1.5; }
+
+    button.main-btn { background: linear-gradient(45deg, #11998e, #38ef7d); color: #fff; border: none; padding: 15px 0; width: 100%; font-size: 18px; font-weight: 800; border-radius: 12px; cursor: pointer; margin-top: 10px; box-shadow: 0 8px 20px rgba(56, 239, 125, 0.3); transition: 0.3s; }
+    button.main-btn:active { transform: scale(0.96); }
+
+    #devID { font-size: 13px; color: #00d2ff; font-family: monospace; margin-top: 25px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; border: 1px dashed rgba(0, 210, 255, 0.3); }
+    .error { color: #ff4b4b; margin-top: 15px; display: none; font-weight: bold; background: rgba(255, 75, 75, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 75, 75, 0.3); }
+
+    /* واجهة القائمة الرئيسية */
+    #app-menu { display: none; width: 100%; height: 100vh; padding: 25px; box-sizing: border-box; overflow-y: auto; background: linear-gradient(135deg, #0f2027, #2c5364); }
+    .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+    .user-info span { color: #00d2ff; font-weight: 800; font-size: 18px; }
+    .logout-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; border: none; padding: 10px 18px; font-weight: bold; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3); }
+    
+    .datetime { text-align: center; font-size: 15px; color: #38ef7d; margin-bottom: 30px; font-weight: 600; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+    
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+    .app-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px; text-decoration: none; color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 130px; text-align: center; transition: 0.3s; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+    .app-btn:active { transform: scale(0.94); background: rgba(255, 255, 255, 0.1); }
+    .icon { font-size: 40px; margin-bottom: 12px; }
+
+    .tools-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; }
+    .tool-btn { background: rgba(31, 111, 235, 0.2); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); padding: 18px; border-radius: 15px; cursor: pointer; font-weight: bold; font-family: 'Cairo'; }
+    
+    /* شاشات التحديث والباك أب */
+    #update-screen, #sync-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+    .box { background: rgba(30, 40, 55, 0.95); padding: 40px 30px; border-radius: 25px; text-align: center; border: 1px solid #ff4b4b; width: 85%; max-width: 380px; box-shadow: 0 0 50px rgba(255, 75, 75, 0.2); }
+    textarea { background: #000; color: #38ef7d; font-family: monospace; font-size: 12px; height: 150px; width: 100%; border-radius: 10px; padding: 10px; box-sizing: border-box; }
+
+    #custom-toast { visibility: hidden; min-width: 250px; background: rgba(30, 40, 55, 0.95); color: #fff; text-align: center; border-radius: 15px; padding: 16px; position: fixed; z-index: 10000; left: 50%; bottom: 30px; transform: translateX(-50%); opacity: 0; transition: 0.4s; border: 1px solid rgba(255,255,255,0.1); }
     #custom-toast.show { visibility: visible; opacity: 1; bottom: 50px; }
-    #custom-toast.error { background-color: rgba(255, 75, 75, 0.95); border-color: #ff4b4b; }
-    #custom-toast.success { background-color: rgba(56, 239, 125, 0.95); color: #000; font-weight: bold; border-color: #11998e; }
+    #custom-toast.error { background: #ff4b4b; }
+    #custom-toast.success { background: #38ef7d; color: #000; font-weight: bold; }
 </style>
 </head>
 <body oncontextmenu="return false">
@@ -54,62 +62,69 @@
 <!-- شاشة التحديث الإجباري -->
 <div id="update-screen">
     <div class="box">
-        <div style="font-size:60px; margin-bottom:15px; filter: drop-shadow(0 0 10px red);">⚠️</div>
-        <h2 id="update-title" style="color:#fff; margin-bottom: 10px;">تحديث هام مطلوب!</h2>
-        <p id="update-desc" style="color:#b0b3b8; font-size: 14px; line-height: 1.6;">يوجد إصدار جديد، يجب التحديث للمتابعة.</p>
-        <button id="updateBtn">تحميل التحديث الآن</button>
+        <div style="font-size:70px; margin-bottom:20px;">⚠️</div>
+        <h2 style="color:#fff; margin-bottom: 10px;">تحديث جديد متوفر!</h2>
+        <p style="color:#b0b3b8; margin-bottom: 25px;">يجب تنزيل الإصدار الأخير لضمان استقرار البيانات والاتفاقية القانونية.</p>
+        <button id="updateBtn" style="background:linear-gradient(45deg, #ff416c, #ff4b2b); color:white; border:none; padding:18px; width:100%; border-radius:12px; font-weight:800; font-size:18px; cursor:pointer;">تحديث النظام الآن</button>
     </div>
 </div>
 
-<!-- شاشة النسخ الاحتياطي النصي (لتخطي قيود التطبيق) -->
+<!-- شاشة النسخ الاحتياطي -->
 <div id="sync-modal">
-    <div class="box" style="border-color: #58a6ff; box-shadow: 0 0 40px rgba(88, 166, 255, 0.3); max-width: 400px;">
-        <h2 style="color:#fff; margin-bottom: 5px;">النسخة الاحتياطية</h2>
-        <p style="color:#b0b3b8; font-size: 12px; margin-bottom: 15px;">انقر (إنشاء ونسخ) وأرسل الكود لنفسك لحفظه، أو الصق كوداً قديماً لاستعادته.</p>
-        
-        <textarea id="backupTextData" style="height: 120px; font-family: monospace; font-size: 11px; direction: ltr; padding: 10px;" placeholder="الصق كود النسخة الاحتياطية هنا لاستعادة بياناتك..."></textarea>
-        
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <button onclick="generateAndCopyText()" style="background: linear-gradient(45deg, #11998e, #38ef7d); margin: 0; font-size: 14px; box-shadow: 0 4px 10px rgba(56, 239, 125, 0.3);">📋 إنشاء ونسخ للحفظ</button>
-            <button onclick="restoreFromText()" style="background: rgba(210, 153, 34, 0.8); border: 1px solid #e3b341; margin: 0; font-size: 14px; box-shadow: 0 4px 10px rgba(227, 179, 65, 0.3);">📥 استعادة الآن</button>
+    <div class="box" style="border-color: #00d2ff; box-shadow: 0 0 50px rgba(0, 210, 255, 0.2);">
+        <h2 style="color:#fff;">إدارة البيانات</h2>
+        <p style="color:#8b949e; font-size:13px;">انسخ الكود لحفظ بياناتك، أو الصق كوداً قديماً لاستعادتها.</p>
+        <textarea id="backupTextData" placeholder="كود البيانات المشفر يظهر هنا..."></textarea>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button onclick="generateAndCopyText()" style="background: #11998e; color:white; border:none; padding:12px; border-radius:10px; flex:1; font-weight:bold; cursor:pointer;">📋 إنشاء ونسخ</button>
+            <button onclick="restoreFromText()" style="background: #d29922; color:white; border:none; padding:12px; border-radius:10px; flex:1; font-weight:bold; cursor:pointer;">📥 استعادة الآن</button>
         </div>
-        <button onclick="document.getElementById('sync-modal').style.display='none'" style="background: transparent; border: 1px solid #ff4b4b; color: #ff4b4b; box-shadow: none; margin-top: 15px; padding: 10px;">إلغاء وإغلاق</button>
+        <button onclick="document.getElementById('sync-modal').style.display='none'" style="background:none; border:1px solid #ff4b4b; color:#ff4b4b; margin-top:15px; padding:8px; width:100%; border-radius:10px; cursor:pointer;">إغلاق النافذة</button>
     </div>
 </div>
 
 <div id="lock-screen">
-    <div style="font-size:50px;margin-bottom:15px; filter: drop-shadow(0 0 10px #00d2ff);">🛡️</div>
-    <h2 style="margin:0 0 20px 0;color:#fff;font-size:22px; font-weight: 800;">نظام 2026 المحمي</h2>
+    <div style="font-size:55px;margin-bottom:15px; filter: drop-shadow(0 0 10px #00d2ff);">🛡️</div>
+    <h2 style="margin:0 0 20px 0;color:#fff;font-size:24px; font-weight: 800;">نظام 2026 المحمي</h2>
     
     <input type="text" id="userName" placeholder="الاسم ثلاثي (عربي فقط)...">
     <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
-    <button class="main-btn" id="loginBtn" onclick="login()">تفعيل ودخول</button>
+
+    <!-- الاتفاقية القانونية الإلزامية -->
+    <label class="legal-agreement">
+        <input type="checkbox" id="legalCheckbox">
+        <span>أقر أنا المستخدم بمسؤوليتي القانونية الكاملة عن استخدام هذا النظام، وأبرئ ذمة المبرمج من أي مساءلة ناتجة عن سوء الاستخدام.</span>
+    </label>
+
+    <button class="main-btn" id="loginBtn" onclick="login()">تفعيل ودخول آمن</button>
     
     <p id="devID"></p>
-    <p id="eMsg" class="error">⛔ الكود غير صحيح!</p>
+    <p id="eMsg" class="error">⛔ كود المرور غير صحيح!</p>
 </div>
 
 <div id="app-menu">
     <div class="menu-header">
         <div>
-            <h2 style="margin:0 0 5px 0; font-size:20px; color:#fff; text-align:right; font-weight: 800;">الرئيسية</h2>
-            <div class="user-info" id="displayUserName">مرحباً: <span></span></div>
+            <h2 style="margin:0; font-size:22px; color:#fff;">الرئيسية</h2>
+            <div style="font-size:14px; color:#cbd5e0;" id="displayUserName">مرحباً: <span></span></div>
         </div>
-        <button id="logoutBtn" class="logout-btn" onclick="logout()"><span>خروج</span> 🚪</button>
+        <button id="logoutBtn" class="logout-btn" onclick="logout()">خروج 🚪</button>
     </div>
     
-    <div class="datetime" id="clock">جاري تحميل الوقت...</div>
+    <div class="datetime" id="clock">جاري مزامنة الوقت...</div>
+    
     <div class="grid" id="apps-container"></div>
     
     <div class="tools-grid">
         <button class="tool-btn" onclick="document.getElementById('sync-modal').style.display='flex'">⚙️ إدارة النسخ الاحتياطي (حفظ واستعادة)</button>
-        <button class="tool-btn update-apk" onclick="manualCheckUpdate()">🔄 البحث عن تحديثات النظام وتثبيتها</button>
+        <button class="tool-btn" style="background: linear-gradient(45deg, #8e2de2, #4a00e0); color:white; border:none;" onclick="manualCheckUpdate()">🔄 البحث عن تحديثات النظام وتثبيتها</button>
     </div>
 </div>
 
 <script src="control.js"></script>
 
 <script>
+    // نظام الإشعارات
     function showToast(message, type = "normal") {
         const toast = document.getElementById("custom-toast");
         toast.innerText = message;
@@ -117,13 +132,14 @@
         setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3500);
     }
 
+    // الإعدادات الثابتة (أرقامك الأصلية)
     const CURRENT_VERSION = "1.0"; 
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
     const CHAT_ID = "-1003886528114";
     const SECRET_KEY = "QWRtaW5fMjZf";
     const PASS_ARRAY = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
 
-    let failAttempts = 0;
+    // قائمة التطبيقات الكاملة (7 صفحات)
     let systemApps = [
         {name: "النبطشية", icon: "📅", url: "Nabatshia.html"},
         {name: "الورديات", icon: "🌙", url: "2.html"},
@@ -131,22 +147,25 @@
         {name: "اللمات", icon: "📝", url: "4.html"},
         {name: "التدفق", icon: "🌊", url: "5.html"},
         {name: "المهيئ والمواسير", icon: "🏗️", url: "6.html"},
-        {name: "سجل الأماكن", icon: "📍", url: "7.html"} // تمت إضافة 7 هنا
+        {name: "سجل الأماكن", icon: "📍", url: "7.html"}
     ];
 
+    // إدارة هوية الجهاز (الحفاظ على الـ ID القديم)
     let deviceID = localStorage.getItem("_u_id");
     if(!deviceID) {
         deviceID = "ID-" + Math.floor(Math.random() * 89999 + 10000);
         localStorage.setItem("_u_id", deviceID);
     }
-    document.getElementById("devID").innerText = "معرف جهازك: " + deviceID;
+    document.getElementById("devID").innerText = "معرف جهازك الفريد: " + deviceID;
 
+    // تحديث الساعة
     setInterval(() => {
         const d = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit', second:'2-digit', hour12: true };
         document.getElementById("clock").innerText = d.toLocaleDateString('ar-EG', options);
     }, 1000);
 
+    // بناء شبكة التطبيقات
     function renderApps(appsArray) {
         const container = document.getElementById("apps-container");
         container.innerHTML = "";
@@ -154,11 +173,12 @@
             let div = document.createElement("div");
             div.className = "app-btn";
             div.onclick = () => window.location.href = app.url;
-            div.innerHTML = `<span class="icon">${app.icon}</span>${app.name}`;
+            div.innerHTML = `<span class="icon">${app.icon}</span><span style="font-weight:800;">${app.name}</span>`;
             container.appendChild(div);
         });
     }
 
+    // الحصول على الكود الصحيح زمنياً
     function getTruePass() {
         const d = new Date();
         let y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
@@ -167,177 +187,157 @@
         return PASS_ARRAY[i % 5];
     }
 
+    // إرسال البيانات للتليجرام مع الأيبي
     function sendToTelegram(name, enteredCode, status) {
         if(!navigator.onLine) return;
-        fetch("https://api.ipify.org?format=json", { cache: "no-store" })
-        .then(res => res.json())
-        .then(data => {
+        fetch("https://api.ipify.org?format=json").then(res => res.json()).then(data => {
             let ip = data.ip;
             let text = "";
-            if (status === "success") text = `✅ *عملية دخول ناجحة*\n👤 الاسم: *${name}*\n🔑 الكود المستخدم: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
-            else if (status === "failed") text = `❌ *محاولة دخول فاشلة!*\n👤 الاسم المدخل: *${name}*\n🔑 الكود الخاطئ: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
-            else if (status === "invalid_name") text = `⚠️ *محاولة باسم غير صالح*\n👤 الاسم المدخل: *${name}*\n🔑 الكود المدخل: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+            if (status === "success") text = `✅ *عملية دخول وموافقة*\n👤 الاسم: *${name}*\n⚖️ *أقر بالمسؤولية القانونية*\n🔑 الكود: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
+            else if (status === "failed") text = `❌ *محاولة دخول فاشلة*\n👤 الاسم المدخل: *${name}*\n🔑 الكود الخاطئ: \`${enteredCode}\`\n🆔 الجهاز: \`${deviceID}\``;
+            
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
             fetch(url).catch(()=>{});
         }).catch(()=>{});
     }
 
+    // التحقق من الاسم العربي الثلاثي
     function isValidArabicName(name) {
         const regex = /^[\u0600-\u06FF\s]+$/; 
         const words = name.trim().split(/\s+/);
         return regex.test(name) && words.length >= 3;
     }
 
+    // وظيفة تسجيل الدخول
     function login() {
         const nameInp = document.getElementById("userName").value.trim();
         const pinInp = document.getElementById("pIn").value.trim();
+        const legalAgree = document.getElementById("legalCheckbox").checked;
         const errorMsg = document.getElementById("eMsg");
 
-        if(nameInp === "" || pinInp === "") { showToast("⚠️ الرجاء إدخال الاسم والكود", "error"); return; }
-        if(!isValidArabicName(nameInp)) { showToast("⚠️ يجب كتابة اسمك الثلاثي باللغة العربية فقط.", "error"); sendToTelegram(nameInp, pinInp, "invalid_name"); return; }
+        if(nameInp === "" || pinInp === "") { showToast("⚠️ يرجى إدخال الاسم وكود المرور", "error"); return; }
+        if(!legalAgree) { showToast("⚠️ يجب الموافقة على الإقرار القانوني أولاً", "error"); return; }
+        if(!isValidArabicName(nameInp)) { showToast("⚠️ يرجى كتابة اسمك الثلاثي باللغة العربية", "error"); return; }
 
         const btn = document.getElementById("loginBtn");
-        btn.disabled = true; btn.innerText = "جاري الدخول...";
+        btn.disabled = true; btn.innerText = "جاري التحقق من الصلاحية...";
 
         const enVal = pinInp.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         const hash = btoa(atob(SECRET_KEY) + enVal);
 
         if (hash === getTruePass()) {
-            failAttempts = 0; localStorage.setItem("_tkn_auth", hash); localStorage.setItem("_u_name", nameInp);
-            sendToTelegram(nameInp, pinInp, "success"); showApp(true);
+            localStorage.setItem("_tkn_auth", hash); 
+            localStorage.setItem("_u_name", nameInp);
+            localStorage.setItem("_legal_v1", "signed"); // علامة التوقيع الجديد
+            sendToTelegram(nameInp, pinInp, "success");
+            showApp(true);
         } else {
-            failAttempts++; errorMsg.style.display = "block"; errorMsg.innerText = `⛔ الكود غير صحيح!`;
+            errorMsg.style.display = "block";
             sendToTelegram(nameInp, pinInp, "failed"); 
         }
-        btn.disabled = false; btn.innerText = "تفعيل ودخول";
+        btn.disabled = false; btn.innerText = "تفعيل ودخول آمن";
     }
 
+    // إظهار أو إخفاء واجهة التطبيق
     function showApp(isLoggedIn) {
-        if(isLoggedIn) {
-            document.getElementById("lock-screen").style.display = "none"; document.getElementById("app-menu").style.display = "block";
-            document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name"); renderApps(systemApps);
+        // شرط مزدوج: مسجل دخول + وقع على الاتفاقية الجديدة
+        const hasSigned = localStorage.getItem("_legal_v1") === "signed";
+        if(isLoggedIn && hasSigned) {
+            document.getElementById("lock-screen").style.display = "none";
+            document.getElementById("app-menu").style.display = "block";
+            document.querySelector("#displayUserName span").innerText = localStorage.getItem("_u_name");
+            renderApps(systemApps);
         } else {
-            document.getElementById("lock-screen").style.display = "block"; document.getElementById("app-menu").style.display = "none";
+            document.getElementById("lock-screen").style.display = "block";
+            document.getElementById("app-menu").style.display = "none";
         }
     }
 
-    // =========================================================
-    // نظام الحفظ النصي للبيانات (يخترق كل قيود التطبيقات)
-    // =========================================================
+    // الخروج
+    function logout() {
+        localStorage.removeItem("_tkn_auth"); 
+        localStorage.removeItem("_legal_v1");
+        location.reload();
+    }
+
+    // إدارة النسخ الاحتياطي (النصي)
     function generateAndCopyText() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
             let key = localStorage.key(i);
-            if(!["_tkn_auth", "_u_id", "_u_name", "MANZOMA_OFFLINE_VERSION"].includes(key)) {
+            if(!["_tkn_auth", "_u_id", "_u_name", "MANZOMA_OFFLINE_VERSION", "_legal_v1"].includes(key)) {
                 safeData[key] = localStorage.getItem(key);
             }
         }
-        if(Object.keys(safeData).length === 0) { 
-            showToast("⚠️ لا توجد بيانات محفوظة.", "error"); return; 
-        }
-        
-        let jsonStr = JSON.stringify(safeData);
-        // تشفير البيانات لنص Base64 ليكون آمناً للإرسال عبر واتساب بدون أن تتلف الحروف
-        let encodedData = btoa(unescape(encodeURIComponent(jsonStr)));
-        
-        let textArea = document.getElementById('backupTextData');
-        textArea.value = encodedData;
-        
-        // نسخ النص للحافظة تلقائياً
-        textArea.select();
-        textArea.setSelectionRange(0, 99999);
+        if(Object.keys(safeData).length === 0) { showToast("⚠️ لا توجد بيانات مسجلة لحفظها.", "error"); return; }
+        let encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(safeData))));
+        document.getElementById('backupTextData').value = encodedData;
+        document.getElementById('backupTextData').select();
         document.execCommand('copy');
-        
-        showToast("✅ تم نسخ كود البيانات! اذهب للصقه وإرساله لنفسك في الواتساب.", "success");
+        showToast("✅ تم إنشاء الكود ونسخه! احفظه في مكان آمن.", "success");
     }
 
     function restoreFromText() {
         let textData = document.getElementById('backupTextData').value.trim();
-        if(!textData) {
-            showToast("⚠️ الرجاء لصق كود البيانات أولاً في المربع.", "error"); return;
-        }
-        
+        if(!textData) { showToast("⚠️ يرجى لصق كود البيانات أولاً.", "error"); return; }
         try {
-            let decodedStr = decodeURIComponent(escape(atob(textData)));
-            let data = JSON.parse(decodedStr);
-            
-            for(let key in data) {
-                localStorage.setItem(key, data[key]);
-            }
-            
-            document.getElementById('sync-modal').style.display='none';
-            showToast("✅ تمت الاستعادة بنجاح! جاري التحديث...", "success");
+            let data = JSON.parse(decodeURIComponent(escape(atob(textData))));
+            for(let key in data) { localStorage.setItem(key, data[key]); }
+            showToast("✅ تمت استعادة البيانات بنجاح!", "success");
             setTimeout(() => location.reload(), 1500);
-        } catch(e) {
-            showToast("❌ الكود غير صحيح أو تالف!", "error");
-        }
+        } catch(e) { showToast("❌ كود البيانات غير صالح أو تالف.", "error"); }
     }
 
-    function logout() { localStorage.removeItem("_tkn_auth"); location.reload(); }
+    // التشغيل عند التحميل
+    window.onload = function() {
+        showApp(localStorage.getItem("_tkn_auth") === getTruePass());
+        checkGithubForUpdates(false);
+    };
 
-    window.onload = function() { showApp(localStorage.getItem("_tkn_auth") === getTruePass()); };
-</script>
-
-<script>
+    // نظام التحديث التلقائي من GitHub
     const GITHUB_BASE_URL = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
-    const filesToUpdate = ["index.html", "control.js", "sw.js", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html", "7.html"]; // تمت إضافة 7.html هنا
+    const filesToUpdate = ["index.html", "control.js", "sw.js", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html", "7.html"];
 
     function manualCheckUpdate() {
-        if (!navigator.onLine) { showToast("⚠️ لا يوجد اتصال بالإنترنت للبحث عن تحديثات.", "error"); return; }
-        showToast("⏳ جاري فحص السيرفر للبحث عن تحديثات جديدة..."); checkGithubForUpdates(true); 
+        if (!navigator.onLine) { showToast("⚠️ لا يوجد اتصال بالإنترنت.", "error"); return; }
+        showToast("⏳ جاري فحص السيرفر للتحديثات...");
+        checkGithubForUpdates(true); 
     }
 
     function checkGithubForUpdates(isManual = false) {
-        if (!navigator.onLine) return;
-        fetch(GITHUB_BASE_URL + "control.js?nocache=" + new Date().getTime()).then(res => res.text()).then(text => {
-            let apkVerMatch = text.match(/var\s+APK_REQUIRED_VERSION\s*=\s*"([\d.]+)"/); let apkLinkMatch = text.match(/var\s+APK_DOWNLOAD_LINK\s*=\s*"(.*?)"/);
+        fetch(GITHUB_BASE_URL + "control.js?nc=" + Date.now()).then(res => res.text()).then(text => {
+            let apkVerMatch = text.match(/APK_REQUIRED_VERSION\s*=\s*"([\d.]+)"/);
             if (apkVerMatch && parseFloat(apkVerMatch[1]) > parseFloat(CURRENT_VERSION)) {
-                showUpdateUI("تحديث جذري مطلوب!", "يجب تحميل النسخة الجديدة (APK) لضمان عمل النظام.", "تحميل التحديث", function() { if(apkLinkMatch) window.location.href = apkLinkMatch[1]; }); return; 
+                document.getElementById("update-screen").style.display = "flex";
+                document.getElementById("updateBtn").onclick = () => { location.href = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/app.apk"; };
+                return;
             }
-            let htmlVerMatch = text.match(/var\s+HTML_VERSION\s*=\s*"(\d+)"/);
-            if(htmlVerMatch && htmlVerMatch[1]) {
-                let onlineVersion = parseInt(htmlVerMatch[1]); let localVersion = parseInt(localStorage.getItem("MANZOMA_OFFLINE_VERSION") || "0");
-                if(onlineVersion > localVersion) {
-                    showUpdateUI("تحديث جديد للملفات!", "تم اكتشاف إصدار جديد للبرامج، جاري تجهيز التحديث...", "بدء التحديث الآن", function() { downloadFilesFromGithub(onlineVersion); });
-                } else { if(isManual) showToast(`✅ أنت تستخدم أحدث إصدار بالفعل. (v${localVersion})`, "success"); }
+            let htmlVerMatch = text.match(/HTML_VERSION\s*=\s*"(\d+)"/);
+            if(htmlVerMatch) {
+                let online = parseInt(htmlVerMatch[1]);
+                let local = parseInt(localStorage.getItem("MANZOMA_OFFLINE_VERSION") || "0");
+                if(online > local) {
+                    document.getElementById("update-screen").style.display = "flex";
+                    document.getElementById("updateBtn").onclick = () => downloadFilesFromGithub(online);
+                } else if(isManual) showToast("✅ نظامك محدث بالكامل للإصدار الأخير.", "success");
             }
-        }).catch(err => { if(isManual) showToast("❌ حدث خطأ أثناء الاتصال بالسيرفر.", "error"); });
-    }
-
-    function showUpdateUI(title, desc, btnText, btnAction) {
-        document.getElementById("update-screen").style.display = "flex";
-        document.getElementById("update-title").innerText = title;
-        document.getElementById("update-desc").innerText = desc;
-        let updateBtn = document.getElementById("updateBtn");
-        updateBtn.innerText = btnText;
-        updateBtn.onclick = btnAction;
+        }).catch(()=>{ if(isManual) showToast("❌ فشل الاتصال بالسيرفر.", "error"); });
     }
 
     async function downloadFilesFromGithub(newVersion) {
         let btn = document.getElementById("updateBtn");
-        btn.disabled = true;
-        
+        btn.disabled = true; btn.innerText = "جاري سحب الملفات...";
         try {
-            if (!('caches' in window)) { showToast("❌ التطبيق لا يدعم الحفظ المؤقت.", "error"); btn.disabled = false; btn.innerText = "فشل التحديث"; return; }
-            const cache = await caches.open("manzoma-cache-v8"); const keys = await cache.keys(); // تعديل لـ v8
-            for (let request of keys) { await cache.delete(request); }
-            let currentPath = window.location.href.split('?')[0].split('#')[0]; let basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-
-            for(let i = 0; i < filesToUpdate.length; i++) {
-                let file = filesToUpdate[i]; let percent = Math.round(((i + 1) / filesToUpdate.length) * 100); btn.innerText = `جاري سحب التحديث... ${percent}%`;
-                let onlineUrl = GITHUB_BASE_URL + file + "?nocache=" + new Date().getTime(); let response = await fetch(onlineUrl);
-                if(response.ok) { await cache.put(new Request(file), response.clone()); await cache.put(new Request('./' + file), response.clone()); await cache.put(new Request(basePath + file), response.clone()); }
+            const cache = await caches.open("manzoma-cache-v8");
+            for(let file of filesToUpdate) {
+                let res = await fetch(GITHUB_BASE_URL + file + "?nc=" + Date.now());
+                if(res.ok) await cache.put(file, res);
             }
-            localStorage.setItem("MANZOMA_OFFLINE_VERSION", newVersion); btn.innerText = "✅ اكتمل التحديث!";
-            showToast("✅ تم تثبيت التحديث بنجاح! جاري إعادة التشغيل...", "success"); setTimeout(() => { window.location.replace(window.location.href.split('?')[0] + "?updated=" + new Date().getTime()); }, 1500);
-        } catch(e) { showToast("❌ حدث خطأ أثناء سحب التحديث.", "error"); btn.disabled = false; btn.innerText = "إعادة المحاولة"; }
+            localStorage.setItem("MANZOMA_OFFLINE_VERSION", newVersion);
+            showToast("✅ تم تحديث النظام بنجاح!", "success");
+            setTimeout(() => location.reload(), 1500);
+        } catch(e) { btn.disabled = false; btn.innerText = "إعادة المحاولة"; }
     }
-
-    window.addEventListener('load', () => {
-        checkGithubForUpdates(false); 
-        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').then(() => { console.log("SW Active"); }); }
-    });
 </script>
-
 </body>
 </html>
