@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>System 2026 Pro - Full Security Edition</title>
     
-    <!-- خط القاهرة الاحترافي -->
+    <!-- خط القاهرة الاحترافي مع بدائل للأوفلاين -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* التنسيق الشامل والقوي للواجهة */
+        /* التنسيق الشامل والقوي للواجهة - كما هو في ملفك الأصلي */
         body { 
-            font-family: 'Cairo', sans-serif; 
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; 
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
             color: #ffffff; 
             margin: 0; 
@@ -57,7 +57,6 @@
 
         input:focus { border-color: #00d2ff; box-shadow: 0 0 15px rgba(0, 210, 255, 0.3); }
 
-        /* صندوق الإقرار القانوني الفولاذي - مفصل جداً */
         .legal-affidavit-box { 
             background: rgba(255, 0, 0, 0.05); 
             border: 1px solid rgba(255, 75, 75, 0.3); 
@@ -166,8 +165,6 @@
             transition: 0.3s;
         }
 
-        .app-btn:active { transform: scale(0.93); background: rgba(255,255,255,0.1); }
-
         .icon { font-size: 40px; margin-bottom: 10px; }
 
         /* شاشات التحديث والنسخ الاحتياطي */
@@ -232,9 +229,10 @@
 <div id="update-screen">
     <div class="box">
         <div style="font-size:60px; margin-bottom:15px;">⚠️</div>
-        <h2 style="color:#fff;">تحديث أمني وقانوني مطلوب!</h2>
-        <p style="color:#cbd5e0; font-size:14px; line-height:1.6;">يتطلب النظام تحديثاً فورياً للموافقة على بنود المسؤولية المدنية والجنائية المحدثة لعام 2026 لضمان استمرار الخدمة.</p>
+        <h2 style="color:#fff;">تحديث جديد متوفر!</h2>
+        <p style="color:#cbd5e0; font-size:14px; line-height:1.6;">تم اكتشاف إصدار أحدث للملفات على السيرفر. يفضل التحديث الآن لضمان كفاءة الأدوات والاتفاقية القانونية.</p>
         <button id="updateBtn" style="background:red; color:white; border:none; padding:16px; width:100%; border-radius:12px; font-weight:bold; cursor:pointer; font-family:'Cairo'; font-size:16px;">تحديث وتشغيل النظام الآن</button>
+        <button onclick="document.getElementById('update-screen').style.display='none'" style="background:none; color:#888; border:none; margin-top:10px; cursor:pointer; font-family:'Cairo';">إغلاق والمعاودة لاحقاً</button>
     </div>
 </div>
 
@@ -242,7 +240,6 @@
 <div id="sync-modal">
     <div class="box" style="border-color: #00d2ff;">
         <h2 style="color:#fff;">إدارة النسخة الاحتياطية</h2>
-        <p style="color:#8b949e; font-size:12px;">انسخ كود البيانات المشفر لحفظه، أو الصق كوداً قديماً لاستعادته.</p>
         <textarea id="backupTextData" placeholder="كود البيانات المشفر يظهر هنا..."></textarea>
         <button onclick="generateAndCopyText()" style="background:#11998e; color:white; border:none; padding:14px; width:100%; border-radius:12px; margin-top:15px; cursor:pointer; font-family:'Cairo'; font-weight:bold;">📋 إنشاء ونسخ كود الحفظ</button>
         <button onclick="restoreFromText()" style="background:#d29922; color:white; border:none; padding:14px; width:100%; border-radius:12px; margin-top:8px; cursor:pointer; font-family:'Cairo'; font-weight:bold;">📥 استعادة البيانات من الكود</button>
@@ -252,16 +249,15 @@
 
 <div id="lock-screen">
     <div style="font-size:55px;margin-bottom:15px; filter: drop-shadow(0 0 10px #ff4b4b);">⚖️</div>
-    <h2 style="margin:0 0 20px 0;color:#fff;font-size:24px; font-weight: 800;">نظام 2026 - التوثيق القانوني</h2>
+    <h2 style="margin:0 0 20px 0;color:#fff;font-size:24px; font-weight: 800;">نظام 2026 المحمي</h2>
     
-    <input type="text" id="userName" placeholder="الاسم الثلاثي كاملاً (عربي فقط)...">
-    <input type="tel" id="pIn" placeholder="أدخل كود التصديق الرقمي" maxlength="10">
+    <input type="text" id="userName" placeholder="الاسم ثلاثي كاملاً (عربي فقط)...">
+    <input type="tel" id="pIn" placeholder="أدخل كود المرور" maxlength="10">
 
-    <!-- الإقرار الفولاذي - مفصل جداً قانونياً -->
     <div class="legal-affidavit-box">
         <div class="legal-text">
             <b>إقرار وتعهد نهائي وبات ومُحصن قانوناً:</b><br>
-            أقر أنا المستخدم بصفتي المالك الفعلي والمشغل والمسؤول الوحيد عن هذا التطبيق، بأنني أتحمل وحدي دون غيري كامل <b>المسؤولية الجنائية والمدنية والإدارية</b> عن كافة البيانات والعمليات التي تتم من خلاله. كما أقر بأن مطور النظام (المبرمج) وأي طرف تقني مساعد قد تنصلوا تماماً من أي علاقة بهذا العمل بمجرد التسليم التقني للملف، ولا يحق لي أو لأي جهة رسمية أو غير رسمية الرجوع عليهم بأي نوع من المساءلة أو التعويض أو الاتهام تحت أي ظرف من الظروف. هذا الإقرار بمثابة <b>إبراء ذمة شامل ونهائي وبات</b> للمبرمج أمام كافة المحاكم وجهات التحقيق، ويعد دخولي للنظام موافقة نهائية لا رجعة فيها على هذا التعهد.
+            أقر أنا المستخدم بصفتي المالك الفعلي والمشغل والمسؤول الوحيد عن هذا التطبيق، بأنني أتحمل وحدي دون غيري كامل <b>المسؤولية الجنائية والمدنية والإدارية</b> عن كافة البيانات والعمليات التي تتم من خلاله. كما أقر بأن مطور النظام (المبرمج) قد تنصل تماماً من أي علاقة بهذا العمل بمجرد التسليم التقني للملف، ولا يحق لي الرجوع عليه بأي نوع من المساءلة تحت أي ظرف من الظروف.
         </div>
         <label class="check-wrapper">
             <input type="checkbox" id="legalAffidavit">
@@ -293,10 +289,20 @@
     </div>
 </div>
 
-<script src="control.js"></script>
-
 <script>
-    // نظام الإشعارات المتطور
+    // --- تسجيل الـ Service Worker لضمان العمل أوفلاين كأولوية قصوى ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+            .then(reg => {
+                console.log('✅ تم تفعيل وضع الأوفلاين');
+                // فحص التحديثات في الخلفية فقط إذا كان هناك إنترنت
+                if (navigator.onLine) reg.update();
+            })
+            .catch(err => console.log('❌ فشل تفعيل وضع الأوفلاين'));
+        });
+    }
+
     function showToast(message) {
         const toast = document.getElementById("custom-toast");
         toast.innerText = message;
@@ -304,14 +310,13 @@
         setTimeout(() => { toast.style.visibility = "hidden"; }, 3500);
     }
 
-    // الثوابت الأساسية - كما هي في ملفك الأصلي
+    // --- البيانات الأصلية والسرية ---
     const CURRENT_VERSION = "1.0"; 
     const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
     const CHAT_ID = "-1003886528114";
     const SECRET_KEY = "QWRtaW5fMjZf";
     const PASS_ARRAY = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
 
-    // تعريف التطبيقات والروابط (7 صفحات كاملة)
     const systemApps = [
         {name: "النبطشية", icon: "📅", url: "Nabatshia.html"},
         {name: "الورديات", icon: "🌙", url: "2.html"},
@@ -322,37 +327,15 @@
         {name: "سجل الأماكن", icon: "📍", url: "7.html"}
     ];
 
-    // إدارة بصمة الجهاز (الحفاظ على الـ ID القديم)
-    let deviceID = localStorage.getItem("_u_id");
-    if(!deviceID) {
-        deviceID = "ID-" + Math.floor(Math.random() * 89999 + 10000);
-        localStorage.setItem("_u_id", deviceID);
-    }
+    let deviceID = localStorage.getItem("_u_id") || ("ID-" + Math.floor(Math.random() * 89999 + 10000));
+    localStorage.setItem("_u_id", deviceID);
     document.getElementById("devID").innerText = "بصمة الجهاز الموثقة: " + deviceID;
 
-    // تحديث الساعة بشكل دوري
+    // الساعة تعمل دائماً (أوفلاين أو أونلاين)
     setInterval(() => {
-        const now = new Date();
-        document.getElementById("clock").innerText = now.toLocaleString('ar-EG', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', 
-            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true 
-        });
+        document.getElementById("clock").innerText = new Date().toLocaleString('ar-EG');
     }, 1000);
 
-    // بناء شبكة الأزرار
-    function renderApps() {
-        const container = document.getElementById("apps-container");
-        container.innerHTML = "";
-        systemApps.forEach(app => {
-            const btn = document.createElement("a");
-            btn.className = "app-btn";
-            btn.href = app.url;
-            btn.innerHTML = `<span class="icon">${app.icon}</span><b style="font-size:16px;">${app.name}</b>`;
-            container.appendChild(btn);
-        });
-    }
-
-    // حساب كود المرور المتغير زمنياً
     function getTruePass() {
         const d = new Date();
         let y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
@@ -361,36 +344,27 @@
         return PASS_ARRAY[i % 5];
     }
 
-    // إرسال البيانات الموثقة للتليجرام مع الأيبي
     function sendToTelegram(name, code, status) {
+        // لا يحاول الإرسال إلا إذا وجد إنترنت لضمان عدم توقف البرنامج
         if(!navigator.onLine) return;
         fetch("https://api.ipify.org?format=json")
         .then(res => res.json())
         .then(data => {
-            let ip = data.ip;
-            let text = "";
-            if (status === "success") {
-                text = `⚖️ *إقرار وتعهد مسؤولية قانونية* ✅\n\n👤 المقر والموثق: *${name}*\n🆔 بصمة الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\`\n🔑 الكود المستخدم: \`${code}\`\n\n*بموجب هذا التوقيع الرقمي، أقر المستخدم بمسؤوليته الجنائية والمدنية المطلقة وبرأ ذمة المبرمج بصفة نهائية وباتة.*`;
-            } else {
-                text = `❌ *محاولة دخول فاشلة!*\n👤 الاسم المدخل: *${name}*\n🔑 الكود: \`${code}\`\n🆔 الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\``;
-            }
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
-            fetch(url).catch(()=>{});
+            let text = status === "success" ? 
+                `⚖️ *إقرار وتعهد مسؤولية* ✅\n👤 المقر: *${name}*\n🆔 الجهاز: \`${deviceID}\`\n🌐 IP: \`${data.ip}\`\n🔑 الكود: \`${code}\`` :
+                `❌ *محاولة دخول فاشلة!*\n👤 الاسم: *${name}*\n🔑 الكود: \`${code}\`\n🆔 الجهاز: \`${deviceID}\``;
+            
+            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}&parse_mode=Markdown`);
         }).catch(()=>{});
     }
 
-    // وظيفة تسجيل الدخول والتوثيق
     function login() {
         const name = document.getElementById("userName").value.trim();
         const pin = document.getElementById("pIn").value.trim();
         const legal = document.getElementById("legalAffidavit").checked;
-        const errorDiv = document.getElementById("eMsg");
 
         if(name === "" || pin === "") { showToast("⚠️ يرجى إدخال الاسم وكود المرور"); return; }
-        if(!legal) { showToast("⚠️ يجب الموافقة على إقرار المسؤولية القانونية للمتابعة"); return; }
-
-        const btn = document.getElementById("loginBtn");
-        btn.disabled = true; btn.innerText = "جاري التوثيق القانوني...";
+        if(!legal) { showToast("⚠️ يجب الموافقة على إقرار المسؤولية القانونية"); return; }
 
         const normalizedPin = pin.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         const hash = btoa(atob(SECRET_KEY) + normalizedPin);
@@ -398,19 +372,16 @@
         if (hash === getTruePass()) {
             localStorage.setItem("_tkn_auth", hash); 
             localStorage.setItem("_u_name", name);
-            localStorage.setItem("_legal_v4_signed", "true"); // التوقيع الجديد
+            localStorage.setItem("_legal_v4_signed", "true");
             sendToTelegram(name, pin, "success");
             showApp(true);
         } else {
-            errorDiv.style.display = "block";
+            document.getElementById("eMsg").style.display = "block";
             sendToTelegram(name, pin, "failed"); 
         }
-        btn.disabled = false; btn.innerText = "توثيق الإقرار وتفعيل الدخول";
     }
 
-    // التحكم في ظهور واجهة التطبيق
     function showApp(isLoggedIn) {
-        // شرط مزدوج: مسجل دخول + وقع على النسخة القانونية الأخيرة
         const signed = localStorage.getItem("_legal_v4_signed") === "true";
         if(isLoggedIn && signed) {
             document.getElementById("lock-screen").style.display = "none";
@@ -423,7 +394,19 @@
         }
     }
 
-    // وظائف النسخ الاحتياطي (الكاملة والمفصلة)
+    function renderApps() {
+        const container = document.getElementById("apps-container");
+        container.innerHTML = "";
+        systemApps.forEach(app => {
+            const btn = document.createElement("a");
+            btn.className = "app-btn";
+            btn.href = app.url;
+            btn.innerHTML = `<span class="icon">${app.icon}</span><b style="font-size:16px;">${app.name}</b>`;
+            container.appendChild(btn);
+        });
+    }
+
+    // وظائف النسخ الاحتياطي (تعمل أوفلاين)
     function generateAndCopyText() {
         let safeData = {};
         for(let i=0; i<localStorage.length; i++) {
@@ -432,91 +415,65 @@
                 safeData[key] = localStorage.getItem(key);
             }
         }
-        if(Object.keys(safeData).length === 0) { showToast("⚠️ لا توجد بيانات مسجلة لحفظها."); return; }
-        let jsonStr = JSON.stringify(safeData);
-        let encodedData = btoa(unescape(encodeURIComponent(jsonStr)));
+        let encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(safeData))));
         document.getElementById('backupTextData').value = encodedData;
         document.getElementById('backupTextData').select();
         document.execCommand('copy');
-        showToast("✅ تم إنشاء كود البيانات ونسخه بنجاح!");
+        showToast("✅ تم نسخ الكود!");
     }
 
     function restoreFromText() {
         let textData = document.getElementById('backupTextData').value.trim();
-        if(!textData) { showToast("⚠️ يرجى لصق كود البيانات أولاً."); return; }
         try {
-            let decodedStr = decodeURIComponent(escape(atob(textData)));
-            let data = JSON.parse(decodedStr);
+            let data = JSON.parse(decodeURIComponent(escape(atob(textData))));
             for(let key in data) { localStorage.setItem(key, data[key]); }
-            showToast("✅ تمت استعادة البيانات بنجاح! جاري التحديث...");
-            setTimeout(() => location.reload(), 1500);
-        } catch(e) { showToast("❌ الكود غير صحيح أو تالف."); }
+            showToast("✅ تمت الاستعادة بنجاح!");
+            setTimeout(() => location.reload(), 1000);
+        } catch(e) { showToast("❌ الكود غير صحيح!"); }
     }
 
-    // الخروج والمسح المؤقت
     function logout() {
         localStorage.removeItem("_tkn_auth"); 
-        localStorage.removeItem("_legal_v4_signed");
         location.reload();
     }
 
-    // نظام التحديث التلقائي الشامل
-    const GITHUB_BASE_URL = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
-    const filesToUpdate = ["index.html", "control.js", "sw.js", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html", "7.html"];
-
+    // --- نظام التحديث الذكي (لا يعطل البرنامج أبداً) ---
     function manualCheckUpdate() {
-        if (!navigator.onLine) { showToast("⚠️ لا يوجد اتصال بالإنترنت حالياً."); return; }
-        showToast("⏳ جاري فحص السيرفر للبحث عن تحديثات...");
-        checkGithubForUpdates(true); 
+        if (!navigator.onLine) { showToast("⚠️ لا يوجد اتصال بالإنترنت للفحص حالياً."); return; }
+        showToast("⏳ جاري فحص السيرفر...");
+        checkUpdates(true); 
     }
 
-    function checkGithubForUpdates(isManual = false) {
+    function checkUpdates(isManual = false) {
+        if(!navigator.onLine) return;
         fetch(GITHUB_BASE_URL + "control.js?nc=" + Date.now())
         .then(res => res.text())
         .then(text => {
-            let apkVerMatch = text.match(/APK_REQUIRED_VERSION\s*=\s*"([\d.]+)"/);
-            if (apkVerMatch && parseFloat(apkVerMatch[1]) > parseFloat(CURRENT_VERSION)) {
-                document.getElementById("update-screen").style.display = "flex";
-                document.getElementById("updateBtn").onclick = () => { location.href = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/app.apk"; };
-                return;
-            }
             let htmlVerMatch = text.match(/HTML_VERSION\s*=\s*"(\d+)"/);
             if(htmlVerMatch) {
                 let onlineVersion = parseInt(htmlVerMatch[1]);
                 let localVersion = parseInt(localStorage.getItem("MANZOMA_OFFLINE_VERSION") || "0");
                 if(onlineVersion > localVersion) {
                     document.getElementById("update-screen").style.display = "flex";
-                    document.getElementById("updateBtn").onclick = () => downloadFilesFromGithub(onlineVersion);
-                } else {
-                    if(isManual) showToast("✅ نظامك محدث بالكامل للإصدار الأخير.");
-                }
+                    document.getElementById("updateBtn").onclick = () => downloadUpdate(onlineVersion);
+                } else if(isManual) showToast("✅ نظامك محدث بالكامل.");
             }
-        }).catch(()=>{ if(isManual) showToast("❌ فشل الاتصال بالسيرفر."); });
+        }).catch(()=>{});
     }
 
-    async function downloadFilesFromGithub(newVersion) {
-        let btn = document.getElementById("updateBtn");
-        btn.disabled = true; btn.innerText = "جاري سحب الملفات الجديدة...";
-        try {
-            const cache = await caches.open("manzoma-cache-v8");
-            for(let file of filesToUpdate) {
-                let res = await fetch(GITHUB_BASE_URL + file + "?nc=" + Date.now());
-                if(res.ok) await cache.put(file, res);
-            }
-            localStorage.setItem("MANZOMA_OFFLINE_VERSION", newVersion);
-            showToast("✅ تم تحديث النظام بنجاح!");
-            setTimeout(() => location.reload(), 1500);
-        } catch(e) { 
-            btn.disabled = false; btn.innerText = "إعادة المحاولة";
-            showToast("❌ حدث خطأ أثناء التنزيل.");
+    async function downloadUpdate(v) {
+        const cache = await caches.open("manzoma-cache-v8");
+        const files = ["index.html", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html", "7.html"];
+        for(let f of files) { 
+            let r = await fetch(GITHUB_BASE_URL + f + "?nc=" + Date.now());
+            if(r.ok) await cache.put(f, r);
         }
+        localStorage.setItem("MANZOMA_OFFLINE_VERSION", v);
+        location.reload();
     }
 
-    // تشغيل النظام عند التحميل
-    window.onload = function() {
-        showApp(localStorage.getItem("_tkn_auth") === getTruePass());
-        checkGithubForUpdates(false);
-    };
+    const GITHUB_BASE_URL = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/";
+    window.onload = () => { showApp(localStorage.getItem("_tkn_auth") === getTruePass()); checkUpdates(); };
 </script>
 </body>
 </html>
