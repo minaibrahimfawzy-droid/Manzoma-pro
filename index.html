@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>System 2026 Pro - Ultimate Offline Edition</title>
+    <title>System 2026 Pro - Full Ultimate Edition</title>
     
-    <!-- تحميل الخط مع خاصية التبديل لضمان عدم توقف الصفحة في حالة الأوفلاين -->
+    <!-- خط القاهرة الاحترافي -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* التنسيق الجرافيكي الكامل والفخم - بدون أي اختصارات */
+        /* التنسيق الجرافيكي الكامل والفخم - نسخة خام طويلة لضمان الحجم والكفاءة */
         body { 
-            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; 
+            font-family: 'Cairo', sans-serif; 
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
             color: #ffffff; margin: 0; padding: 0;
             display: flex; flex-direction: column; align-items: center; 
@@ -20,60 +20,67 @@
 
         #lock-screen { 
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); 
-            border: 2px solid rgba(255, 255, 255, 0.1); padding: 40px 30px; 
-            border-radius: 35px; text-align: center; width: 90%; max-width: 400px; 
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8); position: relative; border-top: 8px solid #ff4b4b; margin: 20px 0;
+            border: 2px solid rgba(255, 255, 255, 0.1); padding: 45px 35px; 
+            border-radius: 40px; text-align: center; width: 90%; max-width: 420px; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8); position: relative; 
+            border-top: 8px solid #ff4b4b; margin: 20px 0;
         }
 
-        .lock-icon { font-size: 50px; margin-bottom: 10px; filter: drop-shadow(0 0 10px #ff4b4b); }
-        h2 { font-weight: 800; margin: 0 0 15px 0; font-size: 24px; }
+        .lock-icon { font-size: 60px; margin-bottom: 10px; filter: drop-shadow(0 0 15px #ff4b4b); }
+        h2 { font-weight: 800; margin: 0 0 15px 0; font-size: 26px; }
 
         #devID { 
             font-size: 14px; color: #58a6ff; font-family: monospace; 
-            margin-bottom: 20px; background: rgba(0, 0, 0, 0.6); padding: 12px; 
+            margin-bottom: 20px; background: rgba(0, 0, 0, 0.6); padding: 15px; 
             border-radius: 15px; border: 1px dashed #58a6ff; font-weight: 800; display: block;
         }
 
         input { 
             background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 255, 255, 0.2); 
             color: #00d2ff; padding: 18px; width: 100%; text-align: center; font-size: 17px; 
-            border-radius: 18px; margin: 12px 0; outline: none; box-sizing: border-box; 
+            font-family: 'Cairo'; border-radius: 18px; margin: 10px 0; outline: none; 
+            box-sizing: border-box; transition: 0.3s;
         }
 
+        /* صندوق الإقرار القانوني الفولاذي الكامل */
         .legal-affidavit-box { 
             background: rgba(255, 0, 0, 0.08); border: 1px solid rgba(255, 75, 75, 0.4); 
             border-radius: 20px; padding: 20px; margin: 15px 0; text-align: justify; 
         }
         .legal-text { 
-            font-size: 10.5px; line-height: 1.7; color: #e2e8f0; height: 100px; 
+            font-size: 11px; line-height: 1.8; color: #e2e8f0; height: 115px; 
             overflow-y: auto; border-bottom: 1px solid rgba(255,255,255,0.1); 
-            margin-bottom: 10px; scrollbar-width: thin; 
+            margin-bottom: 15px; padding-right: 5px; scrollbar-width: thin; 
         }
 
-        .check-wrapper { display: flex; align-items: center; gap: 12px; cursor: pointer; color: #38ef7d; font-weight: 900; font-size: 14px; margin-bottom: 10px; }
-        .check-wrapper input { width: 22px !important; height: 22px !important; cursor: pointer; accent-color: #38ef7d; }
+        .check-wrapper { display: flex; align-items: center; gap: 15px; cursor: pointer; color: #38ef7d; font-weight: 900; font-size: 15px; margin-bottom: 10px; }
+        .check-wrapper input { width: 25px !important; height: 25px !important; cursor: pointer; accent-color: #38ef7d; }
 
         button.main-btn { 
             background: linear-gradient(45deg, #11998e, #38ef7d); color: #fff; 
-            border: none; padding: 18px; width: 100%; font-size: 20px; font-weight: 800; 
-            border-radius: 18px; cursor: pointer; margin-top: 10px; 
-            box-shadow: 0 15px 30px rgba(56, 239, 125, 0.4); display: flex; align-items: center; justify-content: center; gap: 12px;
+            border: none; padding: 20px; width: 100%; font-size: 20px; font-weight: 800; 
+            border-radius: 18px; cursor: pointer; margin-top: 15px; 
+            box-shadow: 0 15px 30px rgba(56, 239, 125, 0.4); transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
         }
 
+        /* واجهة القائمة الرئيسية */
         #app-menu { display: none; width: 100%; height: 100vh; padding: 30px; box-sizing: border-box; overflow-y: auto; background: #0f172a; }
         .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #1e293b; padding-bottom: 20px; }
         .user-info-text span { color: #00d2ff; font-weight: 800; font-size: 20px; }
+
+        .logout-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; border: none; padding: 12px 25px; border-radius: 30px; cursor: pointer; font-weight: 800; font-family: 'Cairo'; }
 
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
         .app-btn { 
             background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); 
             border-radius: 30px; padding: 20px; color: #fff; display: flex; 
             flex-direction: column; align-items: center; justify-content: center; 
-            height: 130px; text-decoration: none; text-align: center; transition: 0.3s;
+            height: 140px; text-decoration: none; text-align: center; transition: 0.3s;
         }
-        .app-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
-        
-        .icon { font-size: 30px; margin-bottom: 8px; } /* حجم الأيقونات 30px */
+
+        /* تصغير حجم الأيقونات 30px */
+        .icon { font-size: 30px; margin-bottom: 8px; } 
 
         #update-screen, #sync-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .box { background: #1e293b; padding: 40px; border-radius: 35px; text-align: center; border: 2px solid #ff4b4b; width: 85%; max-width: 400px; }
@@ -88,35 +95,36 @@
 <!-- شاشة التحديث -->
 <div id="update-screen">
     <div class="box">
+        <div style="font-size:60px; margin-bottom:15px;">⚠️</div>
         <h2 style="color:#fff;">تحديث متاح</h2>
-        <p style="color:#cbd5e0;">يرجى التحديث الآن لضمان كفاءة العمل.</p>
-        <button id="updateBtn" style="background:red; color:white; border:none; padding:18px; width:100%; border-radius:15px; font-weight:800; cursor:pointer;">تحديث الآن</button>
+        <p style="color:#cbd5e0;">يرجى الضغط للتحديث لضمان عمل النظام بكفاءة والموافقة على الشروط الجديدة.</p>
+        <button id="updateBtn" style="background:red; color:white; border:none; padding:18px; width:100%; border-radius:15px; font-weight:800; cursor:pointer;">تحديث وتشغيل النظام الآن</button>
     </div>
 </div>
 
-<!-- النسخ الاحتياطي -->
+<!-- نافذة النسخ الاحتياطي -->
 <div id="sync-modal">
     <div class="box" style="border-color: #00d2ff;">
         <h2 style="color:#fff;">إدارة البيانات</h2>
-        <textarea id="backupTextData" placeholder="كود البيانات..."></textarea>
-        <button onclick="generateAndCopyText()" style="background:#11998e; color:white; border:none; padding:18px; width:100%; border-radius:12px; margin-top:20px; cursor:pointer; font-weight:bold;">📋 نسخ الكود</button>
+        <textarea id="backupTextData" placeholder="كود البيانات المشفر..."></textarea>
+        <button onclick="generateAndCopyText()" style="background:#11998e; color:white; border:none; padding:18px; width:100%; border-radius:12px; margin-top:20px; cursor:pointer; font-weight:bold;">📋 إنشاء ونسخ الكود</button>
         <button onclick="restoreFromText()" style="background:#d29922; color:white; border:none; padding:18px; width:100%; border-radius:12px; margin-top:10px; cursor:pointer; font-weight:bold;">📥 استعادة البيانات</button>
-        <button onclick="document.getElementById('sync-modal').style.display='none'" style="background:none; border:1px solid #ff4b4b; color:#ff4b4b; margin-top:15px; padding:12px; width:100%; border-radius:12px; cursor:pointer;">إلغاء</button>
+        <button onclick="document.getElementById('sync-modal').style.display='none'" style="background:none; border:1px solid #ff4b4b; color:#ff4b4b; margin-top:20px; padding:12px; width:100%; border-radius:12px; cursor:pointer;">إلغاء</button>
     </div>
 </div>
 
 <div id="lock-screen">
     <div class="lock-icon">🛡️</div>
     <h2>نظام 2026 المحمي</h2>
-    <div id="devID">جاري استخراج الهوية...</div>
+    <div id="devID">جاري استخراج بصمة الجهاز...</div>
     <input type="text" id="userName" placeholder="الاسم ثلاثي كاملاً (عربي)...">
     <input type="tel" id="pIn" placeholder="أدخل كود التصديق الرقمي" maxlength="10">
 
     <div class="legal-affidavit-box">
         <div class="legal-text">
-            أقر أنا المستخدم بصفتي المالك الفعلي والمشغل والمسؤول الوحيد عن هذا التطبيق، بأنني أتحمل وحدي دون غيري كامل المسؤولية الجنائية والمدنية والإدارية عن كافة البيانات والعمليات التي تتم من خلاله. كما أقر بأن مطور النظام قد تنصل تماماً من أي علاقة بهذا العمل بمجرد التسليم التقني للملف، ولا يحق لي أو لأي جهة الرجوع عليه بأي نوع من المساءلة تحت أي ظرف.
+            أقر أنا المستخدم بصفتي المالك الفعلي والمشغل والمسؤول الوحيد عن هذا التطبيق، بأنني أتحمل وحدي دون غيري كامل <b>المسؤولية الجنائية والمدنية والإدارية</b> عن كافة البيانات والعمليات التي تتم من خلاله. كما أقر بأن مطور النظام قد تنصل تماماً من أي علاقة بهذا العمل بمجرد التسليم التقني للملف، ولا يحق لي الرجوع عليه بأي نوع من المساءلة تحت أي ظرف من الظروف. هذا الإقرار بمثابة إبراء ذمة شامل ونهائي وبات للمبرمج أمام كافة المحاكم وجهات التحقيق، ويعد دخولي للنظام موافقة نهائية لا رجعة فيها على هذا التعهد.
         </div>
-        <label class="check-wrapper"><input type="checkbox" id="legalAffidavit"><span>أوافق وألتزم قانوناً</span></label>
+        <label class="check-wrapper"><input type="checkbox" id="legalAffidavit"><span>أوافق وألتزم قانوناً بما ورد أعلاه</span></label>
     </div>
 
     <button class="main-btn" id="loginBtn" onclick="login()"><span>دخول للنظام</span> 🚀</button>
@@ -126,10 +134,10 @@
 <div id="app-menu">
     <div class="menu-header">
         <div class="user-info-text">
-            <h2 style="color:#fff; margin:0;">الرئيسية</h2>
+            <h2 style="color:#fff; margin:0; font-size:24px;">الرئيسية</h2>
             مرحباً: <span id="userNameDisplay" style="color:#00d2ff;"></span>
         </div>
-        <button onclick="logout()" style="background:linear-gradient(45deg, #ff416c, #ff4b2b); color:white; border:none; padding:12px 25px; border-radius:30px; cursor:pointer; font-weight:800;">خروج 🚪</button>
+        <button onclick="logout()" class="logout-btn">خروج 🚪</button>
     </div>
     <div id="clock" style="text-align:center; color:#38ef7d; padding:20px; background:rgba(0,0,0,0.5); border-radius:25px; margin-bottom:35px; font-weight:bold; border:1px solid #222; font-size:18px;"></div>
     
@@ -139,22 +147,25 @@
         <a href="3.html" class="app-btn"><span class="icon">⚖️</span><b>التصفيات</b></a>
         <a href="4.html" class="app-btn"><span class="icon">📝</span><b>اللمات</b></a>
         <a href="5.html" class="app-btn"><span class="icon">🌊</span><b>التدفق</b></a>
-        <a href="6.html" class="app-btn"><span class="icon">🏗️</span><b>المواسير</b></a>
+        <!-- تم تعديل الاسم هنا -->
+        <a href="6.html" class="app-btn"><span class="icon">🏗️</span><b>المهيئ والمواسير</b></a>
         <a href="7.html" class="app-btn"><span class="icon">📍</span><b>الأماكن</b></a>
     </div>
 
     <div style="margin-top:40px; border-top:1px solid #1e293b; padding-top:30px; display:grid; gap:15px;">
-        <button onclick="document.getElementById('sync-modal').style.display='flex'" style="padding:20px; background:#1e293b; color:#58a6ff; border:1px solid #58a6ff; border-radius:20px; font-weight:bold; cursor:pointer;">⚙️ إدارة النسخ الاحتياطي</button>
-        <button onclick="manualCheckUpdate()" style="padding:20px; background:linear-gradient(45deg, #8e2de2, #4a00e0); color:white; border:none; border-radius:20px; font-weight:bold; cursor:pointer;">🔄 البحث عن تحديثات</button>
+        <button onclick="document.getElementById('sync-modal').style.display='flex'" style="padding:22px; background:#1e293b; color:#58a6ff; border:1px solid #58a6ff; border-radius:20px; font-weight:bold; cursor:pointer;">⚙️ إدارة النسخ الاحتياطي (حفظ واستعادة)</button>
+        <button onclick="manualCheckUpdate()" style="padding:22px; background:linear-gradient(45deg, #8e2de2, #4a00e0); color:white; border:none; border-radius:20px; font-weight:bold; cursor:pointer;">🔄 البحث عن تحديثات النظام وتثبيتها</button>
     </div>
 </div>
 
 <script>
-    // تسجيل خدمة الأوفلاين بشكل فوري لضمان التحكم بالملفات
+    // تسجيل خدمة الأوفلاين
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js?v=19').then(reg => {
-            console.log("Offline Enabled");
-            if (navigator.onLine) reg.update();
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./sw.js?v=21').then(function(reg) {
+                console.log('Offline Ready');
+                if (navigator.onLine) { reg.update(); }
+            });
         });
     }
 
@@ -171,12 +182,12 @@
 
     setInterval(() => { document.getElementById("clock").innerText = new Date().toLocaleString('ar-EG'); }, 1000);
 
-    // دالة إرسال التليجرام - لا تعيق العمل في حالة الأوفلاين
+    // دالة إرسال التليجرام - دخول وخروج بالتنسيق المطلوب
     async function sendToTelegram(name, code, type) {
-        if(!navigator.onLine) return; // تجاوز التليجرام لو النت مقفول
+        if(!navigator.onLine) return;
         try {
             var ip = "Offline";
-            try { var r = await fetch("https://api.ipify.org?format=json", {timeout: 2000}); var d = await r.json(); ip = d.ip; } catch(e){}
+            try { var r = await fetch("https://api.ipify.org?format=json"); var d = await r.json(); ip = d.ip; } catch(e){}
             
             var message = "";
             if(type === "LOGIN") {
@@ -202,9 +213,8 @@
         if (h === PASS_ARRAY[i % 5]) {
             localStorage.setItem("_tkn_auth", h); localStorage.setItem("_u_name", n);
             localStorage.setItem("_legal_signed_v4", "true");
-            // إرسال التليجرام يتم في الخلفية ولا يعطل الدخول
-            sendToTelegram(n, p, "LOGIN"); 
-            setTimeout(() => location.reload(), 100);
+            await sendToTelegram(n, p, "LOGIN"); 
+            location.reload();
         } else { document.getElementById("eMsg").style.display = "block"; }
     }
 
@@ -242,7 +252,7 @@
         } catch(e) { showToast("❌ الكود غير صحيح!"); }
     }
 
-    function manualCheckUpdate() { if(navigator.onLine) checkUpdates(); else showToast("⚠️ لا يوجد إنترنت حالياً للفحص"); }
+    function manualCheckUpdate() { if(navigator.onLine) checkUpdates(); }
 
     function checkUpdates() {
         fetch("./control.js?nc=" + Date.now()).then(res => res.text()).then(t => {
