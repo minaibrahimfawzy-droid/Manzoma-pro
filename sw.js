@@ -13,7 +13,12 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('Cache Created');
+      return cache.addAll(urlsToCache);
+    })
+  );
   self.skipWaiting();
 });
 

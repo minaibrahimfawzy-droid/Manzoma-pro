@@ -3,90 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>System 2026 Pro - Full Edition</title>
+    <title>System 2026 Pro - Full Master Edition</title>
+    
+    <!-- تحميل خط القاهرة الاحترافي لضمان الفخامة -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); color: #ffffff; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; user-select: none; overflow-y: auto; }
-        
-        #lock-screen { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 2px solid rgba(255, 255, 255, 0.1); padding: 30px 25px; border-radius: 30px; text-align: center; width: 90%; max-width: 380px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); position: relative; border-top: 6px solid #ff4b4b; margin: 20px 0; }
-        
-        .lock-icon { font-size: 50px; margin-bottom: 10px; filter: drop-shadow(0 0 10px #ff4b4b); }
-        h2 { font-weight: 800; margin: 0 0 15px 0; font-size: 22px; }
-        
-        #devID { font-size: 13px; color: #58a6ff; font-family: monospace; margin-bottom: 15px; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 12px; border: 1px dashed #58a6ff; font-weight: 800; display: block; }
-        
-        input { background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 255, 255, 0.2); color: #00d2ff; padding: 15px; width: 100%; text-align: center; font-size: 16px; font-family: 'Cairo'; border-radius: 15px; margin: 8px 0; outline: none; box-sizing: border-box; }
-        
-        .legal-affidavit-box { background: rgba(255, 0, 0, 0.08); border: 1px solid rgba(255, 75, 75, 0.4); border-radius: 15px; padding: 15px; margin: 15px 0; text-align: justify; }
-        .legal-text { font-size: 10px; line-height: 1.6; color: #e2e8f0; height: 90px; overflow-y: auto; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; scrollbar-width: thin; }
-        
-        .check-wrapper { display: flex; align-items: center; gap: 10px; cursor: pointer; color: #38ef7d; font-weight: 900; font-size: 14px; }
-        .check-wrapper input { width: 22px !important; height: 22px !important; cursor: pointer; accent-color: #38ef7d; }
-        
-        button.main-btn { background: linear-gradient(45deg, #11998e, #38ef7d); color: #fff; border: none; padding: 18px; width: 100%; font-size: 18px; font-weight: 800; border-radius: 15px; cursor: pointer; margin-top: 10px; box-shadow: 0 10px 20px rgba(56, 239, 125, 0.4); display: flex; align-items: center; justify-content: center; gap: 10px; }
-        
-        #app-menu { display: none; width: 100%; height: 100vh; padding: 25px; box-sizing: border-box; overflow-y: auto; background: #0f172a; }
-        .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #1e293b; padding-bottom: 15px; }
-        .user-info-box h2 { margin: 0; font-size: 22px; color: #fff; }
-        .logout-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 800; font-family: 'Cairo'; font-size: 14px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .app-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; padding: 20px 10px; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 120px; text-decoration: none; text-align: center; transition: 0.3s; }
-        .app-btn .icon { font-size: 35px; margin-bottom: 10px; } /* تم تصغير الأيقونات هنا */
-        .app-btn b { font-size: 15px; }
 
-        #update-screen, #sync-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
-        .box { background: #1e293b; padding: 40px 30px; border-radius: 25px; text-align: center; border: 2px solid #ff4b4b; width: 85%; max-width: 360px; }
-        textarea { width: 100%; height: 120px; background: #000; color: #38ef7d; font-family: monospace; padding: 10px; border-radius: 12px; margin-top: 15px; border: 1px solid #333; }
-        #custom-toast { visibility: hidden; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 15px 25px; border-radius: 15px; z-index: 10000; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    <style>
+        /* التنسيق الجرافيكي الكامل - نسخة خام بدون اختصارات برمجية لضمان حجم الملف */
+        body { 
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; 
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
+            color: #ffffff; 
+            margin: 0; 
+            padding: 0;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            user-select: none; 
+            overflow-y: auto; 
+        }
+
+        #lock-screen { 
+            background: rgba(15, 23, 42, 0.95); 
+            backdrop-filter: blur(25px); 
+            border: 2px solid rgba(255, 255, 255, 0.1); 
+            padding: 40px 30px; 
+            border-radius: 40px; 
+            text-align: center; 
+            width: 90%; 
+            max-width: 420px; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.8); 
+            position: relative; 
+            z-index: 10; 
+            margin: 20px 0;
+            border-top: 8px solid #ff4b4b; 
+        }
+
+        .lock-icon { 
+            font-size: 60px; 
+            margin-bottom: 10px; 
+            filter: drop-shadow(0 0 15px #ff4b4b); 
+        }
+
+        h2 { font-weight: 800; margin: 0 0 15px 0; font-size: 26px; }
+
+        /* كود الجهاز ID بشكل واضح جداً واحترافي */
+        #devID { 
+            font-size: 14px; 
+            color: #58a6ff; 
+            font-family: monospace; 
+            margin-bottom: 20px; 
+            background: rgba(0, 0, 0, 0.6); 
+            padding: 15px; 
+            border-radius: 15px; 
+            border: 1px dashed #58a6ff; 
+            font-weight: 800;
+            display: block;
+        }
+
+        input { 
+            background: rgba(0, 0, 0, 0.7); 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            color: #00d2ff; 
+            padding: 18px; 
+            width: 100%; 
+            text-align: center; 
+            font-size: 17px; 
+            font-family: 'Cairo'; 
+            border-radius: 18px; 
+            margin: 10px 0; 
+            outline: none; 
+            box-sizing: border-box; 
+            transition: all 0.3s ease;
+        }
+
+        input:focus { border-color: #00d2ff; box-shadow: 0 0 20px rgba(0, 210, 255, 0.5); background: #000; }
+
+        /* صندوق الإقرار القانوني الفولاذي المطور - النص الكامل */
+        .legal-affidavit-box { 
+            background: rgba(255, 0, 0, 0.08); 
+            border: 1px solid rgba(255, 75, 75, 0.4); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin: 15px 0; 
+            text-align: justify; 
+        }
+
+        .legal-text { 
+            font-size: 11px; 
+            line-height: 1.8; 
+            color: #e2e8f0; 
+            height: 120px; 
+            overflow-y: auto; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
+            margin-bottom: 15px; 
+            padding-right: 5px; 
+            scrollbar-width: thin; 
+        }
+
+        .check-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            cursor: pointer; 
+            color: #38ef7d; 
+            font-weight: 900; 
+            font-size: 15px; 
+        }
+
+        .check-wrapper input { 
+            width: 25px !important; 
+            height: 25px !important; 
+            cursor: pointer; 
+            accent-color: #38ef7d; 
+        }
+
+        /* زر الدخول الرئيسي الملون الكبير */
+        button.main-btn { 
+            background: linear-gradient(45deg, #11998e, #38ef7d); 
+            color: #fff; 
+            border: none; 
+            padding: 20px; 
+            width: 100%; 
+            font-size: 20px; 
+            font-weight: 800; 
+            border-radius: 18px; 
+            cursor: pointer; 
+            margin-top: 15px; 
+            box-shadow: 0 15px 30px rgba(56, 239, 125, 0.4); 
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        button.main-btn:active { transform: scale(0.96); }
+
+        /* تصميم واجهة القائمة الرئيسية */
+        #app-menu { 
+            display: none; 
+            width: 100%; 
+            height: 100vh; 
+            padding: 30px; 
+            box-sizing: border-box; 
+            overflow-y: auto; 
+            background: #0f172a; 
+        }
+
+        .menu-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            border-bottom: 1px solid #1e293b; 
+            padding-bottom: 20px; 
+        }
+
+        .user-info-text { font-size: 16px; color: #cbd5e0; }
+        .user-info-text span { color: #00d2ff; font-weight: 800; font-size: 20px; }
+
+        .logout-btn { 
+            background: linear-gradient(45deg, #ff416c, #ff4b2b); 
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-weight: 800; 
+            font-family: 'Cairo';
+        }
+
+        /* شبكة التطبيقات مع الأيقونات المنسقة (35px) */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; 
+        }
+
+        .app-btn { 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 30px; 
+            padding: 20px; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 140px; 
+            text-decoration: none; 
+            text-align: center; 
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .app-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
+
+        .icon { 
+            font-size: 35px; /* الحجم المطلوب 35px */
+            margin-bottom: 10px; 
+        }
+
+        .app-btn b { font-size: 16px; }
+
+        /* شاشات التحديث والباك أب */
+        #update-screen, #sync-modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; 
+            align-items: center; justify-content: center; 
+        }
+
+        .box { background: #1e293b; padding: 40px; border-radius: 35px; text-align: center; border: 2px solid #ff4b4b; width: 85%; max-width: 400px; box-shadow: 0 0 50px rgba(255, 75, 75, 0.3); }
+
+        textarea { width: 100%; height: 130px; background: #000; color: #38ef7d; font-family: monospace; padding: 15px; border-radius: 15px; margin-top: 15px; border: 1px solid #333; }
+
+        #custom-toast { visibility: hidden; position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 15px 30px; border-radius: 20px; z-index: 10000; font-size: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body oncontextmenu="return false">
 
 <div id="custom-toast">رسالة النظام</div>
 
+<!-- شاشة التحديث -->
 <div id="update-screen">
     <div class="box">
-        <h2 style="color:#fff;">تحديث مطلوب!</h2>
-        <p style="color:#cbd5e0; font-size:14px;">يوجد إصدار جديد، يرجى التحديث الآن لضمان كفاءة العمل.</p>
-        <button id="updateBtn" style="background:red; color:white; border:none; padding:15px; width:100%; border-radius:12px; font-weight:bold; cursor:pointer;">تحديث الآن</button>
+        <div style="font-size:60px; margin-bottom:15px;">⚠️</div>
+        <h2 style="color:#fff;">تحديث متاح</h2>
+        <p style="color:#cbd5e0;">يرجى الضغط للتحديث لضمان عمل النظام بكفاءة والموافقة على الشروط الجديدة.</p>
+        <button id="updateBtn" style="background:red; color:white; border:none; padding:18px; width:100%; border-radius:15px; font-weight:800; cursor:pointer;">تحديث وتشغيل النظام الآن</button>
     </div>
 </div>
 
+<!-- نافذة النسخ الاحتياطي -->
 <div id="sync-modal">
-    <div class="box" style="border-color: #00d2ff;">
+    <div class="box" style="border-color: #00d2ff; box-shadow: 0 0 60px rgba(0, 210, 255, 0.3);">
         <h2 style="color:#fff;">إدارة البيانات</h2>
-        <textarea id="backupTextData" placeholder="كود البيانات..."></textarea>
-        <button onclick="generateAndCopyText()" style="background:#11998e; color:white; border:none; padding:15px; width:100%; border-radius:12px; margin-top:15px; cursor:pointer; font-weight:bold;">📋 نسخ الكود</button>
-        <button onclick="restoreFromText()" style="background:#d29922; color:white; border:none; padding:15px; width:100%; border-radius:12px; margin-top:8px; cursor:pointer; font-weight:bold;">📥 استعادة البيانات</button>
-        <button onclick="document.getElementById('sync-modal').style.display='none'" style="background:none; border:1px solid #ff4b4b; color:#ff4b4b; margin-top:15px; padding:10px; width:100%; border-radius:12px; cursor:pointer;">إلغاء</button>
+        <textarea id="backupTextData" placeholder="كود البيانات المشفر..."></textarea>
+        <button onclick="generateAndCopyText()" style="background:#11998e; color:white; border:none; padding:18px; width:100%; border-radius:15px; margin-top:20px; cursor:pointer; font-weight:bold;">📋 نسخ كود الحفظ</button>
+        <button onclick="restoreFromText()" style="background:#d29922; color:white; border:none; padding:18px; width:100%; border-radius:15px; margin-top:10px; cursor:pointer; font-weight:bold;">📥 استعادة البيانات</button>
+        <button onclick="document.getElementById('sync-modal').style.display='none'" style="background:none; border:1px solid #ff4b4b; color:#ff4b4b; margin-top:20px; padding:12px; width:100%; border-radius:15px; cursor:pointer;">إلغاء</button>
     </div>
 </div>
 
 <div id="lock-screen">
     <div class="lock-icon">🛡️</div>
     <h2>نظام 2026 المحمي</h2>
-    <div id="devID">جاري استخراج الهوية...</div>
-    <input type="text" id="userName" placeholder="الاسم ثلاثي (عربي)...">
-    <input type="tel" id="pIn" placeholder="أدخل كود التصديق" maxlength="10">
+    
+    <div id="devID">جاري استخراج بصمة الجهاز...</div>
+
+    <input type="text" id="userName" placeholder="الاسم ثلاثي كاملاً (عربي)...">
+    <input type="tel" id="pIn" placeholder="أدخل كود التصديق الرقمي" maxlength="10">
+
+    <!-- الإقرار القانوني الفولاذي الكامل -->
     <div class="legal-affidavit-box">
-        <div class="legal-text">أقر أنا المستخدم بصفتي المسؤول الوحيد، بأنني أتحمل كامل المسؤولية الجنائية والمدنية عن كافة البيانات والعمليات، وأبرئ ذمة المبرمج تماماً.</div>
-        <label class="check-wrapper"><input type="checkbox" id="legalAffidavit"><span>أوافق وألتزم قانوناً</span></label>
+        <div class="legal-text">
+            <b>إقرار وتعهد نهائي وبات ومُحصن قانوناً:</b><br>
+            أقر أنا المستخدم بصفتي المالك الفعلي والمشغل والمسؤول الوحيد عن هذا التطبيق، بأنني أتحمل وحدي دون غيري كامل <b>المسؤولية الجنائية والمدنية والإدارية</b> عن كافة البيانات والعمليات التي تتم من خلاله. كما أقر بأن مطور النظام (المبرمج) قد تنصل تماماً من أي علاقة بهذا العمل بمجرد التسليم التقني للملف، ولا يحق لي أو لأي جهة رسمية أو غير رسمية الرجوع عليهم بأي نوع من المساءلة أو التعويض أو الاتهام تحت أي ظرف من الظروف. هذا الإقرار بمثابة إبراء ذمة شامل ونهائي وبات للمبرمج أمام كافة المحاكم وجهات التحقيق، ويعد دخولي للنظام موافقة نهائية لا رجعة فيها على هذا التعهد.
+        </div>
+        <label class="check-wrapper">
+            <input type="checkbox" id="legalAffidavit">
+            <span>أوافق وأقر وألتزم قانوناً بما ورد أعلاه</span>
+        </label>
     </div>
-    <button class="main-btn" id="loginBtn" onclick="login()"><span>دخول للنظام</span> 🚀</button>
+
+    <button class="main-btn" id="loginBtn" onclick="login()">
+        <span>دخول للنظام</span> 🚀
+    </button>
     <p id="eMsg" style="color:red; display:none; margin-top:15px; font-weight:bold;">⛔ كود المرور غير صحيح!</p>
 </div>
 
 <div id="app-menu">
     <div class="menu-header">
-        <div class="user-info-box">
-            <h2>الرئيسية</h2>
-            <p style="margin:0; font-size:14px; color:#cbd5e0;">مرحباً: <span id="userNameDisplay" style="color:#00d2ff; font-weight:bold;"></span></p>
+        <div class="user-info-text">
+            <h2 style="color:#fff; margin:0;">الرئيسية</h2>
+            مرحباً: <span id="userNameDisplay" style="color:#00d2ff; font-weight:800;"></span>
         </div>
-        <button onclick="logout()" class="logout-btn">خروج 🚪</button>
+        <button onclick="logout()" class="logout-btn">خروج آمن 🚪</button>
     </div>
-    <div id="clock" style="text-align:center; color:#38ef7d; padding:15px; background:rgba(0,0,0,0.4); border-radius:20px; margin-bottom:25px; font-weight:bold; border:1px solid #222;"></div>
+    
+    <div id="clock" style="text-align:center; color:#38ef7d; padding:20px; background:rgba(0,0,0,0.5); border-radius:25px; margin-bottom:35px; font-weight:bold; border:1px solid #222; font-size:18px;"></div>
+    
     <div class="grid">
+        <!-- كتابة السبع تطبيقات بشكل صريح لضمان حجم الملف والكفاءة -->
         <a href="Nabatshia.html" class="app-btn"><span class="icon">📅</span><b>النبطشية</b></a>
         <a href="2.html" class="app-btn"><span class="icon">🌙</span><b>الورديات</b></a>
         <a href="3.html" class="app-btn"><span class="icon">⚖️</span><b>التصفيات</b></a>
@@ -95,57 +296,65 @@
         <a href="6.html" class="app-btn"><span class="icon">🏗️</span><b>المواسير</b></a>
         <a href="7.html" class="app-btn"><span class="icon">📍</span><b>الأماكن</b></a>
     </div>
-    <div style="margin-top:30px; display:grid; gap:10px;">
-        <button onclick="document.getElementById('sync-modal').style.display='flex'" style="padding:15px; background:#1e293b; color:#58a6ff; border:1px solid #58a6ff; border-radius:12px; font-weight:bold; cursor:pointer;">⚙️ إدارة النسخ الاحتياطي</button>
-        <button onclick="manualCheckUpdate()" style="padding:15px; background:linear-gradient(45deg, #8e2de2, #4a00e0); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">🔄 تحديث النظام</button>
+
+    <div style="margin-top:40px; border-top:1px solid #1e293b; padding-top:30px; display:grid; gap:15px;">
+        <button onclick="document.getElementById('sync-modal').style.display='flex'" style="padding:18px; background:#1e293b; color:#58a6ff; border:1px solid #58a6ff; border-radius:15px; font-weight:bold; cursor:pointer;">⚙️ إدارة النسخ الاحتياطي</button>
+        <button onclick="manualCheckUpdate()" style="padding:18px; background:linear-gradient(45deg, #8e2de2, #4a00e0); color:white; border:none; border-radius:15px; font-weight:bold; cursor:pointer;">🔄 البحث عن تحديثات النظام</button>
     </div>
 </div>
 
 <script>
-    // تسجيل نظام الأوفلاين
+    // تسجيل الخدمة لضمان عمل الأوفلاين
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js?v=15').then(reg => { if (navigator.onLine) reg.update(); });
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./sw.js?v=17').then(function(reg) {
+                if (navigator.onLine) reg.update();
+            });
         });
     }
 
-    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-    const CHAT_ID = "-1003886528114";
-    const SECRET_KEY = "QWRtaW5fMjZf";
-    const PASS_ARRAY = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+    function showToast(message) {
+        var toast = document.getElementById("custom-toast");
+        toast.innerText = message; toast.style.visibility = "visible";
+        setTimeout(() => { toast.style.visibility = "hidden"; }, 3500);
+    }
 
-    let deviceID = localStorage.getItem("_u_id") || ("ID-" + Math.floor(Math.random() * 89999 + 10000));
+    // الإعدادات الأصلية
+    var BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+    var CHAT_ID = "-1003886528114";
+    var SECRET_KEY = "QWRtaW5fMjZf";
+    var PASS_ARRAY = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
+
+    var deviceID = localStorage.getItem("_u_id") || ("ID-" + Math.floor(Math.random() * 89999 + 10000));
     localStorage.setItem("_u_id", deviceID);
-    document.getElementById("devID").innerText = "بصمة الجهاز: " + deviceID;
+    document.getElementById("devID").innerText = "بصمة الجهاز الموثقة: " + deviceID;
 
     setInterval(() => { document.getElementById("clock").innerText = new Date().toLocaleString('ar-EG'); }, 1000);
 
-    // دالة التليجرام المحسنة (لا تعطل الأوفلاين)
+    // دالة إرسال التليجرام الفخمة (تعمل أوفلاين/أونلاين)
     async function sendToTelegram(name, code, type) {
         if(!navigator.onLine) return;
         try {
-            let ip = "Unknown";
-            try { const res = await fetch("https://api.ipify.org?format=json"); const data = await res.json(); ip = data.ip; } catch(e){}
+            var ipRes = await fetch("https://api.ipify.org?format=json");
+            var ipData = await ipRes.json();
+            var ip = ipData.ip;
+            var message = type === "LOGIN" ? 
+                `⚖️ *إقرار وتعهد مسؤولية قانونية* ✅\n\n👤 المقر والموثق: *${name}*\n🆔 بصمة الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\`\n🔑 الكود المستخدم: \`${code}\`\n\nبموجب هذا التوقيع الرقمي، أقر المستخدم بمسؤوليته الجنائية والمدنية المطلقة وبرأ ذمة المبرمج بصفة نهائية وباتة.` :
+                `🚪 *عملية تسجيل خروج من النظام* 🚪\n\n👤 المستخدم: *${name}*\n🆔 بصمة الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\`\n\nتم إنهاء الجلسة والخروج من النظام بنجاح.`;
             
-            let message = "";
-            if(type === "LOGIN") {
-                message = `⚖️ *إقرار وتعهد مسؤولية قانونية* ✅\n\n👤 المقر والموثق: *${name}*\n🆔 بصمة الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\`\n🔑 الكود المستخدم: \`${code}\`\n\nبموجب هذا التوقيع الرقمي، أقر المستخدم بمسؤوليته الجنائية والمدنية المطلقة وبرأ ذمة المبرمج بصفة نهائية وباتة.`;
-            } else {
-                message = `🚪 *عملية تسجيل خروج من النظام* 🚪\n\n👤 المستخدم: *${name}*\n🆔 بصمة الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\`\n\nتم إنهاء الجلسة والخروج من النظام بنجاح.`;
-            }
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`);
         } catch(e) {}
     }
 
     function login() {
-        const n = document.getElementById("userName").value.trim();
-        const p = document.getElementById("pIn").value.trim();
-        const l = document.getElementById("legalAffidavit").checked;
-        if(!n || !p || !l) { alert("⚠️ أكمل البيانات ووافق على الإقرار"); return; }
+        var n = document.getElementById("userName").value.trim();
+        var p = document.getElementById("pIn").value.trim();
+        var l = document.getElementById("legalAffidavit").checked;
+        if(!n || !p || !l) { showToast("⚠️ يرجى إكمال البيانات والموافقة"); return; }
         
-        const h = btoa(atob(SECRET_KEY) + p.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)));
-        const d = new Date(); let y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
-        let i = (y - 2026) * 2; if (d.getMonth() >= 5) i += 1; 
+        var h = btoa(atob(SECRET_KEY) + p.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+        var d = new Date(); var y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
+        var i = (y - 2026) * 2; if (d.getMonth() >= 5) i += 1; 
 
         if (h === PASS_ARRAY[i % 5]) {
             localStorage.setItem("_tkn_auth", h); localStorage.setItem("_u_name", n);
@@ -156,15 +365,15 @@
     }
 
     function logout() {
-        const name = localStorage.getItem("_u_name") || "Unknown";
+        var name = localStorage.getItem("_u_name") || "Unknown";
         sendToTelegram(name, "N/A", "LOGOUT");
         localStorage.removeItem("_tkn_auth");
         location.reload();
     }
 
     function showApp() {
-        const d = new Date(); let y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
-        let i = (y - 2026) * 2; if (d.getMonth() >= 5) i += 1; 
+        var d = new Date(); var y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
+        var i = (y - 2026) * 2; if (d.getMonth() >= 5) i += 1; 
         if(localStorage.getItem("_tkn_auth") === PASS_ARRAY[i % 5] && localStorage.getItem("_legal_signed_v4")) {
             document.getElementById("lock-screen").style.display = "none";
             document.getElementById("app-menu").style.display = "block";
@@ -173,40 +382,46 @@
     }
 
     function generateAndCopyText() {
-        let s = {}; for(let i=0; i<localStorage.length; i++) {
-            let k = localStorage.key(i); if(!["_tkn_auth", "_u_id", "_u_name", "_legal_signed_v4", "M_VER"].includes(k)) s[k] = localStorage.getItem(k);
+        var s = {}; for(var i=0; i<localStorage.length; i++) {
+            var k = localStorage.key(i); if(!["_tkn_auth", "_u_id", "_u_name", "_legal_signed_v4", "M_VER"].includes(k)) s[k] = localStorage.getItem(k);
         }
-        let enc = btoa(unescape(encodeURIComponent(JSON.stringify(s))));
-        document.getElementById('backupTextData').value = enc; document.getElementById('backupTextData').select(); document.execCommand('copy');
-        alert("✅ تم نسخ كود البيانات!");
+        document.getElementById('backupTextData').value = btoa(unescape(encodeURIComponent(JSON.stringify(s))));
+        document.getElementById('backupTextData').select(); document.execCommand('copy');
+        showToast("✅ تم نسخ كود البيانات بنجاح!");
     }
 
     function restoreFromText() {
-        let t = document.getElementById('backupTextData').value.trim();
         try {
-            let d = JSON.parse(decodeURIComponent(escape(atob(t)))); for(let k in d) localStorage.setItem(k, d[k]);
-            alert("✅ تمت الاستعادة!"); location.reload();
-        } catch(e) { alert("❌ كود خطأ!"); }
+            var d = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('backupTextData').value.trim()))));
+            for(var k in d) localStorage.setItem(k, d[k]);
+            location.reload();
+        } catch(e) { showToast("❌ الكود غير صحيح!"); }
     }
 
-    function manualCheckUpdate() { if(navigator.onLine) checkUpdates(true); else alert("لا يوجد إنترنت حالياً"); }
+    // تحديث صامت
+    function manualCheckUpdate() { if(navigator.onLine) checkUpdates(); }
 
-    function checkUpdates(m = false) {
-        if(!navigator.onLine) return;
+    function checkUpdates() {
         fetch("./control.js?nc=" + Date.now()).then(res => res.text()).then(t => {
-            let v = t.match(/HTML_VERSION\s*=\s*"(\d+)"/);
+            var v = t.match(/HTML_VERSION\s*=\s*"(\d+)"/);
             if(v && parseInt(v[1]) > parseInt(localStorage.getItem("M_VER") || "0")) {
                 document.getElementById("update-screen").style.display = "flex";
                 document.getElementById("updateBtn").onclick = () => downloadUpdate(v[1]);
-            } else if(m) alert("✅ نظامك محدث");
+            }
         }).catch(()=>{});
     }
 
     async function downloadUpdate(v) {
-        const c = await caches.open("manzoma-cache-v8");
-        const f = ["index.html", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html", "7.html", "sw.js", "control.js"];
-        for(let file of f) { let r = await fetch(file + "?nc=" + Date.now()); if(r.ok) await c.put(file, r); }
-        localStorage.setItem("M_VER", v); location.reload();
+        var b = document.getElementById("updateBtn"); b.disabled = true; b.innerText = "جاري التحديث...";
+        var c = await caches.open("manzoma-cache-v8");
+        var f = ["index.html", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html", "7.html", "sw.js", "control.js"];
+        try {
+            for(let file of f) { 
+                var r = await fetch(file + "?nc=" + Date.now());
+                if(r.ok) await c.put(file, r);
+            }
+            localStorage.setItem("M_VER", v); location.reload();
+        } catch(e) { b.disabled = false; b.innerText = "فشل.. حاول ثانية"; }
     }
 
     window.onload = () => { showApp(); checkUpdates(); };
