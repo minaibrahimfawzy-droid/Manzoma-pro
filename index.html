@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>System 2026 Pro - Universal Edition</title>
+    <title>System 2026 Pro - Ultimate Master Edition</title>
     
-    <!-- تحميل الخط مع خاصية التبديل لضمان عدم توقف الصفحة في حالة الأوفلاين -->
+    <!-- تحميل الخط مع Fallback لضمان العمل أوفلاين 100% -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* التنسيق الجرافيكي الكامل والفخم - نسخة خام طويلة لضمان الحجم والكفاءة */
+        /* التنسيق الجرافيكي الكامل - نسخة خام طويلة جداً لضمان الحجم والكفاءة */
         body { 
-            font-family: 'Cairo', sans-serif; 
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; 
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
             color: #ffffff; margin: 0; padding: 0;
             display: flex; flex-direction: column; align-items: center; 
@@ -20,7 +20,7 @@
 
         #lock-screen { 
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); 
-            border: 2px solid rgba(255, 255, 255, 0.1); padding: 45px 30px; 
+            border: 2px solid rgba(255, 255, 255, 0.1); padding: 45px 35px; 
             border-radius: 40px; text-align: center; width: 90%; max-width: 420px; 
             box-shadow: 0 40px 80px rgba(0,0,0,0.8); position: relative; 
             border-top: 8px solid #ff4b4b; margin: 20px 0;
@@ -45,7 +45,7 @@
             background: rgba(255, 0, 0, 0.08); border: 1px solid rgba(255, 75, 75, 0.4); 
             border-radius: 20px; padding: 20px; margin: 15px 0; text-align: justify; 
         }
-        .legal-text { font-size: 11px; line-height: 1.8; color: #e2e8f0; height: 110px; overflow-y: auto; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; scrollbar-width: thin; }
+        .legal-text { font-size: 11px; line-height: 1.8; color: #e2e8f0; height: 115px; overflow-y: auto; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; scrollbar-width: thin; }
 
         .check-wrapper { display: flex; align-items: center; gap: 15px; cursor: pointer; color: #38ef7d; font-weight: 900; font-size: 15px; margin-bottom: 10px; }
         .check-wrapper input { width: 25px !important; height: 25px !important; cursor: pointer; accent-color: #38ef7d; }
@@ -57,11 +57,11 @@
             box-shadow: 0 15px 30px rgba(56, 239, 125, 0.4); display: flex; align-items: center; justify-content: center; gap: 12px;
         }
 
+        /* واجهة القائمة الرئيسية */
         #app-menu { display: none; width: 100%; height: 100vh; padding: 30px; box-sizing: border-box; overflow-y: auto; background: #0f172a; }
         .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #1e293b; padding-bottom: 20px; }
         .user-info-text span { color: #00d2ff; font-weight: 800; font-size: 20px; }
-
-        .logout-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; border: none; padding: 12px 25px; border-radius: 30px; cursor: pointer; font-weight: 800; font-family: 'Cairo'; }
+        .logout-btn { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; border: none; padding: 12px 25px; border-radius: 30px; cursor: pointer; font-weight: 800; }
 
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
         .app-btn { 
@@ -71,8 +71,7 @@
             height: 140px; text-decoration: none; text-align: center; transition: 0.3s;
         }
         
-        /* الأيقونات المنسقة 30px */
-        .icon { font-size: 30px; margin-bottom: 8px; } 
+        .icon { font-size: 30px; margin-bottom: 8px; } /* حجم الأيقونات 30px */
 
         #update-screen, #sync-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .box { background: #1e293b; padding: 40px; border-radius: 35px; text-align: center; border: 2px solid #ff4b4b; width: 85%; max-width: 400px; }
@@ -93,9 +92,10 @@
     </div>
 </div>
 
+<!-- نافذة النسخ الاحتياطي -->
 <div id="sync-modal">
     <div class="box" style="border-color: #00d2ff;">
-        <h2 style="color:#fff;">إدارة البيانات</h2>
+        <h2>إدارة البيانات</h2>
         <textarea id="backupTextData" placeholder="كود البيانات..."></textarea>
         <button onclick="generateAndCopyText()" style="background:#11998e; color:white; border:none; padding:18px; width:100%; border-radius:12px; margin-top:20px; cursor:pointer; font-weight:bold;">📋 نسخ الكود</button>
         <button onclick="restoreFromText()" style="background:#d29922; color:white; border:none; padding:18px; width:100%; border-radius:12px; margin-top:10px; cursor:pointer; font-weight:bold;">📥 استعادة البيانات</button>
@@ -112,7 +112,7 @@
 
     <div class="legal-affidavit-box">
         <div class="legal-text">
-            أقر أنا المستخدم بصفتي المالك الفعلي والمشغل والمسؤول الوحيد عن هذا التطبيق، بأنني أتحمل وحده دون غيري كامل المسؤولية الجنائية والمدنية والإدارية عن كافة البيانات، وأبرئ ذمة المبرمج تماماً.
+            أقر أنا المستخدم بصفتي المالك الفعلي والمشغل والمسؤول الوحيد عن هذا التطبيق، بأنني أتحمل وحدي دون غيري كامل المسؤولية الجنائية والمدنية والإدارية عن كافة البيانات، وأبرئ ذمة المبرمج تماماً.
         </div>
         <label class="check-wrapper"><input type="checkbox" id="legalAffidavit"><span>أوافق وألتزم قانوناً</span></label>
     </div>
@@ -148,11 +148,11 @@
 </div>
 
 <script>
-    // تسجيل الخدمة لضمان العمل أوفلاين - تم تحسين الكود ليكون أسرع
+    // --- الخدمة الخلفية لضمان العمل أوفلاين بنظام الـ Force ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
-            navigator.serviceWorker.register('./sw.js?v=22').then(function(reg) {
-                console.log('Offline Ready');
+            navigator.serviceWorker.register('./sw.js?v=24', { scope: './' }).then(function(reg) {
+                console.log('Offline Engine Ready');
                 if (navigator.onLine) { reg.update(); }
             });
         });
@@ -171,28 +171,26 @@
 
     setInterval(() => { document.getElementById("clock").innerText = new Date().toLocaleString('ar-EG'); }, 1000);
 
-    // دالة إرسال التليجرام - معدلة لعدم تعطيل الكود أوفلاين
+    // دالة إرسال التليجرام - تم تعديلها لتكون Non-Blocking تماماً
     async function sendToTelegram(name, code, type) {
-        if(!navigator.onLine) return; // لو مفيش نت اخرج فوراً
+        if(!navigator.onLine) return;
         try {
-            // محاولة جلب الأيبي مع وقت انتظار قصير جداً (2 ثانية)
+            // جلب الأيبي مع تايم أوت قصير جداً لعدم تعطيل الجهاز
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000);
-            
-            let ip = "غير متاح";
+            const id = setTimeout(() => controller.abort(), 1500);
+            let ip = "Offline/Hidden";
             try {
-                const ipRes = await fetch("https://api.ipify.org?format=json", { signal: controller.signal });
-                const ipData = await ipRes.json();
-                ip = ipData.ip;
-            } catch(e) { console.log("IP fetch bypass"); }
-            clearTimeout(timeoutId);
-
+                const r = await fetch("https://api.ipify.org?format=json", { signal: controller.signal });
+                const d = await r.json(); ip = d.ip;
+            } catch(e){}
+            clearTimeout(id);
+            
             var message = type === "LOGIN" ? 
                 `⚖️ *إقرار وتعهد مسؤولية قانونية* ✅\n\n👤 المقر والموثق: *${name}*\n🆔 بصمة الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\`\n🔑 الكود المستخدم: \`${code}\`\n\nبموجب هذا التوقيع الرقمي، أقر المستخدم بمسؤوليته الجنائية والمدنية المطلقة وبرأ ذمة المبرمج بصفة نهائية وباتة.` :
                 `🚪 *عملية تسجيل خروج من النظام* 🚪\n\n👤 المستخدم: *${name}*\n🆔 بصمة الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\`\n\nتم إنهاء الجلسة والخروج من النظام بنجاح.`;
             
             fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`);
-        } catch(e) { console.log("Telegram bypass"); }
+        } catch(e) {}
     }
 
     async function login() {
@@ -208,16 +206,16 @@
         if (h === PASS_ARRAY[i % 5]) {
             localStorage.setItem("_tkn_auth", h); localStorage.setItem("_u_name", n);
             localStorage.setItem("_legal_signed_v4", "true");
-            await sendToTelegram(n, p, "LOGIN"); 
-            location.reload();
+            sendToTelegram(n, p, "LOGIN"); // إرسال خلفي
+            setTimeout(() => { location.reload(); }, 100);
         } else { document.getElementById("eMsg").style.display = "block"; }
     }
 
     async function logout() {
         var n = localStorage.getItem("_u_name") || "Unknown";
-        await sendToTelegram(n, "N/A", "LOGOUT");
+        sendToTelegram(n, "N/A", "LOGOUT"); // إرسال خلفي
         localStorage.removeItem("_tkn_auth");
-        location.reload();
+        setTimeout(() => { location.reload(); }, 100);
     }
 
     function showApp() {
