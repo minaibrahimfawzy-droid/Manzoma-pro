@@ -1,4 +1,6 @@
-const CACHE_NAME = 'manzoma-cache-v9';
+--- START OF FILE sw.js ---
+
+const CACHE_NAME = 'manzoma-cache-v10'; // تم التحديث من v9 إلى v10
 const urlsToCache = [
   './',
   './index.html',
@@ -22,7 +24,7 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// السر هنا: استراتيجية Cache-First الصارمة
+// استراتيجية Cache-First
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
