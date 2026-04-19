@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نظام الحسابات المتكامل</title>
+<title>نظام الحسابات المتكامل - المطور</title>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background: linear-gradient(135deg, #0f172a, #1e293b); color: #f8fafc; min-height: 100vh; padding: 20px; line-height: 1.6; }
@@ -12,7 +12,6 @@
     h1 { text-align: center; color: #38bdf8; margin-bottom: 5px; font-size: 1.8em; text-shadow: 0 2px 10px rgba(56, 189, 248, 0.3); }
     #datetime { text-align: center; color: #94a3b8; font-size: 0.85em; margin-bottom: 20px; background: rgba(255,255,255,0.05); display: inline-block; width: 100%; padding: 5px; border-radius: 10px; }
 
-    /* التبويبات (مربعات الاختيار) */
     .main-nav { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
     .nav-box {
         background: #1e293b; border: 2px solid #334155; padding: 12px 5px; text-align: center;
@@ -41,7 +40,6 @@
     .total-box { margin-top: 20px; border: 2px dashed #10b981; padding: 15px; border-radius: 15px; text-align: center; background: rgba(16, 185, 129, 0.05); }
     .total-val { color: #34d399; font-size: 1.6em; font-weight: 900; }
 
-    /* قسم الشرح الموسع */
     .explanation-section {
         margin-top: 20px; padding: 15px; background: rgba(15, 23, 42, 0.6); border-radius: 15px;
         border: 1px solid rgba(255,255,255,0.05); font-size: 0.88em;
@@ -58,7 +56,7 @@
 <body>
 
 <div class="container">
-    <h1>🛠️ مهيئات ومواسير ومولدات</h1>
+    <h1>🛠️ منظومة الحسابات الموحدة</h1>
     <div id="datetime"></div>
 
     <div class="main-nav">
@@ -69,7 +67,7 @@
 
     <!-- قسم المهيئات -->
     <div id="section-box" class="app-card">
-        <label>اختر نوع النقل (لتحديد المعامل):</label>
+        <label>نوع النقل:</label>
         <select id="boxType">
             <option value="100">نقل ثقيل (ضرب 100)</option>
             <option value="150">كساحة (ضرب 150)</option>
@@ -88,19 +86,18 @@
         <div id="res-box"></div>
 
         <div class="explanation-section">
-            <h3>📖 شرح معادلة المهيئات:</h3>
+            <h3>📖 شرح مقاسات وقواعد المهيئات:</h3>
             <ul>
-                <li><strong>الحساب الأساسي:</strong> الطول × العرض × الارتفاع × المعامل المختار (<span class="num-tag">100</span> أو <span class="num-tag">150</span> أو <span class="num-tag">200</span>).</li>
-                <li><strong>حدود الأبعاد القياسية:</strong> الطول <span class="num-tag">12م</span>، العرض <span class="num-tag">2.4م</span>، الارتفاع <span class="num-tag">2م</span>.</li>
-                <li><strong>حساب البروز:</strong> إذا زادت الأبعاد عن القياس، يُحسب الفرق ويُضرب في <span class="num-tag">500</span> ج.</li>
-                <li><strong>النتيجة النهائية:</strong> البرنامج يقارن تلقائياً بين "الأساسي" و "البروز" ويختار <strong>القيمة الأكبر</strong> بينهما.</li>
+                <li><strong>مقاسات النقل الثقيل/المتعدد:</strong> طول 12، عرض 2.4، ارتفاع 2.</li>
+                <li><strong>مقاسات الكساحة:</strong> طول <span class="num-tag">10</span>، عرض <span class="num-tag">3</span>، ارتفاع <span class="num-tag">3</span>.</li>
+                <li><strong>قاعدة الحساب:</strong> يُحسب الأساسي (حجم × معامل) والبروز (فرق المقاس × 500) ويتم اختيار <strong>الأكبر</strong>.</li>
             </ul>
         </div>
     </div>
 
     <!-- قسم المولدات -->
     <div id="section-gen" class="app-card hidden">
-        <label>نوع السيارة الحاملة للمولد:</label>
+        <label>نوع السيارة للحمل:</label>
         <select id="genType">
             <option value="100">ربع نقل (ضرب 100)</option>
             <option value="150">شفر (ضرب 150)</option>
@@ -121,13 +118,12 @@
         <div id="res-gen"></div>
 
         <div class="explanation-section">
-            <h3>📖 شرح معادلة المولدات:</h3>
+            <h3>📖 شرح قواعد المولدات:</h3>
             <ul>
-                <li><strong>المعادلة:</strong> الطول × العرض × الارتفاع × معامل السيارة.</li>
-                <li><strong>المعاملات حسب النوع:</strong></li>
-                <li>ربع نقل: <span class="num-tag">100</span> | شفر: <span class="num-tag">150</span></li>
-                <li>نقل ثقيل: <span class="num-tag">200</span> | كساحة: <span class="num-tag">250</span></li>
-                <li>متعدد: <span class="num-tag">300</span></li>
+                <li><strong>نظام البروز:</strong> إذا زاد المولد عن المقاسات المسموحة للسيارة، يُحسب البروز بـ <span class="num-tag">500 ج</span>.</li>
+                <li><strong>مقاسات الكساحة للمولد:</strong> طول 10، عرض 3، ارتفاع 3.</li>
+                <li><strong>باقي السيارات:</strong> طول 12، عرض 2.4، ارتفاع 2.</li>
+                <li><strong>النتيجة:</strong> نأخذ الأكبر بين (الأساسي) و (إجمالي البروز).</li>
             </ul>
         </div>
     </div>
@@ -151,16 +147,15 @@
             <h3>📖 شرح معادلة المواسير:</h3>
             <ul>
                 <li><strong>المعادلة:</strong> الطول × القطر × العدد × <span class="num-tag">100</span>.</li>
-                <li>تأكد من إدخال القطر كما هو مطلوب في نظامكم.</li>
             </ul>
         </div>
     </div>
 
     <!-- المجموع التراكمي -->
     <div id="total-section" class="total-box hidden">
-        <div style="color: #94a3b8; font-size: 0.9em; margin-bottom: 5px;">إجمالي الفاتورة الحالية:</div>
+        <div style="color: #94a3b8; font-size: 0.9em; margin-bottom: 5px;">إجمالي الفاتورة:</div>
         <div class="total-val" id="grand-total">0 ج.م</div>
-        <button onclick="clearAll()" style="background:rgba(244, 63, 94, 0.1); color:#fb7185; border:1px solid #fb7185; padding:8px 15px; margin-top:10px; font-size:0.8em;">تصفير المجموع وبدء جديد</button>
+        <button onclick="clearAll()" style="background:rgba(244, 63, 94, 0.1); color:#fb7185; border:1px solid #fb7185; padding:8px 15px; margin-top:10px; font-size:0.8em; cursor:pointer; border-radius:8px;">تصفير المجموع</button>
     </div>
 </div>
 
@@ -183,6 +178,19 @@ function switchTab(tab) {
     currentVal = 0;
 }
 
+// دالة حساب البروز الموحدة
+function getBuroozValue(l, w, h, isKassaha) {
+    let stdL = isKassaha ? 10 : 12;
+    let stdW = isKassaha ? 3 : 2.4;
+    let stdH = isKassaha ? 3 : 2;
+    
+    let burooz = 0;
+    if(l > stdL) burooz += (l - stdL) * stdW * 500;
+    if(w > stdW) burooz += (w - stdW) * l * 500;
+    if(h > stdH) burooz += (h - stdH) * l * 500;
+    return burooz;
+}
+
 function calcBox() {
     let l = parseFloat(document.getElementById('L').value)||0;
     let w = parseFloat(document.getElementById('W').value)||0;
@@ -190,10 +198,7 @@ function calcBox() {
     let factor = parseFloat(document.getElementById('boxType').value);
 
     let base = l * w * h * factor;
-    let burooz = 0;
-    if(l > 12) burooz += (l-12) * 2.4 * 500;
-    if(w > 2.4) burooz += (w-2.4) * l * 500;
-    if(h > 2) burooz += (h-2) * l * 500;
+    let burooz = getBuroozValue(l, w, h, factor === 150);
 
     currentVal = Math.max(base, burooz);
     
@@ -212,8 +217,18 @@ function calcGen() {
     let h = parseFloat(document.getElementById('gH').value)||0;
     let factor = parseFloat(document.getElementById('genType').value);
 
-    currentVal = l * w * h * factor;
-    document.getElementById('res-gen').innerHTML = `<div class="res-item highlight">القيمة: ${currentVal.toLocaleString()} ج</div>`;
+    let base = l * w * h * factor;
+    let burooz = getBuroozValue(l, w, h, factor === 250);
+
+    currentVal = Math.max(base, burooz);
+    
+    document.getElementById('res-gen').innerHTML = `
+        <div class="res-item">
+            <p>الأساسي: ${base.toLocaleString()} ج</p>
+            <p>البروز: ${burooz.toLocaleString()} ج</p>
+            <hr style="margin:10px 0; opacity:0.1">
+            <p class="highlight">المعتمد: ${currentVal.toLocaleString()} ج</p>
+        </div>`;
 }
 
 function calcPipe() {
@@ -248,7 +263,7 @@ function resetFields(type) {
 }
 
 function clearAll() {
-    if(confirm("سيتم مسح إجمالي الحساب بالكامل، هل أنت متأكد؟")) {
+    if(confirm("سيتم تصفير الإجمالي، هل أنت متأكد؟")) {
         grandTotal = 0;
         document.getElementById('grand-total').innerText = "0 ج.م";
         document.getElementById('total-section').classList.add('hidden');

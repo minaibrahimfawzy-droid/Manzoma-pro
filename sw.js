@@ -1,4 +1,6 @@
-const CACHE_NAME = 'manzoma-cache-v11'; // تم رفع الإصدار لضمان التحديث
+--- START OF FILE sw.js ---
+
+const CACHE_NAME = 'manzoma-cache-v12'; // تم التحديث إلى v12
 const urlsToCache = [
   './',
   './index.html',
