@@ -1,5 +1,5 @@
 --- START OF FILE sw.js ---
-const CACHE_NAME = 'manzoma-cache-v25'; // قفزة في الإصدار لضمان التحديث
+const CACHE_NAME = 'manzoma-cache-v60'; // قفزة كبيرة للإصدار
 const urlsToCache = [
   './',
   './index.html',
@@ -15,18 +15,10 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting(); // إجبار السيرفس وركر الجديد على التفعيل فوراً
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(urlsToCache);
-    })
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
     })
   );
 });
@@ -35,9 +27,28 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key); // مسح شامل لكل الكاش القديم
+          }
+        })
       );
     })
   );
   return self.clients.claim();
+});
+
+self.addEventListener('fetch', event => {
+  // استراتيجية النتوورك أولاً لملفات التحكم والبرامج لضمان التحديث
+  if (event.request.url.includes('control.js') || event.request.url.includes('6.html')) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+  } else {
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        return response || fetch(event.request);
+      })
+    );
+  }
 });
