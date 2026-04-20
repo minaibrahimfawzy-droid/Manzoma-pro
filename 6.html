@@ -1,272 +1,557 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>نظام الحسابات المتكامل - المطور</title>
-<style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: linear-gradient(135deg, #0f172a, #1e293b); color: #f8fafc; min-height: 100vh; padding: 20px; line-height: 1.6; }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>منظومة الحسابات المتكاملة - النسخة الشاملة العظمى</title>
+    <style>
+        /* إعدادات الواجهة الرسومية الكاملة */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    .container { max-width: 550px; margin: 0 auto; }
-    h1 { text-align: center; color: #38bdf8; margin-bottom: 5px; font-size: 1.8em; text-shadow: 0 2px 10px rgba(56, 189, 248, 0.3); }
-    #datetime { text-align: center; color: #94a3b8; font-size: 0.85em; margin-bottom: 20px; background: rgba(255,255,255,0.05); display: inline-block; width: 100%; padding: 5px; border-radius: 10px; }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 30px 15px;
+            line-height: 1.8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    .main-nav { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-    .nav-box {
-        background: #1e293b; border: 2px solid #334155; padding: 12px 5px; text-align: center;
-        border-radius: 12px; cursor: pointer; transition: 0.3s; font-weight: bold; font-size: 0.9em; color: #94a3b8;
-    }
-    .nav-box.active { border-color: #38bdf8; background: rgba(56, 189, 248, 0.1); color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
+        .main-container {
+            width: 100%;
+            max-width: 650px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
 
-    .app-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    label { display: block; margin: 10px 0 5px; color: #38bdf8; font-weight: bold; font-size: 0.95em; }
-    input, select {
-        width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #334155;
-        background: #0f172a; color: white; text-align: center; font-size: 1.1em; transition: 0.3s;
-    }
-    input:focus { border-color: #38bdf8; outline: none; background: #1e293b; }
+        header h1 {
+            text-align: center;
+            color: #38bdf8;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+            font-weight: 900;
+            text-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+        }
 
-    .btn-group { display: flex; gap: 10px; margin-top: 5px; }
-    button { padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-    .btn-calc { background: linear-gradient(135deg, #38bdf8, #0ea5e9); color: #0f172a; flex: 2; }
-    .btn-add { background: linear-gradient(135deg, #10b981, #059669); color: white; flex: 1; font-size: 1.6em; }
-    .btn-reset { background: #475569; color: white; width: 50px; }
+        #datetime-display {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 1em;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
 
-    .res-item { background: #0f172a; padding: 15px; border-radius: 12px; margin-top: 15px; border-right: 4px solid #38bdf8; text-align: center; }
-    .highlight { color: #38bdf8; font-size: 1.3em; font-weight: 900; }
+        /* نظام التبويبات الفاخر */
+        .navigation-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
 
-    .total-box { margin-top: 20px; border: 2px dashed #10b981; padding: 15px; border-radius: 15px; text-align: center; background: rgba(16, 185, 129, 0.05); }
-    .total-val { color: #34d399; font-size: 1.6em; font-weight: 900; }
+        .nav-item {
+            background: #1e293b;
+            border: 2px solid #334155;
+            padding: 20px 10px;
+            text-align: center;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 800;
+            color: #94a3b8;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
 
-    .explanation-section {
-        margin-top: 20px; padding: 15px; background: rgba(15, 23, 42, 0.6); border-radius: 15px;
-        border: 1px solid rgba(255,255,255,0.05); font-size: 0.88em;
-    }
-    .explanation-section h3 { color: #fbbf24; font-size: 1.1em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-    .explanation-section ul { list-style: none; }
-    .explanation-section li { margin-bottom: 8px; padding-right: 15px; position: relative; color: #cbd5e1; }
-    .explanation-section li::before { content: "←"; position: absolute; right: 0; color: #38bdf8; }
-    .num-tag { color: #38bdf8; font-weight: bold; background: rgba(56, 189, 248, 0.1); padding: 1px 4px; border-radius: 4px; }
+        .nav-item:hover {
+            background: #334155;
+            color: #f8fafc;
+            transform: translateY(-3px);
+        }
 
-    .hidden { display: none; }
-</style>
+        .nav-item.active-tab {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* بطاقة التطبيق */
+        .application-card {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .standard-limit-badge {
+            background: rgba(56, 189, 248, 0.1);
+            color: #38bdf8;
+            padding: 15px;
+            border-radius: 18px;
+            font-size: 1em;
+            margin-bottom: 25px;
+            text-align: center;
+            border: 2px dashed #38bdf8;
+            font-weight: 900;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 10px;
+            color: #cbd5e1;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 18px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            border: 2px solid #334155;
+            background: #0f172a;
+            color: #ffffff;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #38bdf8;
+            outline: none;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+            background: #1e293b;
+        }
+
+        /* الأزرار */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 18px;
+            border: none;
+            border-radius: 18px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .btn-calculate {
+            background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+            color: #0f172a;
+            flex: 2;
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn-add-total {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            flex: 1;
+            font-size: 2em;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-reset-fields {
+            background: #475569;
+            color: white;
+            width: 80px;
+        }
+
+        .btn:active { transform: scale(0.95); }
+
+        /* منطقة النتائج التفصيلية */
+        .detailed-results {
+            margin-top: 25px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-row {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            border: 1px solid #334155;
+            text-align: right;
+            border-right: 5px solid #38bdf8;
+        }
+
+        .result-row p {
+            margin-bottom: 10px;
+            font-size: 1.05em;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .currency-label { color: #38bdf8; font-weight: 900; }
+
+        .final-price-tag {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            font-size: 1.8em;
+            font-weight: 900;
+            text-align: center;
+            margin-top: 20px;
+            border: 3px solid #10b981;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);
+        }
+
+        /* صندوق الشرح الكامل (Formula Card) */
+        .formula-explanation-card {
+            margin-top: 35px;
+            padding: 25px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid #38bdf8;
+            border-radius: 25px;
+            text-align: right;
+            font-size: 0.95em;
+            color: #e2e8f0;
+            line-height: 2.2;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .formula-explanation-card h3 {
+            color: #fbbf24;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            text-decoration: underline;
+        }
+
+        .step-item {
+            margin-bottom: 15px;
+            position: relative;
+            padding-right: 35px;
+        }
+
+        .step-item::before {
+            content: "📌";
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        .example-demonstration {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border-right: 5px solid #10b981;
+        }
+
+        /* المجموع التراكمي */
+        .grand-total-container {
+            margin-top: 40px;
+            border: 4px dashed #10b981;
+            padding: 30px;
+            border-radius: 25px;
+            text-align: center;
+            background: rgba(16, 185, 129, 0.1);
+            width: 100%;
+        }
+
+        .grand-total-title { color: #94a3b8; font-size: 1.2em; font-weight: bold; margin-bottom: 15px; }
+        .grand-total-amount { color: #34d399; font-size: 2.5em; font-weight: 900; text-shadow: 0 0 15px rgba(52, 211, 153, 0.4); }
+
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🛠️ منظومة الحسابات الموحدة</h1>
-    <div id="datetime"></div>
+<div class="main-container">
+    <header>
+        <h1>🛠️ نظام الحسابات المتكامل</h1>
+        <div id="datetime-display">جاري تحميل الوقت...</div>
+    </header>
 
-    <div class="main-nav">
-        <div class="nav-box active" id="tab-box" onclick="switchTab('box')">📦 المهيئات</div>
-        <div class="nav-box" id="tab-gen" onclick="switchTab('gen')">⚡ المولدات</div>
-        <div class="nav-box" id="tab-pipe" onclick="switchTab('pipe')">🔧 المواسير</div>
-    </div>
+    <!-- قائمة التبويبات -->
+    <nav class="navigation-menu">
+        <div class="nav-item active-tab" id="tab-box" onclick="changeAppTab('box')">📦 المهيئات</div>
+        <div class="nav-item" id="tab-gen" onclick="changeAppTab('gen')">⚡ المولدات</div>
+        <div class="nav-item" id="tab-pipe" onclick="changeAppTab('pipe')">🔧 المواسير</div>
+    </nav>
 
-    <!-- قسم المهيئات -->
-    <div id="section-box" class="app-card">
-        <label>نوع النقل:</label>
-        <select id="boxType">
-            <option value="100">نقل ثقيل (ضرب 100)</option>
-            <option value="150">كساحة (ضرب 150)</option>
-            <option value="200">متعدد (ضرب 200)</option>
+    <!-- ================= قسم المهيئات ================= -->
+    <section id="section-box" class="application-card">
+        <label for="boxType">اختر نوع السيارة (المعامل والمقاسات):</label>
+        <select id="boxType" onchange="refreshUIData('box')">
+            <option value="100">نقل ثقيل (معامل ×100)</option>
+            <option value="150">كساحة (معامل ×150)</option>
+            <option value="200">متعدد (معامل ×200)</option>
         </select>
-        <input type="number" id="L" placeholder="الطول (متر)">
-        <input type="number" id="W" placeholder="العرض (متر)">
-        <input type="number" id="H" placeholder="الارتفاع (متر)">
         
-        <div class="btn-group">
-            <button class="btn-calc" onclick="calcBox()">حساب القيمة</button>
-            <button class="btn-add" onclick="addToTotal('box')">+</button>
-            <button class="btn-reset" onclick="resetFields('box')">🔄</button>
+        <div id="boxLimitBadge" class="standard-limit-badge">تحميل البيانات...</div>
+
+        <label>أبعاد الشحنة بالامتار:</label>
+        <input type="number" id="box-length" placeholder="أدخل الطول (L)">
+        <input type="number" id="box-width" placeholder="أدخل العرض (W)">
+        <input type="number" id="box-height" placeholder="أدخل الارتفاع (H)">
+        
+        <div class="action-buttons">
+            <button class="btn btn-calculate" onclick="performFinalCalculation('box')">بدء الحساب التفصيلي</button>
+            <button class="btn btn-add-total" onclick="appendToInvoice('box')">+</button>
+            <button class="btn btn-reset-fields" onclick="clearInputs('box')">🔄</button>
         </div>
 
-        <div id="res-box"></div>
+        <div id="results-display-box" class="detailed-results"></div>
 
-        <div class="explanation-section">
-            <h3>📖 شرح مقاسات وقواعد المهيئات:</h3>
-            <ul>
-                <li><strong>مقاسات النقل الثقيل/المتعدد:</strong> طول 12، عرض 2.4، ارتفاع 2.</li>
-                <li><strong>مقاسات الكساحة:</strong> طول <span class="num-tag">10</span>، عرض <span class="num-tag">3</span>، ارتفاع <span class="num-tag">3</span>.</li>
-                <li><strong>قاعدة الحساب:</strong> يُحسب الأساسي (حجم × معامل) والبروز (فرق المقاس × 500) ويتم اختيار <strong>الأكبر</strong>.</li>
-            </ul>
-        </div>
-    </div>
+        <!-- شرح معادلة المهيئات -->
+        <article id="box-formula-card" class="formula-explanation-card">
+            <h3 id="box-formula-title">📖 شرح معادلة الحساب</h3>
+            <div id="box-formula-content"></div>
+        </article>
+    </section>
 
-    <!-- قسم المولدات -->
-    <div id="section-gen" class="app-card hidden">
-        <label>نوع السيارة للحمل:</label>
-        <select id="genType">
-            <option value="100">ربع نقل (ضرب 100)</option>
-            <option value="150">شفر (ضرب 150)</option>
-            <option value="200">نقل ثقيل (ضرب 200)</option>
-            <option value="250">كساحة (ضرب 250)</option>
-            <option value="300">متعدد (ضرب 300)</option>
+    <!-- ================= قسم المولدات ================= -->
+    <section id="section-gen" class="application-card hidden">
+        <label for="genType">نوع السيارة الحاملة للمولد:</label>
+        <select id="genType" onchange="refreshUIData('gen')">
+            <option value="100">ربع نقل (معامل ×100)</option>
+            <option value="150">شفر (معامل ×150)</option>
+            <option value="200">نقل ثقيل (معامل ×200)</option>
+            <option value="250">كساحة (معامل ×250)</option>
+            <option value="300">متعدد (معامل ×300)</option>
         </select>
-        <input type="number" id="gL" placeholder="طول المولد (متر)">
-        <input type="number" id="gW" placeholder="عرض المولد (متر)">
-        <input type="number" id="gH" placeholder="ارتفاع المولد (متر)">
+
+        <div id="genLimitBadge" class="standard-limit-badge">تحميل البيانات...</div>
+
+        <label>أبعاد المولد بالامتار:</label>
+        <input type="number" id="gen-length" placeholder="الطول">
+        <input type="number" id="gen-width" placeholder="العرض">
+        <input type="number" id="gen-height" placeholder="الارتفاع">
         
-        <div class="btn-group">
-            <button class="btn-calc" onclick="calcGen()">حساب القيمة</button>
-            <button class="btn-add" onclick="addToTotal('gen')">+</button>
-            <button class="btn-reset" onclick="resetFields('gen')">🔄</button>
+        <div class="action-buttons">
+            <button class="btn btn-calculate" onclick="performFinalCalculation('gen')">بدء الحساب التفصيلي</button>
+            <button class="btn btn-add-total" onclick="appendToInvoice('gen')">+</button>
+            <button class="btn btn-reset-fields" onclick="clearInputs('gen')">🔄</button>
         </div>
 
-        <div id="res-gen"></div>
+        <div id="results-display-gen" class="detailed-results"></div>
 
-        <div class="explanation-section">
-            <h3>📖 شرح قواعد المولدات:</h3>
-            <ul>
-                <li><strong>نظام البروز:</strong> إذا زاد المولد عن المقاسات المسموحة للسيارة، يُحسب البروز بـ <span class="num-tag">500 ج</span>.</li>
-                <li><strong>مقاسات الكساحة للمولد:</strong> طول 10، عرض 3، ارتفاع 3.</li>
-                <li><strong>باقي السيارات:</strong> طول 12، عرض 2.4، ارتفاع 2.</li>
-                <li><strong>النتيجة:</strong> نأخذ الأكبر بين (الأساسي) و (إجمالي البروز).</li>
-            </ul>
-        </div>
-    </div>
+        <article id="gen-formula-card" class="formula-explanation-card">
+            <h3 id="gen-formula-title">📖 شرح معادلة المولدات</h3>
+            <div id="gen-formula-content"></div>
+        </article>
+    </section>
 
-    <!-- قسم المواسير -->
-    <div id="section-pipe" class="app-card hidden">
-        <label>بيانات المواسير:</label>
-        <input type="number" id="pL" placeholder="الطول (متر)">
-        <input type="number" id="pD" placeholder="القطر">
-        <input type="number" id="pC" placeholder="العدد">
+    <!-- ================= قسم المواسير ================= -->
+    <section id="section-pipe" class="application-card hidden">
+        <label>أبعاد ومواصفات المواسير:</label>
+        <input type="number" id="pipe-length" placeholder="إجمالي الطول (متر)">
+        <input type="number" id="pipe-diameter" placeholder="القطر">
+        <input type="number" id="pipe-count" placeholder="العدد الكلي">
         
-        <div class="btn-group">
-            <button class="btn-calc" onclick="calcPipe()">حساب القيمة</button>
-            <button class="btn-add" onclick="addToTotal('pipe')">+</button>
-            <button class="btn-reset" onclick="resetFields('pipe')">🔄</button>
+        <div class="action-buttons">
+            <button class="btn btn-calculate" onclick="performFinalCalculation('pipe')">حساب القيمة</button>
+            <button class="btn btn-add-total" onclick="appendToInvoice('pipe')">+</button>
         </div>
 
-        <div id="res-pipe"></div>
+        <div id="results-display-pipe" class="detailed-results"></div>
 
-        <div class="explanation-section">
-            <h3>📖 شرح معادلة المواسير:</h3>
-            <ul>
-                <li><strong>المعادلة:</strong> الطول × القطر × العدد × <span class="num-tag">100</span>.</li>
-            </ul>
-        </div>
-    </div>
+        <article class="formula-explanation-card">
+            <h3>📖 كيفية حساب المواسير</h3>
+            <div class="step-item"><b>المعادلة:</b> الطول × القطر × العدد × <span class="currency-label">100</span></div>
+        </article>
+    </section>
 
-    <!-- المجموع التراكمي -->
-    <div id="total-section" class="total-box hidden">
-        <div style="color: #94a3b8; font-size: 0.9em; margin-bottom: 5px;">إجمالي الفاتورة:</div>
-        <div class="total-val" id="grand-total">0 ج.م</div>
-        <button onclick="clearAll()" style="background:rgba(244, 63, 94, 0.1); color:#fb7185; border:1px solid #fb7185; padding:8px 15px; margin-top:10px; font-size:0.8em; cursor:pointer; border-radius:8px;">تصفير المجموع</button>
-    </div>
+    <!-- المجموع التراكمي النهائي -->
+    <footer id="invoice-total-section" class="grand-total-container hidden">
+        <div class="grand-total-title">إجمالي الحساب المجمع للفاتورة:</div>
+        <div class="grand-total-amount" id="invoice-grand-total">0 ج.م</div>
+        <button onclick="resetInvoice()" style="background:none; color:#fb7185; border:2px solid #fb7185; padding:12px 25px; margin-top:20px; cursor:pointer; border-radius:15px; font-weight:bold; font-size: 1.1em;">تصفير الفاتورة بالكامل</button>
+    </footer>
 </div>
 
 <script>
-let grandTotal = 0;
-let currentVal = 0;
+// --- متغيرات النظام الشاملة ---
+let totalInvoiceAccumulator = 0;
+let lastResultValue = 0;
 
-function updateTime(){
-    const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    document.getElementById('datetime').innerText = now.toLocaleDateString('ar-EG', options);
+// قاعدة بيانات المواصفات (المقاسات المسموحة والمعاملات)
+const specsDatabase = {
+    "100_box": { car: "نقل ثقيل", L: 12, W: 2.4, H: 2, F: 100 },
+    "150_box": { car: "كساحة", L: 9, W: 2.75, H: 3, F: 150 },
+    "200_box": { car: "متعدد", L: 12, W: 2.4, H: 2, F: 200 },
+    "100_gen": { car: "ربع نقل", L: 3.5, W: 1.8, H: 1.8, F: 100 },
+    "150_gen": { car: "شفر", L: 4.5, W: 2.1, H: 2, F: 150 },
+    "200_gen": { car: "نقل ثقيل", L: 12, W: 2.4, H: 2, F: 200 },
+    "250_gen": { car: "كساحة", L: 9, W: 2.75, H: 3, F: 250 },
+    "300_gen": { car: "متعدد", L: 12, W: 2.4, H: 2, F: 300 }
+};
+
+// تحديث الساعة والتاريخ
+function updateClock(){
+    const date = new Date();
+    document.getElementById('datetime-display').innerText = date.toLocaleString('ar-EG', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
 }
-setInterval(updateTime, 1000); updateTime();
+setInterval(updateClock, 1000);
+updateClock();
 
-function switchTab(tab) {
-    document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.app-card').forEach(el => el.classList.add('hidden'));
-    document.getElementById('tab-' + tab).classList.add('active');
-    document.getElementById('section-' + tab).classList.remove('hidden');
-    currentVal = 0;
+// تحديث الواجهة عند اختيار نوع السيارة
+function refreshUIData(type) {
+    const factor = document.getElementById(type === 'box' ? 'boxType' : 'genType').value;
+    const key = factor + "_" + type;
+    const spec = specsDatabase[key];
+
+    // تحديث شارة المقاسات
+    document.getElementById(type + 'LimitBadge').innerText = `المقاس المسموح لـ (${spec.car}): ${spec.L}م طول | ${spec.W}م عرض | ${spec.H}م ارتفاع`;
+
+    // تحديث الشرح التفصيلي والمثال
+    const testL = 12, testW = 3, testH = 3.5; // مقاسات افتراضية للمثال
+    const exBase = testL * testW * testH * spec.F;
+    const exOverL = (testL > spec.L) ? (testL - spec.L) * spec.W * 500 : 0;
+    const exOverW = (testW > spec.W) ? (testW - spec.W) * testL * 500 : 0;
+    const exOverH = (testH > spec.H) ? (testH - spec.H) * testL * 500 : 0;
+
+    const content = `
+        <div class="step-item"><b>أولاً:</b> حساب القيمة الأساسية (الطول × العرض × الارتفاع × <span class="currency-label">${spec.F}</span>)</div>
+        <div class="step-item"><b>ثانياً:</b> حساب بروز الطول (أي زيادة عن <span class="currency-label">${spec.L}م</span>) × ${spec.W} × 500</div>
+        <div class="step-item"><b>ثالثاً:</b> حساب بروز العرض (أي زيادة عن <span class="currency-label">${spec.W}م</span>) × الطول الحقيقي × 500</div>
+        <div class="step-item"><b>رابعاً:</b> حساب بروز الارتفاع (أي زيادة عن <span class="currency-label">${spec.H}م</span>) × الطول الحقيقي × 500</div>
+        <div class="example-demonstration">
+            <b>مثال توضيحي لسيارة (${spec.car}):</b> لو المقاس ${testL} × ${testW} × ${testH}:<br>
+            • الأساسي: ${testL}×${testW}×${testH}×${spec.F} = <span class="currency-label">${exBase.toLocaleString()} ج</span><br>
+            • بروز الطول: (${testL}-${spec.L}) × ${spec.W} × 500 = <span class="currency-label">${exOverL.toLocaleString()} ج</span><br>
+            • بروز العرض: (${testW}-${spec.W}) × ${testL} × 500 = <span class="currency-label">${exOverW.toLocaleString()} ج</span><br>
+            • بروز الارتفاع: (${testH}-${spec.H}) × ${testL} × 500 = <span class="currency-label">${exOverH.toLocaleString()} ج</span>
+        </div>
+    `;
+    document.getElementById(type + '-formula-content').innerHTML = content;
 }
 
-// دالة حساب البروز الموحدة
-function getBuroozValue(l, w, h, isKassaha) {
-    let stdL = isKassaha ? 10 : 12;
-    let stdW = isKassaha ? 3 : 2.4;
-    let stdH = isKassaha ? 3 : 2;
+// البدء الأولي للبيانات
+refreshUIData('box');
+refreshUIData('gen');
+
+// التنقل بين التبويبات
+function changeAppTab(targetTab) {
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-tab'));
+    document.querySelectorAll('.application-card').forEach(el => el.classList.add('hidden'));
     
-    let burooz = 0;
-    if(l > stdL) burooz += (l - stdL) * stdW * 500;
-    if(w > stdW) burooz += (w - stdW) * l * 500;
-    if(h > stdH) burooz += (h - stdH) * l * 500;
-    return burooz;
+    document.getElementById('tab-' + targetTab).classList.add('active-tab');
+    document.getElementById('section-' + targetTab).classList.remove('hidden');
+    lastResultValue = 0;
 }
 
-function calcBox() {
-    let l = parseFloat(document.getElementById('L').value)||0;
-    let w = parseFloat(document.getElementById('W').value)||0;
-    let h = parseFloat(document.getElementById('H').value)||0;
-    let factor = parseFloat(document.getElementById('boxType').value);
-
-    let base = l * w * h * factor;
-    let burooz = getBuroozValue(l, w, h, factor === 150);
-
-    currentVal = Math.max(base, burooz);
-    
-    document.getElementById('res-box').innerHTML = `
-        <div class="res-item">
-            <p>الأساسي: ${base.toLocaleString()} ج</p>
-            <p>البروز: ${burooz.toLocaleString()} ج</p>
-            <hr style="margin:10px 0; opacity:0.1">
-            <p class="highlight">المعتمد: ${currentVal.toLocaleString()} ج</p>
-        </div>`;
-}
-
-function calcGen() {
-    let l = parseFloat(document.getElementById('gL').value)||0;
-    let w = parseFloat(document.getElementById('gW').value)||0;
-    let h = parseFloat(document.getElementById('gH').value)||0;
-    let factor = parseFloat(document.getElementById('genType').value);
-
-    let base = l * w * h * factor;
-    let burooz = getBuroozValue(l, w, h, factor === 250);
-
-    currentVal = Math.max(base, burooz);
-    
-    document.getElementById('res-gen').innerHTML = `
-        <div class="res-item">
-            <p>الأساسي: ${base.toLocaleString()} ج</p>
-            <p>البروز: ${burooz.toLocaleString()} ج</p>
-            <hr style="margin:10px 0; opacity:0.1">
-            <p class="highlight">المعتمد: ${currentVal.toLocaleString()} ج</p>
-        </div>`;
-}
-
-function calcPipe() {
-    let l = parseFloat(document.getElementById('pL').value)||0;
-    let d = parseFloat(document.getElementById('pD').value)||0;
-    let c = parseFloat(document.getElementById('pC').value)||0;
-
-    currentVal = l * d * c * 100;
-    document.getElementById('res-pipe').innerHTML = `<div class="res-item highlight">القيمة: ${currentVal.toLocaleString()} ج</div>`;
-}
-
-function addToTotal(type) {
-    if(currentVal <= 0) { alert("يرجى حساب القيمة أولاً"); return; }
-    grandTotal += currentVal;
-    document.getElementById('total-section').classList.remove('hidden');
-    document.getElementById('grand-total').innerText = grandTotal.toLocaleString() + " ج.م";
-    resetFields(type);
-}
-
-function resetFields(type) {
-    currentVal = 0;
-    if(type === 'box') { 
-        document.getElementById('L').value=''; document.getElementById('W').value=''; 
-        document.getElementById('H').value=''; document.getElementById('res-box').innerHTML='';
-    } else if(type === 'gen') {
-        document.getElementById('gL').value=''; document.getElementById('gW').value=''; 
-        document.getElementById('gH').value=''; document.getElementById('res-gen').innerHTML='';
-    } else {
-        document.getElementById('pL').value=''; document.getElementById('pD').value=''; 
-        document.getElementById('pC').value=''; document.getElementById('res-pipe').innerHTML='';
+// محرك الحسابات الرئيسي (الأكثر تفصيلاً ودقة)
+function performFinalCalculation(appType) {
+    if(appType === 'pipe') {
+        const L = parseFloat(document.getElementById('pipe-length').value) || 0;
+        const D = parseFloat(document.getElementById('pipe-diameter').value) || 0;
+        const C = parseFloat(document.getElementById('pipe-count').value) || 0;
+        lastResultValue = L * D * C * 100;
+        document.getElementById('results-display-pipe').innerHTML = `<div class="final-price-tag">القيمة الإجمالية: ${lastResultValue.toLocaleString()} ج.م</div>`;
+        return;
     }
+
+    // جلب المدخلات
+    const inputL = parseFloat(document.getElementById(appType + '-length').value) || 0;
+    const inputW = parseFloat(document.getElementById(appType + '-width').value) || 0;
+    const inputH = parseFloat(document.getElementById(appType + '-height').value) || 0;
+
+    // جلب المواصفات بناءً على النوع
+    const factorSelect = document.getElementById(appType === 'box' ? 'boxType' : 'genType').value;
+    const spec = specsDatabase[factorSelect + "_" + appType];
+
+    // 1. الحساب الأساسي
+    const basicVolumePrice = inputL * inputW * inputH * spec.F;
+
+    // 2. حساب بروز الطول
+    const overLength = (inputL > spec.L) ? (inputL - spec.L) * spec.W * 500 : 0;
+
+    // 3. حساب بروز العرض
+    const overWidth = (inputW > spec.W) ? (inputW - spec.W) * inputL * 500 : 0;
+
+    // 4. حساب بروز الارتفاع
+    const overHeight = (inputH > spec.H) ? (inputH - spec.H) * inputL * 500 : 0;
+
+    const totalOverhangPrice = overLength + overWidth + overHeight;
+
+    // النتيجة النهائية هي الأكبر
+    lastResultValue = Math.max(basicVolumePrice, totalOverhangPrice);
+
+    // بناء واجهة النتائج التفصيلية
+    document.getElementById('results-display-' + appType).innerHTML = `
+        <div class="result-row">
+            <p><span>حساب الحجم الأساسي:</span> <span class="currency-label">${basicVolumePrice.toLocaleString()} ج</span></p>
+            <p><span>قيمة بروز <b style="color:#fb7185">الطول</b>:</span> <span class="currency-label">${overLength.toLocaleString()} ج</span></p>
+            <p><span>قيمة بروز <b style="color:#fb7185">العرض</b>:</span> <span class="currency-label">${overWidth.toLocaleString()} ج</span></p>
+            <p><span>قيمة بروز <b style="color:#fb7185">الارتفاع</b>:</span> <span class="currency-label">${overHeight.toLocaleString()} ج</span></p>
+            <p><span>إجمالي قيمة كافة البروزات:</span> <span class="currency-label">${totalOverhangPrice.toLocaleString()} ج</span></p>
+            <div class="final-price-tag">القيمة المعتمدة (الأكبر): ${lastResultValue.toLocaleString()} ج.م</div>
+        </div>
+    `;
 }
 
-function clearAll() {
-    if(confirm("سيتم تصفير الإجمالي، هل أنت متأكد؟")) {
-        grandTotal = 0;
-        document.getElementById('grand-total').innerText = "0 ج.م";
-        document.getElementById('total-section').classList.add('hidden');
+// الإضافة للفاتورة المجمعة
+function appendToInvoice(appType) {
+    if (lastResultValue <= 0) {
+        alert("يرجى إجراء الحساب أولاً!");
+        return;
+    }
+    totalInvoiceAccumulator += lastResultValue;
+    document.getElementById('invoice-total-section').classList.remove('hidden');
+    document.getElementById('invoice-grand-total').innerText = totalInvoiceAccumulator.toLocaleString() + " ج.م";
+    
+    // تصفير الحقول بعد الإضافة لسهولة الإدخال التالي
+    clearInputs(appType);
+}
+
+// تصفير الحقول
+function clearInputs(appType) {
+    lastResultValue = 0;
+    if(appType === 'box' || appType === 'gen') {
+        document.getElementById(appType + '-length').value = '';
+        document.getElementById(appType + '-width').value = '';
+        document.getElementById(appType + '-height').value = '';
+    } else {
+        document.getElementById('pipe-length').value = '';
+        document.getElementById('pipe-diameter').value = '';
+        document.getElementById('pipe-count').value = '';
+    }
+    document.getElementById('results-display-' + appType).innerHTML = '';
+}
+
+// تصفير الفاتورة بالكامل
+function resetInvoice() {
+    if (confirm("هل تريد تصفير الفاتورة المجمعة والبدء من جديد؟")) {
+        totalInvoiceAccumulator = 0;
+        document.getElementById('invoice-grand-total').innerText = "0 ج.م";
+        document.getElementById('invoice-total-section').classList.add('hidden');
     }
 }
 </script>
