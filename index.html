@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>System 2026 Pro - Ultimate Master Edition</title>
     
-    <!-- تحميل الخط مع Fallback لضمان العمل أوفلاين 100% -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
-        /* التنسيق الجرافيكي الكامل - نسخة خام طويلة جداً لضمان الحجم والكفاءة */
         body { 
             font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; 
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
@@ -30,7 +28,7 @@
         h2 { font-weight: 800; margin: 0 0 15px 0; font-size: 26px; }
 
         #devID { 
-            font-size: 14px; color: #58a6ff; font-family: monospace; 
+            font-size: 13px; color: #58a6ff; font-family: monospace; 
             margin-bottom: 20px; background: rgba(0, 0, 0, 0.6); padding: 15px; 
             border-radius: 15px; border: 1px dashed #58a6ff; font-weight: 800; display: block;
         }
@@ -57,7 +55,8 @@
             box-shadow: 0 15px 30px rgba(56, 239, 125, 0.4); display: flex; align-items: center; justify-content: center; gap: 12px;
         }
 
-        /* واجهة القائمة الرئيسية */
+        button:disabled { filter: grayscale(1); cursor: not-allowed; }
+
         #app-menu { display: none; width: 100%; height: 100vh; padding: 30px; box-sizing: border-box; overflow-y: auto; background: #0f172a; }
         .menu-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #1e293b; padding-bottom: 20px; }
         .user-info-text span { color: #00d2ff; font-weight: 800; font-size: 20px; }
@@ -71,7 +70,7 @@
             height: 140px; text-decoration: none; text-align: center; transition: 0.3s;
         }
         
-        .icon { font-size: 30px; margin-bottom: 8px; } /* حجم الأيقونات 30px */
+        .icon { font-size: 30px; margin-bottom: 8px; }
 
         #update-screen, #sync-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
         .box { background: #1e293b; padding: 40px; border-radius: 35px; text-align: center; border: 2px solid #ff4b4b; width: 85%; max-width: 400px; }
@@ -125,9 +124,9 @@
     <div class="menu-header">
         <div class="user-info-text">
             <h2 style="color:#fff; margin:0;">الرئيسية</h2>
-            مرحباً: <span id="userNameDisplay" style="color:#00d2ff; font-weight: 800;"></span>
+            مرحباً: <span id="userNameDisplay"></span>
         </div>
-        <button onclick="logout()" class="logout-btn">خروج 🚪</button>
+        <button onclick="logout()" id="logoutBtn" class="logout-btn">خروج 🚪</button>
     </div>
     <div id="clock" style="text-align:center; color:#38ef7d; padding:20px; background:rgba(0,0,0,0.5); border-radius:25px; margin-bottom:35px; font-weight:bold; border:1px solid #222; font-size:18px;"></div>
     
@@ -148,108 +147,152 @@
 </div>
 
 <script>
-    // --- الخدمة الخلفية لضمان العمل أوفلاين بنظام الـ Force ---
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('./sw.js?v=24', { scope: './' }).then(function(reg) {
-                console.log('Offline Engine Ready');
-                if (navigator.onLine) { reg.update(); }
-            });
-        });
-    }
+    // --- الإعدادات ---
+    const BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
+    const CHAT_ID = "-1003886528114";
+    const SECRET_KEY = "QWRtaW5fMjZf";
+    const PASS_ARRAY = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
 
-    function showToast(m) { var t=document.getElementById("custom-toast"); t.innerText=m; t.style.visibility="visible"; setTimeout(()=>t.style.visibility="hidden",3500); }
-
-    var BOT_TOKEN = "8596993745:AAG0FXH8LFqweLH5nlPTcFpEM07BHhabrHw";
-    var CHAT_ID = "-1003886528114";
-    var SECRET_KEY = "QWRtaW5fMjZf";
-    var PASS_ARRAY = ["QWRtaW5fMjZfMjkxMTk5Ng==","QWRtaW5fMjZfNzYxOTg3","QWRtaW5fMjZfNDExMjAxNA==","QWRtaW5fMjZfMjA3MjAxNw==","QWRtaW5fMjZfNzYyMDIx"];
-
-    var deviceID = localStorage.getItem("_u_id") || ("ID-" + Math.floor(Math.random() * 89999 + 10000));
+    // هوية الجهاز
+    const deviceID = localStorage.getItem("_u_id") || ("ID-" + Math.floor(Math.random() * 89999 + 10000));
     localStorage.setItem("_u_id", deviceID);
     document.getElementById("devID").innerText = "بصمة الجهاز الموثقة: " + deviceID;
 
+    // ساعة النظام
     setInterval(() => { document.getElementById("clock").innerText = new Date().toLocaleString('ar-EG'); }, 1000);
 
-    // دالة إرسال التليجرام - تم تعديلها لتكون Non-Blocking تماماً
+    function showToast(m) { var t=document.getElementById("custom-toast"); t.innerText=m; t.style.visibility="visible"; setTimeout(()=>t.style.visibility="hidden",3500); }
+
+    // --- نظام الإشعارات المتطور ---
     async function sendToTelegram(name, code, type) {
-        if(!navigator.onLine) return;
+        let ip = "Checking...";
         try {
-            // جلب الأيبي مع تايم أوت قصير جداً لعدم تعطيل الجهاز
             const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), 1500);
-            let ip = "Offline/Hidden";
-            try {
-                const r = await fetch("https://api.ipify.org?format=json", { signal: controller.signal });
-                const d = await r.json(); ip = d.ip;
-            } catch(e){}
-            clearTimeout(id);
-            
-            var message = type === "LOGIN" ? 
-                `⚖️ *إقرار وتعهد مسؤولية قانونية* ✅\n\n👤 المقر والموثق: *${name}*\n🆔 بصمة الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\`\n🔑 الكود المستخدم: \`${code}\`\n\nبموجب هذا التوقيع الرقمي، أقر المستخدم بمسؤوليته الجنائية والمدنية المطلقة وبرأ ذمة المبرمج بصفة نهائية وباتة.` :
-                `🚪 *عملية تسجيل خروج من النظام* 🚪\n\n👤 المستخدم: *${name}*\n🆔 بصمة الجهاز: \`${deviceID}\`\n🌐 الأيبي: \`${ip}\`\n\nتم إنهاء الجلسة والخروج من النظام بنجاح.`;
-            
-            fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}&parse_mode=Markdown`);
-        } catch(e) {}
+            setTimeout(() => controller.abort(), 2000);
+            const r = await fetch("https://api.ipify.org?format=json", { signal: controller.signal });
+            const d = await r.json(); ip = d.ip;
+        } catch(e) { ip = "Hidden/Offline"; }
+
+        let action = type === "LOGIN" ? "✅ دخول جديد للنظام" : "🚪 تسجيل خروج";
+        let message = `🔔 *تنبيه من منظومة 2026*\n`;
+        message += `----------------------------\n`;
+        message += `📝 *الحدث:* ${action}\n`;
+        message += `👤 *المستخدم:* ${name}\n`;
+        message += `🆔 *بصمة الجهاز:* \`${deviceID}\`\n`;
+        message += `🌐 *الأيبي:* \`${ip}\`\n`;
+        message += `🔑 *الكود:* \`${code}\`\n`;
+        message += `⏰ *التوقيت:* ${new Date().toLocaleString('ar-EG')}\n`;
+        message += `----------------------------`;
+
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        
+        try {
+            await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: "Markdown" }),
+                keepalive: true // لضمان الإرسال حتى لو اغلقت الصفحة
+            });
+        } catch (err) {
+            // حفظ في الطابور إذا فشل الإرسال
+            let queue = JSON.parse(localStorage.getItem("_msg_queue") || "[]");
+            queue.push(message);
+            localStorage.setItem("_msg_queue", JSON.stringify(queue));
+        }
     }
 
+    // معالجة الرسائل المعلقة
+    async function processQueue() {
+        if (!navigator.onLine) return;
+        let queue = JSON.parse(localStorage.getItem("_msg_queue") || "[]");
+        if (queue.length === 0) return;
+        for (let msg of queue) {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" }),
+                keepalive: true
+            });
+        }
+        localStorage.removeItem("_msg_queue");
+    }
+
+    // --- الدخول والخروج ---
     async function login() {
-        var n = document.getElementById("userName").value.trim();
-        var p = document.getElementById("pIn").value.trim();
-        var l = document.getElementById("legalAffidavit").checked;
-        if(!n || !p || !l) { showToast("⚠️ يرجى إكمال البيانات والموافقة"); return; }
+        const n = document.getElementById("userName").value.trim();
+        const p = document.getElementById("pIn").value.trim();
+        const l = document.getElementById("legalAffidavit").checked;
         
-        var h = btoa(atob(SECRET_KEY) + p.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)));
-        var d = new Date(); var y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
-        var i = (y - 2026) * 2; if (d.getMonth() >= 5) i += 1; 
+        if(!n || !p || !l) { showToast("⚠️ أكمل البيانات ووافق على الإقرار"); return; }
+        
+        const h = btoa(atob(SECRET_KEY) + p.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+        const d = new Date(); let y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
+        let i = (y - 2026) * 2; if (d.getMonth() >= 5) i += 1; 
 
         if (h === PASS_ARRAY[i % 5]) {
-            localStorage.setItem("_tkn_auth", h); localStorage.setItem("_u_name", n);
+            const btn = document.getElementById("loginBtn");
+            btn.disabled = true;
+            btn.innerText = "جاري التوثيق... ⏳";
+
+            localStorage.setItem("_tkn_auth", h); 
+            localStorage.setItem("_u_name", n);
             localStorage.setItem("_legal_signed_v4", "true");
-            sendToTelegram(n, p, "LOGIN"); // إرسال خلفي
-            setTimeout(() => { location.reload(); }, 100);
-        } else { document.getElementById("eMsg").style.display = "block"; }
+
+            await sendToTelegram(n, p, "LOGIN");
+            location.reload(); 
+        } else { 
+            document.getElementById("eMsg").style.display = "block"; 
+        }
     }
 
     async function logout() {
-        var n = localStorage.getItem("_u_name") || "Unknown";
-        sendToTelegram(n, "N/A", "LOGOUT"); // إرسال خلفي
+        if (!confirm("هل أنت متأكد من تسجيل الخروج؟")) return;
+        const n = localStorage.getItem("_u_name") || "Unknown";
+        const btn = document.getElementById("logoutBtn");
+        btn.disabled = true;
+        btn.innerText = "جاري الخروج...";
+
+        await sendToTelegram(n, "N/A", "LOGOUT");
         localStorage.removeItem("_tkn_auth");
-        setTimeout(() => { location.reload(); }, 100);
+        location.reload();
     }
 
     function showApp() {
-        var d = new Date(); var y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
-        var i = (y - 2026) * 2; if (d.getMonth() >= 5) i += 1; 
+        const d = new Date(); let y = d.getFullYear() < 2026 ? 2026 : d.getFullYear();
+        let i = (y - 2026) * 2; if (d.getMonth() >= 5) i += 1; 
         if(localStorage.getItem("_tkn_auth") === PASS_ARRAY[i % 5] && localStorage.getItem("_legal_signed_v4")) {
             document.getElementById("lock-screen").style.display = "none";
             document.getElementById("app-menu").style.display = "block";
             document.getElementById("userNameDisplay").innerText = localStorage.getItem("_u_name");
+            processQueue(); 
         }
     }
 
+    // --- إدارة البيانات والتحديثات ---
     function generateAndCopyText() {
-        var s = {}; for(var i=0; i<localStorage.length; i++) {
-            var k = localStorage.key(i); if(!["_tkn_auth", "_u_id", "_u_name", "_legal_signed_v4", "M_VER"].includes(k)) s[k] = localStorage.getItem(k);
+        let s = {}; for(let i=0; i<localStorage.length; i++) {
+            let k = localStorage.key(i); if(!["_tkn_auth", "_u_id", "_u_name", "_legal_signed_v4", "M_VER", "_msg_queue"].includes(k)) s[k] = localStorage.getItem(k);
         }
         document.getElementById('backupTextData').value = btoa(unescape(encodeURIComponent(JSON.stringify(s))));
         document.getElementById('backupTextData').select(); document.execCommand('copy');
-        showToast("✅ تم نسخ كود البيانات!");
+        showToast("✅ تم نسخ الكود!");
     }
 
     function restoreFromText() {
         try {
-            var d = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('backupTextData').value.trim()))));
-            for(var k in d) localStorage.setItem(k, d[k]);
+            let d = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('backupTextData').value.trim()))));
+            for(let k in d) localStorage.setItem(k, d[k]);
+            alert("تمت استعادة البيانات بنجاح!");
             location.reload();
-        } catch(e) { showToast("❌ الكود غير صحيح!"); }
+        } catch(e) { showToast("❌ كود غير صالح!"); }
     }
 
-    function manualCheckUpdate() { if(navigator.onLine) checkUpdates(); else showToast("⚠️ لا يوجد إنترنت للفحص"); }
+    function manualCheckUpdate() { if(navigator.onLine) checkUpdates(); else showToast("⚠️ لا يوجد إنترنت"); }
 
     function checkUpdates() {
+        if(!navigator.onLine) return;
         fetch("./control.js?nc=" + Date.now()).then(res => res.text()).then(t => {
-            var v = t.match(/HTML_VERSION\s*=\s*"(\d+)"/);
+            let v = t.match(/HTML_VERSION\s*=\s*"(\d+)"/);
             if(v && parseInt(v[1]) > parseInt(localStorage.getItem("M_VER") || "0")) {
                 document.getElementById("update-screen").style.display = "flex";
                 document.getElementById("updateBtn").onclick = () => downloadUpdate(v[1]);
@@ -258,19 +301,25 @@
     }
 
     async function downloadUpdate(v) {
-        var b = document.getElementById("updateBtn"); b.disabled = true; b.innerText = "جاري التحديث...";
-        var c = await caches.open("manzoma-cache-v8");
-        var f = ["index.html", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html", "7.html", "sw.js", "control.js"];
+        const b = document.getElementById("updateBtn"); b.disabled = true; b.innerText = "جاري التحديث...";
+        const c = await caches.open("manzoma-cache-v8");
+        const f = ["index.html", "Nabatshia.html", "2.html", "3.html", "4.html", "5.html", "6.html", "7.html", "sw.js", "control.js"];
         try {
             for(let file of f) { 
-                var r = await fetch(file + "?nc=" + Date.now());
+                let r = await fetch(file + "?nc=" + Date.now());
                 if(r.ok) await c.put(file, r);
             }
             localStorage.setItem("M_VER", v); location.reload();
-        } catch(e) { b.disabled = false; b.innerText = "فشل.. حاول ثانية"; }
+        } catch(e) { b.disabled = false; b.innerText = "فشل التحديث.. حاول ثانية"; }
     }
 
-    window.onload = () => { showApp(); checkUpdates(); };
+    window.onload = () => { 
+        showApp(); 
+        checkUpdates();
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js?v=24');
+        }
+    };
 </script>
 </body>
 </html>
