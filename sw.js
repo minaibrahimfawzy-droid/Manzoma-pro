@@ -1,14 +1,12 @@
 --- START OF FILE sw.js ---
-const CACHE_NAME = 'manzoma-cache-v205'; 
-
-// إضافة ?v=205 بجانب الملفات لضمان تحميل النسخة الجديدة قسرياً
+const CACHE_NAME = 'manzoma-cache-v206'; 
 const urlsToCache = [
   './',
   './index.html',
   './Nabatshia.html',
   './2.html',
   './3.html',
-  './4.html?v=205', // هنا يكمن الحل
+  './4.html', 
   './5.html',
   './6.html',
   './7.html',
@@ -17,7 +15,7 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting(); 
+  self.skipWaiting(); // إجبار السيرفس وركر الجديد على العمل فوراً
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(urlsToCache);
@@ -30,21 +28,22 @@ self.addEventListener('activate', event => {
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
+          // مسح أي كاش قديم مهما كان اسمه لضمان النظافة
           if (key !== CACHE_NAME) {
-            return caches.delete(key); 
+            return caches.delete(key);
           }
         })
       );
     })
   );
-  return self.clients.claim();
+  return self.clients.claim(); // السيطرة على الصفحة فوراً
 });
 
 self.addEventListener('fetch', event => {
+  // استراتيجية: الإنترنت أولاً لضمان تحميل النسخة الجديدة
   event.respondWith(
     fetch(event.request).catch(() => {
-      // إذا فشل الإنترنت، يحاول البحث عن الملف الأصلي أو الملف برقم الفيرجن
-      return caches.match(event.request) || caches.match('./4.html?v=205');
+      return caches.match(event.request);
     })
   );
 });
