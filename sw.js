@@ -1,5 +1,5 @@
 --- START OF FILE sw.js ---
-const CACHE_NAME = 'manzoma-cache-v207'; 
+const CACHE_NAME = 'manzoma-cache-v208'; 
 const urlsToCache = [
   './',
   './index.html',
@@ -14,17 +14,18 @@ const urlsToCache = [
   './sw.js'
 ];
 
-// التثبيت: تخزين كل الملفات في ذاكرة الموبايل فوراً
+// مرحلة التثبيت: حفظ الملفات فوراً
 self.addEventListener('install', event => {
-  self.skipWaiting(); 
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
+      console.log('جاري حفظ ملفات الأوفلاين...');
       return cache.addAll(urlsToCache);
     })
   );
 });
 
-// التفعيل: مسح النسخ القديمة لضمان عدم حدوث تعارض
+// مرحلة التنشيط: طرد أي نسخة قديمة
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
@@ -40,11 +41,14 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// جلب الملفات: يبحث في الكاش أولاً (ليعمل الأوفلاين) ثم يبحث في النت
+// محرك التشغيل: يبحث في الكاش أولاً (يعمل حتى لو النت مفصول تماماً)
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+    caches.match(event.request).then(cachedResponse => {
+      if (cachedResponse) {
+        return cachedResponse; // إذا الملف موجود في الموبايل، افتحه فوراً
+      }
+      return fetch(event.request); // إذا مش موجود، اطلبه من النت
     })
   );
 });
