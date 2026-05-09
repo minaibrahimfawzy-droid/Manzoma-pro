@@ -1,5 +1,5 @@
 --- START OF FILE sw.js ---
-const CACHE_NAME = 'manzoma-cache-v210'; 
+const CACHE_NAME = 'manzoma-cache-v300'; 
 const urlsToCache = [
   './',
   './index.html',
@@ -14,25 +14,42 @@ const urlsToCache = [
   './sw.js'
 ];
 
+// 1. عند التثبيت: سحب كل الملفات وتخزينها في الموبايل
 self.addEventListener('install', event => {
-  self.skipWaiting(); 
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
+// 2. عند التفعيل: مسح أي نسخ قديمة فوراً
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.map(key => { if (key !== CACHE_NAME) return caches.delete(key); })
-    ))
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+    })
   );
   return self.clients.claim();
 });
 
-// استراتيجية ذكية لـ GitHub والـ APK: حاول من النت أولاً، إذا فشل (أوفلاين) اسحب من الكاش
+// 3. عند طلب أي ملف: ابحث في الكاش (الأوفلاين) أولاً
 self.addEventListener('fetch', event => {
   event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+    caches.match(event.request).then(cachedResponse => {
+      // إذا وجد الملف في الكاش، افتحه فوراً (حتى بدون نت)
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      // إذا لم يجده (ملف جديد)، اطلبه من الإنترنت
+      return fetch(event.request);
+    })
   );
 });
