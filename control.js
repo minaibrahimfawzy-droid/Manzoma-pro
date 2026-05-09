@@ -1,5 +1,5 @@
---- START OF FILE control (2).js ---
+--- START OF FILE control.js ---
 
 var APK_REQUIRED_VERSION = "1.0"; 
-var HTML_VERSION = "70"; // تم الرفع من 60 إلى 70 لتنشيط التحديث الجديد
+var HTML_VERSION = "200"; // تم القفز إلى 200 لضمان التحديث الإجباري
 var APK_DOWNLOAD_LINK = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/app.apk";

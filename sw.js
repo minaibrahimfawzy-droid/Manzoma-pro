@@ -1,13 +1,13 @@
---- START OF FILE sw (1).js ---
+--- START OF FILE sw.js ---
 
-const CACHE_NAME = 'manzoma-cache-v40'; // تم الرفع من v35 إلى v40 لمسح الكاش القديم
+const CACHE_NAME = 'manzoma-cache-v200'; // تم التغيير إلى v200 لمسح شامل لكل الملفات القديمة
 const urlsToCache = [
   './',
   './index.html',
   './Nabatshia.html',
   './2.html',
   './3.html',
-  './4.html', // ملف اللمات المطور
+  './4.html', 
   './5.html',
   './6.html',
   './7.html',
