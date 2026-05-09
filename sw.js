@@ -1,5 +1,5 @@
 --- START OF FILE sw.js ---
-const CACHE_NAME = 'manzoma-pro-v700';
+const CACHE_NAME = 'manzoma-offline-v800';
 const urlsToCache = [
   './',
   './index.html',
@@ -14,26 +14,23 @@ const urlsToCache = [
   './sw.js'
 ];
 
-// 1. تثبيت وحفظ الملفات في الموبايل
+// تثبيت السيرفس وركر وتخزين الملفات
 self.addEventListener('install', event => {
-  self.skipWaiting();
+  self.skipWaiting(); // إجبار التنشيط الفوري
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log('تم تأمين ملفات الأوفلاين في الذاكرة');
       return cache.addAll(urlsToCache);
     })
   );
 });
 
-// 2. تنشيط السيرفر وركر ومسح القديم
+// تنشيط ومسح الكاش القديم
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
+          if (key !== CACHE_NAME) return caches.delete(key);
         })
       );
     })
@@ -41,24 +38,24 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// 3. الاستراتيجية الأقوى للأوفلاين (البحث في الذاكرة أولاً)
+// الاستراتيجية القاطعة: ابحث في الكاش أولاً (للأوفلاين)
 self.addEventListener('fetch', event => {
+  // إذا كان الطلب للموقع الرئيسي أو الملفات، ابحث في الكاش
   event.respondWith(
     caches.match(event.request).then(cachedResponse => {
-      // إذا وجد الملف في الذاكرة (أوفلاين) يفتحه فوراً
       if (cachedResponse) {
-        return cachedResponse;
+        return cachedResponse; // افتح من الموبايل فوراً
       }
-      // إذا لم يجده (ملف جديد) يطلبه من الإنترنت
+      
+      // إذا لم يكن مخزناً، اطلبه من الإنترنت وخزنه للمرة القادمة
       return fetch(event.request).then(networkResponse => {
         return caches.open(CACHE_NAME).then(cache => {
-          // تحديث الذاكرة بالملف الجديد للمرة القادمة
           cache.put(event.request, networkResponse.clone());
           return networkResponse;
         });
       });
     }).catch(() => {
-      // إذا النت مقطوع والملف غير مخزن (حالة نادرة)
+      // إذا النت مقطوع والملف غير موجود (حالة فشل كامل)
       return caches.match('./index.html');
     })
   );
