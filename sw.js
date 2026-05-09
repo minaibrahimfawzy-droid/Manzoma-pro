@@ -1,5 +1,5 @@
 --- START OF FILE sw.js ---
-const CACHE_NAME = 'manzoma-cache-v206'; 
+const CACHE_NAME = 'manzoma-cache-v207'; 
 const urlsToCache = [
   './',
   './index.html',
@@ -14,8 +14,9 @@ const urlsToCache = [
   './sw.js'
 ];
 
+// التثبيت: تخزين كل الملفات في ذاكرة الموبايل فوراً
 self.addEventListener('install', event => {
-  self.skipWaiting(); // إجبار السيرفس وركر الجديد على العمل فوراً
+  self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(urlsToCache);
@@ -23,12 +24,12 @@ self.addEventListener('install', event => {
   );
 });
 
+// التفعيل: مسح النسخ القديمة لضمان عدم حدوث تعارض
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
-          // مسح أي كاش قديم مهما كان اسمه لضمان النظافة
           if (key !== CACHE_NAME) {
             return caches.delete(key);
           }
@@ -36,14 +37,14 @@ self.addEventListener('activate', event => {
       );
     })
   );
-  return self.clients.claim(); // السيطرة على الصفحة فوراً
+  return self.clients.claim();
 });
 
+// جلب الملفات: يبحث في الكاش أولاً (ليعمل الأوفلاين) ثم يبحث في النت
 self.addEventListener('fetch', event => {
-  // استراتيجية: الإنترنت أولاً لضمان تحميل النسخة الجديدة
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request);
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
     })
   );
 });
