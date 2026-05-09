@@ -1,5 +1,5 @@
 --- START OF FILE sw.js ---
-const CACHE_NAME = 'manzoma-cache-v201'; 
+const CACHE_NAME = 'manzoma-cache-v204'; // رفع رقم الكاش لـ 204
 const urlsToCache = [
   './',
   './index.html',
@@ -14,8 +14,9 @@ const urlsToCache = [
   './sw.js'
 ];
 
+// التثبيت وتخزين الملفات
 self.addEventListener('install', event => {
-  self.skipWaiting(); 
+  self.skipWaiting(); // إجبار النسخة الجديدة على التنشيط فوراً
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(urlsToCache);
@@ -23,13 +24,14 @@ self.addEventListener('install', event => {
   );
 });
 
+// التفعيل ومسح الكاش القديم (هنا يتم تنظيف المتصفح بالكامل)
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            return caches.delete(key); 
+            return caches.delete(key); // مسح أي كاش قديم
           }
         })
       );
@@ -38,6 +40,7 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
+// استراتيجية التشغيل: الإنترنت أولاً (للتحديث) ثم الكاش (للأوفلاين)
 self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request).catch(() => {
