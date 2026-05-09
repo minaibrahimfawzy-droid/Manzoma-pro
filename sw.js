@@ -1,12 +1,14 @@
 --- START OF FILE sw.js ---
-const CACHE_NAME = 'manzoma-cache-v204'; // رفع رقم الكاش لـ 204
+const CACHE_NAME = 'manzoma-cache-v205'; 
+
+// إضافة ?v=205 بجانب الملفات لضمان تحميل النسخة الجديدة قسرياً
 const urlsToCache = [
   './',
   './index.html',
   './Nabatshia.html',
   './2.html',
   './3.html',
-  './4.html', 
+  './4.html?v=205', // هنا يكمن الحل
   './5.html',
   './6.html',
   './7.html',
@@ -14,9 +16,8 @@ const urlsToCache = [
   './sw.js'
 ];
 
-// التثبيت وتخزين الملفات
 self.addEventListener('install', event => {
-  self.skipWaiting(); // إجبار النسخة الجديدة على التنشيط فوراً
+  self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(urlsToCache);
@@ -24,14 +25,13 @@ self.addEventListener('install', event => {
   );
 });
 
-// التفعيل ومسح الكاش القديم (هنا يتم تنظيف المتصفح بالكامل)
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            return caches.delete(key); // مسح أي كاش قديم
+            return caches.delete(key); 
           }
         })
       );
@@ -40,11 +40,11 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// استراتيجية التشغيل: الإنترنت أولاً (للتحديث) ثم الكاش (للأوفلاين)
 self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request).catch(() => {
-      return caches.match(event.request);
+      // إذا فشل الإنترنت، يحاول البحث عن الملف الأصلي أو الملف برقم الفيرجن
+      return caches.match(event.request) || caches.match('./4.html?v=205');
     })
   );
 });
