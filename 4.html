@@ -3,93 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام اللمات الذكي - الإصدار 59</title>
+    <title>نظام اللمات الذكي - الإصدار 60 المطور</title>
     <style>
         :root {
             --primary: #0d6efd; --success: #198754; --danger: #dc3545; --warning: #ffc107; 
-            --dark: #212529; --light: #f8f9fa; --info: #0dcaf0;
+            --dark: #212529; --light: #f8f9fa; --info: #0dcaf0; --purple: #8e44ad;
             --sep-thickness: 12px; 
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f0f2f5; color: #212529; font-size: 16px; user-select: none; overflow-x: hidden; }
-        .container { width: 100%; padding: 4px; margin: 0 auto; }
+        .container { width: 100%; padding: 8px; margin: 0 auto; }
 
-        /* شريط الأدوات العلوي */
-        .top-nav { background: #fff; border-bottom: 3px solid #bbb; padding: 10px 5px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 3px 6px rgba(0,0,0,0.15); }
-        .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-        .gates-scroll { display: flex; gap: 6px; overflow-x: auto; flex-grow: 1; scrollbar-width: none; }
-        .gate-btn { white-space: nowrap; padding: 8px 18px; border-radius: 25px; border: 2px solid #ccc; background: #f8f9fa; font-size: 14px; font-weight: bold; cursor: pointer; color: #333; }
-        .gate-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        /* شريط التنقل */
+        .top-nav { background: #fff; border-bottom: 4px solid #bbb; padding: 12px 8px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .gates-scroll { display: flex; gap: 8px; overflow-x: auto; flex-grow: 1; scrollbar-width: none; }
+        .gate-tab { white-space: nowrap; padding: 10px 22px; border-radius: 30px; border: 2px solid #ccc; background: #f8f9fa; font-size: 15px; font-weight: bold; cursor: pointer; color: #333; transition: 0.3s; }
+        .gate-tab.active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
 
-        /* سطر المعلومات */
-        .status-bar { background: var(--dark); color: white; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin: 6px 0; border-right: 8px solid var(--warning); }
-        .gate-title { color: var(--warning); font-weight: 900; font-size: 18px; }
-        .clock { font-family: 'Courier New', monospace; font-size: 18px; color: #0df0f0; font-weight: bold; }
-        .shift-tag { background: var(--danger); padding: 4px 12px; border-radius: 6px; font-size: 14px; font-weight: bold; border: 1px solid #fff; }
+        /* شريط الحالة */
+        .status-bar { background: var(--dark); color: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin: 10px 0; border-right: 10px solid var(--warning); }
+        .gate-title { color: var(--warning); font-weight: 900; font-size: 20px; }
+        .clock { font-family: 'Courier New', monospace; font-size: 22px; color: #0df0f0; font-weight: bold; }
+        .shift-tag { background: var(--danger); padding: 5px 15px; border-radius: 8px; font-size: 16px; font-weight: bold; border: 2px solid #fff; }
+
+        /* أدوات التحكم */
+        .ctrl-grid { display: flex; gap: 8px; margin-bottom: 12px; }
+        .input-st { padding: 12px; border: 2px solid #000; border-radius: 8px; font-weight: 900; font-size: 18px; }
 
         /* الجدول الضخم */
-        .table-wrap { overflow-x: auto; background: white; border: 2px solid #000; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .data-table { width: 100%; border-collapse: collapse; min-width: 950px; }
-        .data-table th, .data-table td { border: 1px solid #333; text-align: center; vertical-align: middle; height: 75px; padding: 0; }
+        .table-wrap { overflow-x: auto; background: white; border: 3px solid #000; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.3); }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        .data-table th, .data-table td { border: 1px solid #333; text-align: center; vertical-align: middle; height: 100px; padding: 4px; }
         
         .color-entry { background-color: #198754 !important; color: white; } 
         .color-exit { background-color: #0d6efd !important; color: white; }  
-        .color-naql { background-color: #d35400 !important; color: white; }    
-        .color-mizan { background-color: #c0392b !important; color: white; }   
-
+        
         .thick-separator { border-right: var(--sep-thickness) solid #000 !important; }
-        .prev-lemma-highlight { background-color: #fff3cd !important; border-top: 2px solid #ffc107 !important; border-bottom: 2px solid #ffc107 !important; }
+        .prev-lemma-highlight { background-color: #fff3cd !important; border-top: 3px solid var(--warning) !important; border-bottom: 3px solid var(--warning) !important; }
 
-        .lane-ctrl { display: flex; flex-direction: column; align-items: center; padding: 4px; }
-        .lane-name { font-size: 14px; font-weight: 900; margin-bottom: 4px; }
-        .lane-btns { display: flex; gap: 4px; justify-content: center; width: 100%; }
-        .move-btn { background: rgba(0,0,0,0.4); color: #fff; border: 1px solid #fff; border-radius: 4px; padding: 2px 8px; font-size: 14px; }
-        .del-lane-btn { background: var(--warning); color: #000; border-radius: 4px; font-size: 11px; padding: 2px 6px; cursor: pointer; font-weight: 900; }
+        .amt-txt { font-weight: 900; font-size: 26px; color: #000; display: block; line-height: 1.1; }
+        .visa-txt { font-size: 13px; color: #004085; font-weight: 900; background: #e7f1ff; border: 1px solid #0d6efd; border-radius: 5px; padding: 2px 4px; display: inline-block; margin-top: 4px; }
+        .nfc-txt { font-size: 13px; color: #4a148c; font-weight: 900; background: #f3e5f5; border: 1px solid #8e44ad; border-radius: 5px; padding: 2px 4px; display: inline-block; margin-top: 4px; margin-right: 4px; }
+        .run-total { font-size: 13px; color: #555; border-top: 1.5px solid #ddd; display: block; margin-top: 6px; font-weight: bold; }
 
-        .amt-txt { font-weight: 900; font-size: 24px; color: #000; display: block; line-height: 1; }
-        .visa-txt { font-size: 13px; color: #004085; font-weight: 900; background: rgba(255,255,255,0.7); border-radius: 4px; padding: 1px 4px; }
-        .run-total { font-size: 12px; color: #444; border-top: 1.5px solid #ccc; display: block; width: 90%; margin: 4px auto; font-weight: bold; }
+        .row-foot td { background: var(--dark); color: white; font-weight: 900; font-size: 18px; height: 60px; cursor: pointer; }
+        .grand-cell { background: var(--warning) !important; color: #000 !important; font-size: 28px !important; }
 
-        .row-rem { background-color: #cfe2ff; color: #084298; font-weight: 900; font-size: 18px; }
-        .row-foot td { background: var(--dark); color: white; font-weight: 900; font-size: 16px; }
-        .grand-cell { background: var(--warning) !important; color: #000 !important; font-size: 24px !important; }
+        /* الكروت */
+        .stats-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 15px; }
+        .stat-card { background: white; padding: 15px 5px; border-radius: 12px; border: 2px solid #000; text-align: center; box-shadow: 0 4px 0 #000; }
+        .stat-card .label { font-size: 13px; font-weight: 900; color: #444; display: block; margin-bottom: 5px; }
+        .stat-card .value { font-size: 22px; font-weight: 900; }
 
-        .lemma-cell { background: #dee2e6; width: 55px; position: relative; font-weight: 900; font-size: 18px; }
-        .del-lem { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); font-size: 12px; color: red; font-weight: bold; background: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 2px solid red; cursor: pointer; }
+        /* تذييل الصفحة */
+        .mega-footer { margin-top: 20px; background: #2c3e50; border-radius: 15px; padding: 20px; color: white; border-bottom: 10px solid var(--warning); }
+        .mega-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .mega-card { text-align: center; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); }
+        .mega-num { font-size: 26px; font-weight: 900; color: var(--warning); display: block; }
+        .final-asset-line { margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.08); border: 3px dashed var(--warning); border-radius: 12px; text-align: center; }
+        .final-asset-value { color: var(--info); font-size: 38px; font-weight: 900; display: block; margin-top: 10px; text-shadow: 2px 2px 0 #000; }
 
-        .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
-        .stat-card { background: white; padding: 12px 4px; border-radius: 8px; border: 2px solid #bbb; text-align: center; }
-        .stat-card .label { font-size: 11px; font-weight: 900; color: #555; display: block; margin-bottom: 5px; }
-        .stat-card .value { font-size: 18px; font-weight: 900; }
-
-        .fin-section { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .fin-card { background: white; padding: 12px; border: 2px solid #ccc; border-radius: 10px; }
-        .fin-card.red { border-right: 8px solid var(--danger); }
-        .fin-card.green { border-right: 8px solid var(--success); }
-        .tag-item { display: inline-flex; align-items: center; background: #f1f3f5; padding: 5px 12px; border-radius: 6px; margin: 3px; font-size: 14px; font-weight: 900; border: 2px solid #ddd; }
-        .tag-time { color: var(--danger); font-size: 11px; margin-right: 8px; border-right: 1.5px solid #bbb; padding-right: 8px; font-weight: 900; }
-
-        .mega-footer { margin-top: 15px; background: #2c3e50; border-radius: 12px; padding: 15px; color: white; border-bottom: 8px solid var(--warning); }
-        .mega-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .mega-card { text-align: center; padding: 15px 5px; border-radius: 10px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); }
-        .mega-num { font-size: 24px; font-weight: 900; color: var(--warning); display: block; margin-bottom: 5px; }
-        .mega-detail { font-size: 11px; display: block; margin-top: 5px; border-top: 1px solid #555; padding-top: 5px; color: #fff; }
-        .final-asset-line { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.08); border: 2px dashed var(--warning); border-radius: 10px; flex-wrap: wrap; }
-        .final-asset-label { color: #adb5bd; font-size: 14px; font-weight: 900; }
-        .final-asset-value { color: var(--info); font-size: 28px; font-weight: 900; }
-
-        /* شاشة تسجيل المبالغ بريميوم */
-        .modal-bg { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(5px); }
+        /* المودال */
+        .modal-bg { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .modal-bg.active { display: flex; }
-        .modal-win { background: #fff; border-radius: 20px; width: 100%; max-width: 450px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .input-card { background: #f8f9fa; border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 3px solid transparent; position: relative; }
-        .input-card.cash { border-color: #2ecc71; background: #f0fff4; }
-        .input-card.visa { border-color: #3498db; background: #f0f7ff; }
-        .card-label { display: block; font-weight: 900; font-size: 18px; margin-bottom: 5px; }
-        .card-input { width: 100%; background: transparent; border: none; text-align: center; font-size: 45px; font-weight: 900; color: #212529; }
-        .save-btn-premium { background: linear-gradient(to bottom, #27ae60, #2ecc71); color: white; border: none; width: 100%; padding: 20px; border-radius: 12px; font-size: 26px; font-weight: 900; cursor: pointer; }
+        .modal-win { background: #fff; border-radius: 25px; width: 95%; max-width: 450px; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5); border: 3px solid #000; }
+        .input-card { background: #f8f9fa; border-radius: 15px; padding: 15px; margin-bottom: 12px; border-right: 12px solid #ccc; }
+        .card-input { width: 100%; background: transparent; border: none; text-align: center; font-size: 45px; font-weight: 900; color: #000; }
+        .btn-save { background: linear-gradient(180deg, var(--success), #146c43); color: white; border: none; width: 100%; padding: 20px; font-size: 26px; font-weight: 900; cursor: pointer; border-radius: 0; }
 
-        @media print { .no-print { display: none !important; } }
+        @media print { .no-print { display: none !important; } .table-wrap { overflow: visible; } }
     </style>
 </head>
 <body>
@@ -97,26 +80,24 @@
     <div class="top-nav no-print">
         <div class="nav-row">
             <div id="uiGates" class="gates-scroll"></div>
-            <button onclick="addGatePrompt()" class="btn btn-success" style="font-size: 24px; padding: 0 15px;">+</button>
-            <button onclick="toggleModal('settingsModal', true)" class="btn btn-warning">⚙️</button>
-            <button onclick="window.print()" class="btn btn-primary">🖨️</button>
+            <button onclick="addGatePrompt()" class="btn-st" style="background:var(--success); color:white; border-radius:50%; width:45px; height:45px; border:2px solid #000; font-size:24px; font-weight:bold;">+</button>
+            <button onclick="toggleModal('settingsModal', true)" class="btn-st" style="background:var(--warning); border-radius:50%; width:45px; height:45px; border:2px solid #000;">⚙️</button>
+            <button onclick="window.print()" class="btn-st" style="background:var(--primary); color:white; border-radius:50%; width:45px; height:45px; border:2px solid #000;">🖨️</button>
         </div>
     </div>
 
     <div class="container">
         <div class="status-bar">
-            <div id="uiGateLabel" class="gate-title">بوابة...</div>
+            <div id="uiGateLabel" class="gate-title">تحميل...</div>
             <div class="clock" id="uiClock">00:00:00</div>
-            <div class="shift-tag" id="uiShiftBadge">الوردية</div>
+            <div class="shift-tag" id="uiShiftBadge">---</div>
         </div>
 
         <div class="ctrl-grid no-print">
-            <button onclick="modDate(-1)" class="btn btn-outline-dark" style="width:60px; font-size: 24px;"><b>></b></button>
             <input type="date" id="uiDate" class="input-st" style="flex-grow:1;" onchange="refresh()">
-            <button onclick="modDate(1)" class="btn btn-outline-dark" style="width:60px; font-size: 24px;"><b><</b></button>
-            <select id="uiShift" class="input-st" style="width:120px;" onchange="refresh()">
-                <option value="صباحية">صباحية</option>
-                <option value="مسائية">مسائية</option>
+            <select id="uiShift" class="input-st" style="width:140px;" onchange="refresh()">
+                <option value="صباحية">صباحية ☀️</option>
+                <option value="مسائية">مسائية 🌙</option>
             </select>
         </div>
 
@@ -127,60 +108,64 @@
                 <tfoot id="uiFoot"></tfoot>
             </table>
         </div>
-        <button onclick="addLem()" class="btn btn-warning w-100 mt-2 py-4 fw-bold no-print" style="font-size:22px; border:3px solid #000;">+ إضافة لمة جديدة</button>
+
+        <button onclick="addLem()" class="btn-save no-print" style="border-radius:15px; margin-top:15px; background:var(--warning); color:#000; border:3px solid #000;">+ إضافة لمة جديدة</button>
 
         <div class="stats-strip">
-            <div class="stat-card" style="border-top: 5px solid var(--primary);"><span class="label">كاش حارات</span><span class="value" id="stCash">0</span></div>
-            <div class="stat-card" style="border-top: 5px solid var(--info);"><span class="label">فيزا وردية</span><span class="value text-info" id="stVisa">0</span></div>
-            <div class="stat-card" style="border-top: 5px solid var(--success);"><span class="label">بند الرقابة</span><span class="value text-success" id="stReq">0</span></div>
-            <div class="stat-card" style="background:var(--dark); color:white;"><span class="label" style="color:#aaa;">خزينة</span><span class="value text-warning" id="stSafe">0</span></div>
-        </div>
-
-        <div class="fin-section no-print">
-            <div class="fin-card red">
-                <span class="text-danger fw-bold">التوريدات (بالوقت):</span>
-                <div style="display:flex; gap:5px; margin-top: 5px; margin-bottom:10px;">
-                    <input type="number" id="inTaw" class="input-st" style="width:100%; height: 55px; font-size: 22px;" placeholder="0">
-                    <button onclick="addFin('tawreed')" class="btn btn-danger" style="padding:0 20px;">إضافة</button>
-                </div>
-                <div id="tawList" class="d-flex flex-wrap"></div>
-            </div>
-            <div class="fin-card green">
-                <span class="text-success fw-bold">الرقابة:</span>
-                <div style="display:flex; gap:5px; margin-top: 5px; margin-bottom:10px;">
-                    <input type="number" id="inReq" class="input-st" style="width:100%; height: 55px; font-size: 22px;" placeholder="0">
-                    <button onclick="addFin('reqaba')" class="btn btn-success" style="padding: 0 20px;">إضافة</button>
-                </div>
-                <div id="reqList" class="d-flex flex-wrap"></div>
-            </div>
+            <div class="stat-card" style="border-color: var(--success);"><span class="label">💵 كاش الحارات</span><span class="value" id="stCash">0</span></div>
+            <div class="stat-card" style="border-color: var(--info);"><span class="label">💳 فيزا الوردية</span><span class="value text-primary" id="stVisa">0</span></div>
+            <div class="stat-card" style="border-color: var(--purple);"><span class="label">📱 NFC الوردية</span><span class="value" style="color:var(--purple);" id="stNfc">0</span></div>
+            <div class="stat-card" style="border-color: var(--danger);"><span class="label">🚨 بند الرقابة</span><span class="value text-danger" id="stReq">0</span></div>
+            <div class="stat-card" style="background:var(--dark); color:white;"><span class="label" style="color:#aaa;">💰 خزينة الكاش</span><span class="value text-warning" id="stSafe">0</span></div>
         </div>
 
         <div class="mega-footer">
             <div class="mega-grid">
-                <div class="mega-card"><span class="mega-num" id="mgRev">0</span><span class="mega-txt">إيراد اليوم</span><span class="mega-detail">ص: <b id="dMornRev">0</b> | م: <b id="dEvenRev">0</b></span></div>
-                <div class="mega-card"><span class="mega-num" id="mgTaw" style="color:#ff7675;">0</span><span class="mega-txt">توريد اليوم</span><span class="mega-detail">ص: <b id="dMornTaw">0</b> | م: <b id="dEvenTaw">0</b></span></div>
-                <div class="mega-card"><span class="mega-num" id="mgVis" style="color:var(--info);">0</span><span class="mega-txt">فيزا اليوم</span><span class="mega-detail">ص: <b id="dMornVis">0</b> | م: <b id="dEvenVis">0</b></span></div>
+                <div class="mega-card"><span class="mega-num" id="mgRev">0</span><span>إيراد اليوم الكلي</span></div>
+                <div class="mega-card"><span class="mega-num" id="mgTaw" style="color:#ff7675;">0</span><span>إجمالي التوريدات</span></div>
+                <div class="mega-card"><span class="mega-num" id="mgVis" style="color:var(--info);">0</span><span>فيزا اليوم (ص+م)</span></div>
+                <div class="mega-card"><span class="mega-num" id="mgNfc" style="color:var(--purple);">0</span><span>NFC اليوم (ص+م)</span></div>
             </div>
             <div class="final-asset-line">
-                <span class="final-asset-label">إجمالي العُهدة الكلية (كاش الخزينة + فيزا اليوم ص وم):</span>
+                <span style="font-size: 20px; font-weight: 900;">إجمالي العُهدة الكلية (كاش الخزينة + فيزا + NFC):</span>
                 <span class="final-asset-value" id="mgFinal">0</span>
             </div>
         </div>
     </div>
 
-    <!-- نافذة التسجيل -->
+    <!-- نافذة تسجيل المبالغ -->
     <div id="entryModal" class="modal-bg">
         <div class="modal-win">
-            <div class="p-3 bg-dark text-white d-flex justify-content-between">
-                <span id="modLabel" style="font-weight:900; font-size:18px; color: var(--warning);">تسجيل لمة جديدة</span>
-                <button onclick="toggleModal('entryModal', false)" class="btn p-0 text-white" style="font-size:35px; line-height:0;">&times;</button>
+            <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+                <span id="modLabel" style="font-weight:900; font-size:20px; color:var(--warning);">تسجيل لمة حارة</span>
+                <button onclick="toggleModal('entryModal', false)" style="background:none; border:none; color:white; font-size:35px; cursor:pointer;">&times;</button>
             </div>
-            <div class="p-4">
+            <div class="p-3">
                 <input type="hidden" id="actL"> <input type="hidden" id="actN">
-                <div class="input-card cash"><span class="card-label" style="color: #27ae60;">💵 كاش</span><input type="number" id="modCashInput" class="card-input" placeholder="0"></div>
-                <div class="input-card visa"><span class="card-label" style="color: #2980b9;">💳 فيزا</span><input type="number" id="modVisaInput" class="card-input" placeholder="0"></div>
-                <button onclick="saveLaneData()" class="save-btn-premium">حفـظ</button>
-                <div class="text-center mt-3"><span onclick="clearLaneData()" style="color: red; font-weight: bold; cursor: pointer; text-decoration: underline;">تصفير</span></div>
+                <div class="input-card" style="border-color: var(--success);"><span style="color:var(--success); font-weight:900;">💵 كاش</span><input type="number" id="modCash" class="card-input" placeholder="0"></div>
+                <div class="input-card" style="border-color: var(--info);"><span style="color:var(--info); font-weight:900;">💳 فيزا</span><input type="number" id="modVisa" class="card-input" placeholder="0"></div>
+                <div class="input-card" style="border-color: var(--purple);"><span style="color:var(--purple); font-weight:900;">📱 NFC</span><input type="number" id="modNfc" class="card-input" placeholder="0"></div>
+                <button onclick="saveLaneData()" class="btn-save">حفـظ الآن</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل الإجمالي (سطر ج) -->
+    <div id="adjModal" class="modal-bg">
+        <div class="modal-win">
+            <div class="p-3 bg-primary text-white d-flex justify-content-between">
+                <span style="font-weight:bold;">تعديل إجمالي الحارة</span>
+                <button onclick="toggleModal('adjModal', false)" style="color:white; background:none; border:none; font-size:25px;">&times;</button>
+            </div>
+            <div class="p-4 text-center">
+                <input type="hidden" id="adjLaneName">
+                <h3 id="adjLaneLabel" style="margin-bottom:15px; color:var(--primary);">---</h3>
+                <div class="input-card" style="border-color: var(--primary);">
+                    <span style="font-weight:bold;">اكتب الإجمالي الفعلي الصحيح:</span>
+                    <input type="number" id="adjTarget" class="card-input" placeholder="0">
+                </div>
+                <p style="color:#666; font-size:14px;">(سيقوم النظام بحساب الفرق وفتح لمة جديدة بالتعديل تلقائياً)</p>
+                <button onclick="applyAdjustment()" class="btn-save" style="border-radius:15px;">تأكيد التعديل</button>
             </div>
         </div>
     </div>
@@ -188,23 +173,24 @@
     <!-- الإعدادات -->
     <div id="settingsModal" class="modal-bg">
         <div class="modal-win">
-            <div class="p-3 bg-dark text-white d-flex justify-content-between"><span style="font-weight: 900;">الإعدادات</span><button onclick="toggleModal('settingsModal', false)" class="btn p-0 text-white" style="font-size:30px;">&times;</button></div>
-            <div class="p-4">
-                <div style="display:flex; gap:5px; margin-top:8px; margin-bottom:15px;">
-                    <input type="text" id="newLName" class="input-st" style="flex-grow:1;" placeholder="الاسم">
-                    <select id="newLType" class="input-st" style="width:110px;"><option value="دخول">دخول</option><option value="خروج">خروج</option></select>
-                    <button onclick="addNewLane()" class="btn btn-success" style="font-size: 24px; padding:0 15px;">+</button>
+            <div class="p-3 bg-dark text-white d-flex justify-content-between"><span>إعدادات البوابة</span><button onclick="toggleModal('settingsModal', false)" style="color:white; background:none; border:none; font-size:25px;">&times;</button></div>
+            <div class="p-3">
+                <div style="display:flex; gap:8px; margin-bottom:15px;">
+                    <input type="text" id="newLName" class="input-st" style="flex-grow:1; font-size:14px;" placeholder="اسم الحارة">
+                    <select id="newLType" class="input-st" style="font-size:14px;"><option value="دخول">دخول</option><option value="خروج">خروج</option></select>
+                    <button onclick="addNewLane()" class="btn-st" style="background:var(--success); color:white; padding:0 15px; border-radius:8px; border:2px solid #000;">+</button>
                 </div>
-                <ul id="laneListUI" class="list-unstyled p-0 m-0 border rounded" style="max-height:180px; overflow-y:auto; background:#f8f9fa;"></ul>
-                <hr><button onclick="resetGate()" class="btn btn-danger w-100 py-2">حذف البوابة</button>
+                <ul id="laneListUI" style="list-style:none; padding:0; max-height:250px; overflow-y:auto; border:1px solid #ccc; border-radius:10px;"></ul>
+                <hr>
+                <button onclick="resetGate()" class="btn-st" style="background:var(--danger); color:white; width:100%; padding:12px; border-radius:10px; border:2px solid #000; font-weight:bold;">حذف بيانات البوابة نهائياً</button>
             </div>
         </div>
     </div>
 
     <script>
-        /* --- المحرك البرمجي V204 --- */
-        let gates = JSON.parse(localStorage.getItem('app_v204_g')) || [{id:'h1', name:'بوابة حلوان'}, {id:'k1', name:'بوابة الكريمات'}];
-        let activeG = localStorage.getItem('app_v204_act') || 'h1';
+        /* المحرك V60 المطور */
+        let gates = JSON.parse(localStorage.getItem('app_v60_g')) || [{id:'h1', name:'بوابة حلوان'}];
+        let activeG = localStorage.getItem('app_v60_act') || 'h1';
         let lanes = []; let archives = {}; let curT = []; let curF = {reqaba:[], tawreed:[]}; let curLem = 1;
 
         window.onload = function() {
@@ -216,158 +202,118 @@
             renderGates(); switchG(activeG);
         };
 
-        function forceGroupLanes() {
-            const ent = lanes.filter(l => l.type === 'دخول');
-            const exi = lanes.filter(l => l.type === 'خروج');
-            lanes = [...ent, ...exi];
-        }
-
-        function getLClass(l) {
-            if(l.name.includes('نقل')) return 'color-naql'; if(l.name.includes('موازين')) return 'color-mizan';
-            return l.type === 'دخول' ? 'color-entry' : 'color-exit';
-        }
-
         function switchG(id) {
-            activeG = id; localStorage.setItem('app_v204_act', id);
+            activeG = id; localStorage.setItem('app_v60_act', id);
             const gateObj = gates.find(g => g.id === id); document.getElementById('uiGateLabel').innerText = gateObj ? gateObj.name : '';
-            const savedLanes = localStorage.getItem(`l_v204_${activeG}`);
-            lanes = savedLanes ? JSON.parse(savedLanes) : (activeG === 'h1' ? [{name:'نقل 1',type:'دخول'},{name:'نقل 2',type:'دخول'},{name:'ملاكي 1',type:'دخول'},{name:'خروج 1',type:'خروج'},{name:'موازين 1',type:'خروج'}] : [{name:'حارة 1',type:'دخول'},{name:'خروج 1',type:'خروج'}]);
-            forceGroupLanes(); archives = JSON.parse(localStorage.getItem(`arc_v204_${activeG}`)) || {}; refresh(); renderGates(); renderLSettings();
+            const savedLanes = localStorage.getItem(`l_v60_${activeG}`);
+            lanes = savedLanes ? JSON.parse(savedLanes) : [{name:'حارة 1',type:'دخول'},{name:'خروج 1',type:'خروج'}];
+            archives = JSON.parse(localStorage.getItem(`arc_v60_${activeG}`)) || {}; 
+            refresh(); renderGates(); renderLSettings();
         }
 
         function renderGates() { document.getElementById('uiGates').innerHTML = gates.map(g => `<div onclick="switchG('${g.id}')" class="gate-tab ${g.id === activeG ? 'active' : ''}">${g.name}</div>`).join(''); }
-        function addGatePrompt() { const n = prompt("اسم البوابة:"); if(n) { const id = 'g'+Date.now(); gates.push({id, name:n}); localStorage.setItem('app_v204_g', JSON.stringify(gates)); switchG(id); } }
+        function addGatePrompt() { const n = prompt("اسم البوابة الجديدة:"); if(n) { const id = 'g'+Date.now(); gates.push({id, name:n}); localStorage.setItem('app_v60_g', JSON.stringify(gates)); switchG(id); } }
 
         function refresh() {
             const key = `${document.getElementById('uiDate').value}_${document.getElementById('uiShift').value}`;
             const data = archives[key] || { trans: [], fin: {reqaba:[], tawreed:[]}, lem: 1 };
             curT = data.trans; curF = data.fin; curLem = data.lem;
             document.getElementById('uiShiftBadge').innerText = document.getElementById('uiShift').value;
-            renderSheet(); calcTotals(); renderFin();
+            renderSheet(); calcTotals();
         }
 
         function save() {
             const key = `${document.getElementById('uiDate').value}_${document.getElementById('uiShift').value}`;
             archives[key] = { trans: curT, fin: curF, lem: curLem };
-            localStorage.setItem(`arc_v204_${activeG}`, JSON.stringify(archives)); localStorage.setItem(`l_v204_${activeG}`, JSON.stringify(lanes));
-            renderSheet(); calcTotals(); renderFin();
+            localStorage.setItem(`arc_v60_${activeG}`, JSON.stringify(archives)); 
+            localStorage.setItem(`l_v60_${activeG}`, JSON.stringify(lanes));
+            renderSheet(); calcTotals();
         }
 
         function renderSheet() {
             const h = document.getElementById('uiHead'), b = document.getElementById('uiBody'), f = document.getElementById('uiFoot');
             let firstExitIdx = lanes.findIndex(l => l.type === 'خروج');
-            let hH = '<tr><th style="width:55px; background:#dee2e6;">م</th>';
-            lanes.forEach((l, i) => {
-                let sepClass = (i === firstExitIdx && firstExitIdx !== -1) ? 'thick-separator' : '';
-                hH += `<th class="${getLClass(l)} ${sepClass}"><div class="lane-ctrl"><span class="lane-name">${l.name}</span><div class="lane-btns no-print"><span class="move-btn" onclick="moveLane(${i},-1)">></span><span class="del-lane-btn" onclick="delL(${i})">حذف</span><span class="move-btn" onclick="moveLane(${i},1)"><</span></div></div></th>`;
-            });
-            hH += '<th style="background:#000; color:#ffc107;">إجمالي</th></tr>'; h.innerHTML = hH;
             
-            let bH = ''; let colT = {}, run = {}, lastV = {}; lanes.forEach(l => { colT[l.name]=0; run[l.name]=0; lastV[l.name]=0; });
+            h.innerHTML = `<tr><th style="width:60px; background:#eee;">م</th>${lanes.map((l,i)=>`<th class="${l.type==='دخول'?'color-entry':'color-exit'} ${i===firstExitIdx?'thick-separator':''}">${l.name}</th>`).join('')}<th style="background:#000; color:#fff;">إجمالي</th></tr>`;
+
+            let bH = ''; let colT = {}, run = {}; lanes.forEach(l => { colT[l.name]=0; run[l.name]=0; });
             for(let i=1; i<=curLem; i++) {
-                let highlightClass = (i === curLem - 1) ? 'prev-lemma-highlight' : '';
-                bH += `<tr class="${highlightClass}"><td class="lemma-cell">${i}<div class="del-lem" onclick="delLemRow(${i})">x</div></td>`;
+                let high = (i === curLem) ? 'prev-lemma-highlight' : '';
+                bH += `<tr class="${high}"><td>${i}</td>`;
                 let rSum = 0;
                 lanes.forEach((l, idx) => {
-                    const tx = curT.find(t => t.lem == i && t.lane === l.name);
-                    const c = tx ? (tx.amt || 0) : 0, v = tx ? (tx.visa || 0) : 0;
-                    if(tx) lastV[l.name] = c + v; run[l.name] += (c + v); colT[l.name] += (c + v); rSum += (c + v);
-                    let sepClass = (idx === firstExitIdx && firstExitIdx !== -1) ? 'thick-separator' : '';
-                    bH += `<td class="${sepClass}" onclick="openEntryUI(${i},'${l.name}')"><div><span class="amt-txt">${c || ''}</span>${v ? `<span class="visa-txt">${v} فيزا</span>` : ''}<span class="run-total">${run[l.name] || ''}</span></div></td>`;
+                    const tx = curT.find(t => t.lem == i && t.lane === l.name) || {amt:0, visa:0, nfc:0};
+                    let val = tx.amt + tx.visa + tx.nfc;
+                    run[l.name] += val; colT[l.name] += val; rSum += val;
+                    bH += `<td class="${idx===firstExitIdx?'thick-separator':''}" onclick="openEntryUI(${i},'${l.name}')">
+                        <span class="amt-txt">${tx.amt || ''}</span>
+                        ${tx.visa ? `<span class="visa-txt">💳 ${tx.visa}</span>` : ''}
+                        ${tx.nfc ? `<span class="nfc-txt">📱 ${tx.nfc}</span>` : ''}
+                        <span class="run-total">${run[l.name].toLocaleString() || ''}</span>
+                    </td>`;
                 });
-                bH += `<td style="font-weight:900;">${rSum.toLocaleString()}</td></tr>`;
+                bH += `<td style="font-weight:900; font-size:20px;">${rSum.toLocaleString()}</td></tr>`;
             }
             b.innerHTML = bH;
-            let remH = `<tr class="row-rem"><td>باقي</td>`;
-            let remT = 0; lanes.forEach((l, idx) => { 
-                let sepClass = (idx === firstExitIdx && firstExitIdx !== -1) ? 'thick-separator' : '';
-                remH += `<td class="${sepClass}">${lastV[l.name] || ''}</td>`; remT += (lastV[l.name] || 0); 
-            });
-            remH += `<td>${remT.toLocaleString()}</td></tr>`; b.innerHTML += remH;
-            let fH = `<tr class="row-foot"><td>ج</td>`;
-            let gr = 0; lanes.forEach((l, idx) => { 
-                let sepClass = (idx === firstExitIdx && firstExitIdx !== -1) ? 'thick-separator' : '';
-                fH += `<td class="${sepClass}" onclick="openAdj('${l.name}')">${colT[l.name].toLocaleString()}</td>`; gr += colT[l.name]; 
-            });
-            fH += `<td class="grand-cell">${gr.toLocaleString()}</td></tr>`; f.innerHTML = fH;
+
+            f.innerHTML = `<tr class="row-foot"><td>ج</td>${lanes.map((l,idx)=>`<td class="${idx===firstExitIdx?'thick-separator':''}" onclick="openAdj('${l.name}')">${colT[l.name].toLocaleString()}</td>`).join('')}<td class="grand-cell">${Object.values(colT).reduce((a,b)=>a+b,0).toLocaleString()}</td></tr>`;
         }
 
-        function moveLane(index, dir) {
-            let target = index + dir;
-            if(target >= 0 && target < lanes.length) {
-                if(lanes[index].type !== lanes[target].type) return; 
-                let temp = lanes[index]; lanes[index] = lanes[target]; lanes[target] = temp; save();
-            }
+        function openEntryUI(lem, l) {
+            document.getElementById('actN').value = lem; document.getElementById('actL').value = l;
+            const tx = curT.find(t => t.lem == lem && t.lane === l) || {amt:'', visa:'', nfc:''};
+            document.getElementById('modCash').value = tx.amt; document.getElementById('modVisa').value = tx.visa; document.getElementById('modNfc').value = tx.nfc;
+            toggleModal('entryModal', true);
+            setTimeout(()=>document.getElementById('modCash').focus(), 300);
         }
 
-        function addFin(t) {
-            const inp = document.getElementById(t === 'reqaba' ? 'inReq' : 'inTaw');
-            if(inp.value > 0) {
-                curF[t].push({ id: Date.now(), val: parseFloat(inp.value), time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'}) });
-                inp.value = ''; save();
-            }
+        function saveLaneData() {
+            const lem = parseInt(document.getElementById('actN').value), lane = document.getElementById('actL').value;
+            const c = parseFloat(document.getElementById('modCash').value) || 0, v = parseFloat(document.getElementById('modVisa').value) || 0, n = parseFloat(document.getElementById('modNfc').value) || 0;
+            curT = curT.filter(t => !(t.lem == lem && t.lane === lane));
+            if(c || v || n) curT.push({lem, lane, amt:c, visa:v, nfc:n});
+            save(); toggleModal('entryModal', false);
         }
-        function renderFin() {
-            const mk = (l, t) => l.map(i => `<div class="tag-item">${t === 'tawreed' ? `<span class="tag-time">${i.time}</span>` : ''}<b>${i.val.toLocaleString()}</b><span style="color:red; margin-right:8px;" onclick="delFin('${i.id}', '${t}')">x</span></div>`).join('');
-            document.getElementById('tawList').innerHTML = mk(curF.tawreed, 'tawreed');
-            document.getElementById('reqList').innerHTML = mk(curF.reqaba, 'reqaba');
+
+        function openAdj(l) {
+            document.getElementById('adjLaneName').value = l; document.getElementById('adjLaneLabel').innerText = "تعديل إجمالي: " + l;
+            let current = 0; curT.forEach(t => { if(t.lane === l) current += (t.amt + t.visa + t.nfc); });
+            document.getElementById('adjTarget').value = current;
+            toggleModal('adjModal', true);
         }
-        function delFin(id, t) { curF[t] = curF[t].filter(x => x.id != id); save(); }
+
+        function applyAdjustment() {
+            const lane = document.getElementById('adjLaneName').value, target = parseFloat(document.getElementById('adjTarget').value) || 0;
+            let current = 0; curT.forEach(t => { if(t.lane === lane) current += (t.amt + t.visa + t.nfc); });
+            const diff = target - current;
+            if(diff !== 0) { curLem++; curT.push({lem: curLem, lane: lane, amt: diff, visa: 0, nfc: 0}); save(); }
+            toggleModal('adjModal', false);
+        }
 
         function calcTotals() {
             const date = document.getElementById('uiDate').value;
             const getS = (s) => {
                 const d = archives[`${date}_${s}`] || { trans: [], fin: {reqaba:[], tawreed:[]} };
-                let c = 0, v = 0; d.trans.forEach(t => { c += (t.amt||0); v += (t.visa||0); });
-                const r = (d.fin.reqaba || []).reduce((a, b) => a + b.val, 0); const t = (d.fin.tawreed || []).reduce((a, b) => a + b.val, 0);
-                return { c, v, r, t, tot: (c + v + r) };
+                let c = 0, v = 0, n = 0; d.trans.forEach(t => { c += (t.amt||0); v += (t.visa||0); n += (t.nfc||0); });
+                const r = (d.fin.reqaba || []).reduce((a, b) => a + b.val, 0), t = (d.fin.tawreed || []).reduce((a, b) => a + b.val, 0);
+                return { c, v, n, r, t, rev: (c + v + n + r) };
             };
-            const mS = getS('صباحية'), eS = getS('مسائية'), cur = (document.getElementById('uiShift').value === 'صباحية') ? mS : eS;
-            document.getElementById('stCash').innerText = cur.c.toLocaleString(); document.getElementById('stVisa').innerText = cur.v.toLocaleString(); document.getElementById('stReq').innerText = cur.r.toLocaleString();
-            let carry = (mS.c + mS.r) - mS.t;
-            let safe = (document.getElementById('uiShift').value === 'صباحية') ? ((mS.c + mS.r) - mS.t) : (carry + (eS.c + eS.r) - eS.t);
-            document.getElementById('stSafe').innerText = safe.toLocaleString();
-            document.getElementById('mgRev').innerText = (mS.tot + eS.tot).toLocaleString();
-            document.getElementById('dMornRev').innerText = mS.tot.toLocaleString(); document.getElementById('dEvenRev').innerText = eS.tot.toLocaleString();
-            document.getElementById('mgTaw').innerText = (mS.t + eS.t).toLocaleString();
-            document.getElementById('dMornTaw').innerText = mS.t.toLocaleString(); document.getElementById('dEvenTaw').innerText = eS.t.toLocaleString();
-            document.getElementById('mgVis').innerText = (mS.v + eS.v).toLocaleString();
-            document.getElementById('dMornVis').innerText = mS.v.toLocaleString(); document.getElementById('dEvenVis').innerText = eS.v.toLocaleString();
-            document.getElementById('mgFinal').innerText = (safe + (mS.v + eS.v)).toLocaleString();
+            const m = getS('صباحية'), e = getS('مسائية'), cur = (document.getElementById('uiShift').value === 'صباحية' ? m : e);
+            document.getElementById('stCash').innerText = cur.c.toLocaleString(); document.getElementById('stVisa').innerText = cur.v.toLocaleString();
+            document.getElementById('stNfc').innerText = cur.n.toLocaleString(); document.getElementById('stReq').innerText = cur.r.toLocaleString();
+            let safeM = (m.c + m.r) - m.t, safeE = safeM + (e.c + e.r) - e.t;
+            document.getElementById('stSafe').innerText = (document.getElementById('uiShift').value === 'صباحية' ? safeM : safeE).toLocaleString();
+            document.getElementById('mgRev').innerText = (m.rev + e.rev).toLocaleString(); document.getElementById('mgTaw').innerText = (m.t + e.t).toLocaleString();
+            document.getElementById('mgVis').innerText = (m.v + e.v).toLocaleString(); document.getElementById('mgNfc').innerText = (m.n + e.n).toLocaleString();
+            document.getElementById('mgFinal').innerText = (safeE + (m.v + e.v) + (m.n + e.n)).toLocaleString();
         }
 
-        function toggleModal(id, show) { if(show) document.getElementById(id).classList.add('active'); else document.getElementById(id).classList.remove('active'); }
-        function modDate(o) { const d = new Date(document.getElementById('uiDate').value); d.setDate(d.getDate()+o); document.getElementById('uiDate').valueAsDate=d; refresh(); }
-        function openEntryUI(lem, l) { document.getElementById('actN').value = lem; document.getElementById('actL').value = l; const tx = curT.find(t => t.lem == lem && t.lane === l); document.getElementById('modCashInput').value = tx ? tx.amt : ''; document.getElementById('modVisaInput').value = tx ? tx.visa : ''; toggleModal('entryModal', true); setTimeout(()=>document.getElementById('modCashInput').focus(), 250); }
-        function saveLaneData() {
-            const lem = parseInt(document.getElementById('actN').value), lane = document.getElementById('actL').value;
-            const cash = parseFloat(document.getElementById('modCashInput').value) || 0, visa = parseFloat(document.getElementById('modVisaInput').value) || 0;
-            curT = curT.filter(t => !(t.lem == lem && t.lane === lane));
-            if(cash || visa) curT.push({id:Date.now(), lem, lane, amt:cash, visa});
-            save(); toggleModal('entryModal', false);
-        }
-        function clearLaneData() { curT = curT.filter(t => !(t.lem == document.getElementById('actN').value && t.lane === document.getElementById('actL').value)); save(); toggleModal('entryModal', false); }
-        function delLemRow(n) { if(confirm(`حذف؟`)) { curT = curT.filter(t => t.lem != n); curT.forEach(t => { if(t.lem > n) t.lem--; }); if(curLem > 1) curLem--; save(); } }
+        function toggleModal(id, show) { document.getElementById(id).classList.toggle('active', show); }
         function addLem() { curLem++; save(); }
-        function openAdj(l) { 
-            let s = 0, v = 0; curT.forEach(t => { if(t.lane === l) { s += (t.amt||0)+(t.visa||0); v += (t.visa||0); } });
-            document.getElementById('adjLaneName').value = l; document.getElementById('adjT').value = s; document.getElementById('adjV').value = v; calcAdj(); toggleModal('adjModal', true); 
-        }
-        function calcAdj() { 
-            const l = document.getElementById('adjLaneName').value; let cc = 0, cv = 0; curT.forEach(t => { if(t.lane === l) { cc += (t.amt||0); cv += (t.visa||0); } });
-            const tt = parseFloat(document.getElementById('adjT').value)||0, tv = parseFloat(document.getElementById('adjV').value)||0;
-            document.getElementById('diffC').innerText = (tt-tv)-cc; document.getElementById('diffV').innerText = tv-cv;
-        }
-        function applyAdj() { 
-            const l = document.getElementById('adjLaneName').value; let cc = 0, cv = 0; curT.forEach(t => { if(t.lane === l) { cc += (t.amt||0); cv += (t.visa||0); } });
-            const tt = parseFloat(document.getElementById('adjT').value)||0, tv = parseFloat(document.getElementById('adjV').value)||0;
-            if((tt-tv)-cc !== 0 || tv-cv !== 0) { curLem++; curT.push({id: Date.now(), lem:curLem, lane:l, amt:(tt-tv)-cc, visa:tv-cv}); save(); }
-            toggleModal('adjModal', false); 
-        }
-        function renderLSettings() { document.getElementById('laneListUI').innerHTML = lanes.map((l, i) => `<li class="d-flex justify-content-between p-2 border-bottom"><span>${l.name} (${l.type})</span><button onclick="delL(${i})" class="btn btn-danger btn-sm p-1">x</button></li>`).join(''); }
-        function addNewLane() { const n = document.getElementById('newLName').value, t = document.getElementById('newLType').value; if(n) { lanes.push({name:n, type:t}); forceGroupLanes(); document.getElementById('newLName').value=''; save(); renderLSettings(); } }
+        function addNewLane() { const n = document.getElementById('newLName').value, t = document.getElementById('newLType').value; if(n) { lanes.push({name:n, type:t}); save(); renderLSettings(); } }
         function delL(i) { if(confirm("حذف؟")) { lanes.splice(i,1); save(); renderLSettings(); } }
-        function resetGate() { if(confirm("مسح؟")) { localStorage.removeItem(`arc_v204_${activeG}`); localStorage.removeItem(`l_v204_${activeG}`); location.reload(); } }
+        function renderLSettings() { document.getElementById('laneListUI').innerHTML = lanes.map((l, i) => `<li style="padding:10px; border-bottom:1px solid #ddd; display:flex; justify-content:space-between;">${l.name} (${l.type}) <button onclick="delL(${i})" style="color:red; background:none; border:none; font-weight:bold;">X</button></li>`).join(''); }
+        function resetGate() { if(confirm("مسح كل البيانات؟")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
 </html>

@@ -1,8 +1,7 @@
 var APK_REQUIRED_VERSION = "1.0"; 
-var HTML_VERSION = "2002"; // تم التحديث لإجبار النظام على قراءة الكود الجديد
+var HTML_VERSION = "2003"; // التحديث الجديد
 var APK_DOWNLOAD_LINK = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/app.apk";
 
-// كود تسجيل نظام الأوفلاين - يعمل على كل الصفحات
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('./sw.js')
