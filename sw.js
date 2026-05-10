@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manzoma-pro-v2006'; // تحديث اسم الكاش إلى 2006
+const CACHE_NAME = 'manzoma-pro-v2007'; // تم تغيير الاسم لنسخة 2007
 
 // القائمة الأساسية للملفات
 const urlsToCache = [

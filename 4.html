@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام اللمات الذكي - الإصدار 80</title>
+    <title>نظام اللمات الذكي - الإصدار 81</title>
     <style>
         :root {
             --primary: #0d6efd; --success: #198754; --danger: #dc3545; --warning: #ffc107; 
@@ -15,16 +15,23 @@
         body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f0f2f5; color: #212529; font-size: 16px; user-select: none; }
         .container { width: 100%; padding: 8px; }
 
+        /* الهيدر العلوي */
         .top-nav { background: #fff; border-bottom: 3px solid #bbb; padding: 10px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .gates-scroll { display: flex; gap: 8px; overflow-x: auto; flex-grow: 1; scrollbar-width: none; }
         .gate-tab { white-space: nowrap; padding: 10px 20px; border-radius: 20px; border: 2px solid #ccc; background: #f8f9fa; font-weight: bold; cursor: pointer; }
         .gate-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .status-bar { background: var(--dark); color: white; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin: 8px 0; border-right: 10px solid var(--warning); }
+        /* شريط التحكم (التاريخ والوردية) */
+        .ctrl-bar { display: flex; gap: 8px; margin: 10px 0; background: #fff; padding: 10px; border-radius: 10px; border: 2px solid #000; }
+        .input-ctrl { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-weight: 900; font-size: 16px; }
+
+        /* شريط الحالة */
+        .status-bar { background: var(--dark); color: white; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-right: 10px solid var(--warning); }
         .clock { font-family: 'Courier New', monospace; font-size: 20px; color: #0df0f0; font-weight: bold; }
         .shift-badge { background: var(--danger); padding: 4px 12px; border-radius: 6px; font-weight: bold; border: 1px solid #fff; }
 
+        /* الجدول */
         .table-wrap { overflow-x: auto; background: white; border: 2px solid #000; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .data-table { width: 100%; border-collapse: collapse; min-width: 1100px; }
         .data-table th, .data-table td { border: 1px solid #333; text-align: center; vertical-align: middle; height: 105px; padding: 3px; position: relative; }
@@ -47,17 +54,19 @@
         .row-foot td { background: var(--total-bg) !important; color: #ffffff !important; font-weight: 900; font-size: 24px; height: 80px; border-top: 5px solid var(--warning) !important; cursor: pointer; }
         .grand-cell { background: var(--warning) !important; color: #000 !important; font-size: 30px !important; border: 2px solid #000 !important; }
 
-        /* قسم التوريد والرقابة (المعاد) */
-        .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .op-card { background: white; padding: 15px; border-radius: 12px; border: 2px solid #000; box-shadow: 4px 4px 0 #000; }
-        .op-card.red { border-top: 8px solid var(--danger); }
-        .op-card.green { border-top: 8px solid var(--success); }
-
+        /* الإحصائيات */
         .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
         .stat-item { background: white; border: 2px solid #000; padding: 12px 5px; border-radius: 12px; text-align: center; box-shadow: 2px 2px 0 #000; }
         .stat-item span { font-size: 12px; font-weight: 900; color: #555; display: block; margin-bottom: 5px; }
         .stat-item b { font-size: 19px; font-weight: 900; display: block; }
 
+        /* صناديق التوريد والرقابة */
+        .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .op-card { background: white; padding: 15px; border-radius: 12px; border: 2px solid #000; box-shadow: 4px 4px 0 #000; }
+        .op-card.red { border-top: 8px solid var(--danger); }
+        .op-card.green { border-top: 8px solid var(--success); }
+
+        /* الفوتر ص وم */
         .mega-footer { background: #2c3e50; color: white; padding: 20px; border-radius: 15px; margin-top: 20px; border-bottom: 10px solid var(--warning); }
         .mega-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .mega-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
@@ -67,15 +76,16 @@
         .final-line { margin-top: 20px; text-align: center; padding: 20px; border: 3px dashed var(--warning); border-radius: 15px; background: rgba(255,255,255,0.05); }
         .final-val { font-size: 45px; font-weight: 900; color: var(--info); display: block; }
 
+        /* المودالات */
         .modal-bg { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(4px); overflow-y: auto; }
         .modal-bg.active { display: flex; }
         .modal-win { background: #fff; border-radius: 25px; width: 95%; max-width: 500px; border: 3px solid #000; margin: 20px auto; }
         .modal-header { background: #212529; color: white; padding: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         .modal-body { padding: 20px; }
         .input-box { background: #f8f9fa; padding: 12px; border-radius: 15px; margin-bottom: 15px; border-right: 12px solid #ccc; }
-        .huge-input { width: 100%; border: none; background: none; font-size: 40px; font-weight: 900; text-align: center; }
+        .huge-input { width: 100%; border: none; background: none; font-size: 45px; font-weight: 900; text-align: center; }
 
-        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-warning { background: var(--warning); color: black; }
@@ -98,6 +108,15 @@
     </div>
 
     <div class="container">
+        <!-- شريط التحكم الذي تمت إعادته -->
+        <div class="ctrl-bar no-print">
+            <input type="date" id="uiDate" class="input-ctrl" style="flex-grow:1;" onchange="refresh()">
+            <select id="uiShift" class="input-ctrl" style="width:150px;" onchange="refresh()">
+                <option value="صباحية">صباحية ☀️</option>
+                <option value="مسائية">مسائية 🌙</option>
+            </select>
+        </div>
+
         <div class="status-bar">
             <div id="uiGateLabel" style="font-weight: 900; font-size: 22px; color: var(--warning);">تحميل...</div>
             <div class="clock" id="uiClock">00:00:00</div>
@@ -114,7 +133,7 @@
 
         <button onclick="addLem()" class="btn btn-warning w-100 no-print" style="margin-top:12px; font-size:26px; border:3px solid #000; padding:18px;">+ إضافة لمة جديدة</button>
 
-        <!-- قسم التوريدات والرقابة (تمت إعادته) -->
+        <!-- التوريد والرقابة -->
         <div class="ops-grid no-print">
             <div class="op-card red">
                 <b>📥 بند التوريد:</b>
@@ -145,6 +164,7 @@
             <div class="stat-item" style="background:var(--dark); color:white; grid-column: span 2;"><span>💰 خزينة كاش المتبقي</span><b id="stSafe" style="color:var(--warning); font-size:24px;">0</b></div>
         </div>
 
+        <!-- الفوتر السفلي ص وم -->
         <div class="mega-footer">
             <div class="mega-grid">
                 <div class="mega-card"><span class="mega-num" id="mgRev">0</span><span>إيراد اليوم (ص+م)</span><span class="mega-sub">ص: <b id="dMornRev">0</b> | م: <b id="dEvenRev">0</b></span></div>
@@ -162,7 +182,7 @@
         </div>
     </div>
 
-    <!-- المودالات -->
+    <!-- مودال التسجيل -->
     <div id="entryModal" class="modal-bg">
         <div class="modal-win">
             <div class="modal-header"><b>تسجيل بيانات الحارة</b><span onclick="toggleModal('entryModal', false)" style="cursor:pointer; font-size:30px;">&times;</span></div>
@@ -179,6 +199,7 @@
         </div>
     </div>
 
+    <!-- مودال التصحيح الشامل -->
     <div id="adjModal" class="modal-bg">
         <div class="modal-win" style="max-width: 600px;">
             <div class="modal-header"><b>تصحيح الإجمالي الشامل</b><span onclick="toggleModal('adjModal', false)" style="cursor:pointer; font-size:30px;">&times;</span></div>
@@ -190,6 +211,7 @@
         </div>
     </div>
 
+    <!-- الإعدادات -->
     <div id="settingsModal" class="modal-bg">
         <div class="modal-win">
             <div class="modal-header"><b>⚙️ إعدادات الحارات</b><span onclick="toggleModal('settingsModal', false)" style="cursor:pointer; font-size:35px;">&times;</span></div>
@@ -209,12 +231,15 @@
     </div>
 
     <script>
-        let gates = JSON.parse(localStorage.getItem('app_v80_g')) || [{id:'h1', name:'بوابة حلوان'}];
-        let activeG = localStorage.getItem('app_v80_act') || 'h1';
+        let gates = JSON.parse(localStorage.getItem('app_v81_g')) || [{id:'h1', name:'بوابة حلوان'}];
+        let activeG = localStorage.getItem('app_v81_act') || 'h1';
         let lanes = []; let archives = {}; let curT = []; let curF = {reqaba:[], tawreed:[]}; let curLem = 1;
 
         window.onload = function() {
             setInterval(() => { document.getElementById('uiClock').innerText = new Date().toLocaleTimeString('ar-EG'); }, 1000);
+            const now = new Date();
+            document.getElementById('uiDate').valueAsDate = now;
+            document.getElementById('uiShift').value = (now.getHours() >= 9 && now.getHours() < 21) ? 'صباحية' : 'مسائية';
             renderGates(); switchG(activeG);
         };
 
@@ -225,19 +250,18 @@
         }
 
         function switchG(id) {
-            activeG = id; localStorage.setItem('app_v80_act', id);
+            activeG = id; localStorage.setItem('app_v81_act', id);
             const gateObj = gates.find(g => g.id === id); document.getElementById('uiGateLabel').innerText = gateObj ? gateObj.name : '';
-            lanes = JSON.parse(localStorage.getItem(`l_v80_${activeG}`)) || [{name:'نقل 1',type:'دخول'},{name:'موازين 1',type:'خروج'}];
-            archives = JSON.parse(localStorage.getItem(`arc_v80_${activeG}`)) || {}; 
+            lanes = JSON.parse(localStorage.getItem(`l_v81_${activeG}`)) || [{name:'نقل 1',type:'دخول'},{name:'موازين 1',type:'خروج'}];
+            archives = JSON.parse(localStorage.getItem(`arc_v81_${activeG}`)) || {}; 
             refresh(); renderGates();
         }
 
         function renderGates() { document.getElementById('uiGates').innerHTML = gates.map(g => `<div onclick="switchG('${g.id}')" class="gate-tab ${g.id === activeG ? 'active' : ''}">${g.name}</div>`).join(''); }
 
         function refresh() {
-            const now = new Date();
-            const dateKey = now.toISOString().split('T')[0];
-            const shiftKey = (now.getHours() >= 9 && now.getHours() < 21) ? 'صباحية' : 'مسائية';
+            const dateKey = document.getElementById('uiDate').value;
+            const shiftKey = document.getElementById('uiShift').value;
             const key = `${dateKey}_${shiftKey}`;
             const data = archives[key] || { trans: [], fin: {reqaba:[], tawreed:[]}, lem: 1 };
             curT = data.trans; curF = data.fin; curLem = data.lem;
@@ -246,13 +270,12 @@
         }
 
         function save() {
-            const now = new Date();
-            const dateKey = now.toISOString().split('T')[0];
-            const shiftKey = document.getElementById('uiShiftBadge').innerText;
+            const dateKey = document.getElementById('uiDate').value;
+            const shiftKey = document.getElementById('uiShift').value;
             const key = `${dateKey}_${shiftKey}`;
             archives[key] = { trans: curT, fin: curF, lem: curLem };
-            localStorage.setItem(`arc_v80_${activeG}`, JSON.stringify(archives)); 
-            localStorage.setItem(`l_v80_${activeG}`, JSON.stringify(lanes));
+            localStorage.setItem(`arc_v81_${activeG}`, JSON.stringify(archives)); 
+            localStorage.setItem(`l_v81_${activeG}`, JSON.stringify(lanes));
             renderSheet(); calcTotals();
         }
 
@@ -288,7 +311,7 @@
             const t = document.getElementById('laneTypeInput');
             const newName = n.value.trim();
             if (newName !== "") {
-                if(lanes.some(l => l.name === newName)) { alert("هذا الاسم موجود بالفعل!"); return; }
+                if(lanes.some(l => l.name === newName)) { alert("الاسم موجود بالفعل!"); return; }
                 lanes.push({ name: newName, type: t.value }); n.value = ""; save(); renderLaneListDisplay(); renderSheet();
             }
         }
@@ -339,15 +362,15 @@
         }
 
         function calcTotals() {
-            const now = new Date(); const dateKey = now.toISOString().split('T')[0];
+            const dateKey = document.getElementById('uiDate').value;
             const getS = (s) => {
                 const d = archives[`${dateKey}_${s}`] || { trans: [], fin: {reqaba:[], tawreed:[]} };
                 let c = 0, v = 0, n = 0; d.trans.forEach(t => { c += (t.amt||0); v += (t.visa||0); n += (t.nfc||0); });
                 const r = (d.fin.reqaba || []).reduce((a, b) => a + b.val, 0), t = (d.fin.tawreed || []).reduce((a, b) => a + b.val, 0);
                 return { c, v, n, r, t, rev: (c + v + n + r) };
             };
-            const m = getS('صباحية'), e = getS('مسائية'), shiftVal = document.getElementById('uiShiftBadge').innerText;
-            const cur = (shiftVal === 'صباحية' ? m : e);
+            const m = getS('صباحية'), e = getS('مسائية'), curShift = document.getElementById('uiShift').value;
+            const cur = (curShift === 'صباحية' ? m : e);
 
             document.getElementById('stCash').innerText = cur.c.toLocaleString();
             document.getElementById('stVisa').innerText = cur.v.toLocaleString();
@@ -356,7 +379,7 @@
             document.getElementById('stReq').innerText = cur.r.toLocaleString();
             document.getElementById('stTaw').innerText = cur.t.toLocaleString();
             let safeM = (m.c + m.r) - m.t, safeE = safeM + (e.c + e.r) - e.t;
-            document.getElementById('stSafe').innerText = (shiftVal === 'صباحية' ? safeM : safeE).toLocaleString();
+            document.getElementById('stSafe').innerText = (curShift === 'صباحية' ? safeM : safeE).toLocaleString();
 
             document.getElementById('mgRev').innerText = (m.rev + e.rev).toLocaleString();
             document.getElementById('dMornRev').innerText = m.rev.toLocaleString(); document.getElementById('dEvenRev').innerText = e.rev.toLocaleString();
@@ -389,7 +412,7 @@
         function moveLane(i, d) { let t = i + d; if(t >= 0 && t < lanes.length) { [lanes[i], lanes[t]] = [lanes[t], lanes[i]]; save(); } }
         function openSettingsUI() { toggleModal('settingsModal', true); renderLaneListDisplay(); }
         function resetGate() { if(confirm("مسح الكل؟")) { localStorage.clear(); location.reload(); } }
-        function addGatePrompt() { const n = prompt("اسم البوابة:"); if(n) { const id = 'g'+Date.now(); gates.push({id, name:n}); localStorage.setItem('app_v80_g', JSON.stringify(gates)); switchG(id); } }
+        function addGatePrompt() { const n = prompt("اسم البوابة:"); if(n) { const id = 'g'+Date.now(); gates.push({id, name:n}); localStorage.setItem('app_v81_g', JSON.stringify(gates)); switchG(id); } }
     </script>
 </body>
 </html>
