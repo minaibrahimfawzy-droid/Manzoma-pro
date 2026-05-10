@@ -3,90 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام اللمات الذكي - الإصدار 77</title>
+    <title>نظام اللمات الذكي - الإصدار 79</title>
     <style>
         :root {
             --primary: #0d6efd; --success: #198754; --danger: #dc3545; --warning: #ffc107; 
             --dark: #212529; --light: #f8f9fa; --info: #0dcaf0; --purple: #8e44ad;
-            --total-bg: #1a2a3a; 
-            --sep-thickness: 12px; 
+            --naql: #d35400; --mizan: #c0392b; 
+            --total-bg: #1a2a3a; --sep-thickness: 12px; 
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f0f2f5; color: #212529; font-size: 16px; user-select: none; }
         .container { width: 100%; padding: 8px; }
 
-        /* شريط التنقل */
         .top-nav { background: #fff; border-bottom: 3px solid #bbb; padding: 10px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .gates-scroll { display: flex; gap: 8px; overflow-x: auto; flex-grow: 1; scrollbar-width: none; }
         .gate-tab { white-space: nowrap; padding: 10px 20px; border-radius: 20px; border: 2px solid #ccc; background: #f8f9fa; font-weight: bold; cursor: pointer; }
         .gate-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* الحالة */
         .status-bar { background: var(--dark); color: white; padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin: 8px 0; border-right: 10px solid var(--warning); }
         .clock { font-family: 'Courier New', monospace; font-size: 20px; color: #0df0f0; font-weight: bold; }
         .shift-badge { background: var(--danger); padding: 4px 12px; border-radius: 6px; font-weight: bold; border: 1px solid #fff; }
 
-        /* الجدول */
         .table-wrap { overflow-x: auto; background: white; border: 2px solid #000; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .data-table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        .data-table th, .data-table td { border: 1px solid #333; text-align: center; vertical-align: middle; height: 95px; padding: 3px; position: relative; }
+        .data-table th, .data-table td { border: 1px solid #333; text-align: center; vertical-align: middle; height: 105px; padding: 3px; position: relative; }
         
+        .color-entry { background-color: var(--success) !important; color: white; } 
+        .color-exit { background-color: var(--primary) !important; color: white; }  
+        .color-naql { background-color: var(--naql) !important; color: white; }    
+        .color-mizan { background-color: var(--mizan) !important; color: white; }   
+
         .prev-lemma-highlight { background-color: #fff3cd !important; border-top: 2px solid var(--warning) !important; border-bottom: 2px solid var(--warning) !important; }
 
-        .lane-name { font-weight: 900; font-size: 15px; display: block; margin-bottom: 4px; }
-        .btn-ctrl { background: rgba(0,0,0,0.1); border: 1px solid #333; border-radius: 4px; padding: 1px 5px; font-size: 10px; cursor: pointer; }
+        .amt-txt { font-weight: 900; font-size: 26px; color: #000; display: block; line-height: 1; }
+        .visa-txt { font-size: 15px; color: #004085; font-weight: 900; background: #e7f1ff; border-radius: 4px; padding: 2px 4px; display: block; margin-top: 4px; border: 1px solid var(--info); }
+        .nfc-txt { font-size: 15px; color: #4a148c; font-weight: 900; background: #f3e5f5; border-radius: 4px; padding: 2px 4px; display: block; margin-top: 4px; border: 1px solid var(--purple); }
+        .run-total { font-size: 13px; color: #666; border-top: 1px solid #ddd; display: block; margin-top: 6px; font-weight: bold; }
 
         .lemma-cell { background: #dee2e6; width: 60px; font-weight: 900; font-size: 18px; }
         .del-lem { position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); color: red; border: 1px solid red; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: #fff; cursor: pointer; font-size: 12px; }
 
-        .amt-txt { font-weight: 900; font-size: 25px; color: #000; display: block; line-height: 1; }
-        .visa-txt { font-size: 11px; color: #004085; font-weight: 900; background: #e7f1ff; border-radius: 4px; padding: 1px 3px; display: block; margin-top: 2px; }
-        .nfc-txt { font-size: 11px; color: #4a148c; font-weight: 900; background: #f3e5f5; border-radius: 4px; padding: 1px 3px; display: block; margin-top: 2px; }
-        .run-total { font-size: 12px; color: #666; border-top: 1px solid #eee; display: block; margin-top: 4px; font-weight: bold; }
+        .row-foot td { background: var(--total-bg) !important; color: #ffffff !important; font-weight: 900; font-size: 24px; height: 80px; border-top: 5px solid var(--warning) !important; cursor: pointer; }
+        .grand-cell { background: var(--warning) !important; color: #000 !important; font-size: 30px !important; border: 2px solid #000 !important; }
 
-        /* سطر ج المميز */
-        .row-foot td { background: var(--total-bg) !important; color: #ffffff !important; font-weight: 900; font-size: 22px; height: 75px; border-top: 5px solid var(--warning) !important; cursor: pointer; }
-        .grand-cell { background: var(--warning) !important; color: #000 !important; font-size: 28px !important; border: 2px solid #000 !important; }
-        .thick-separator { border-right: var(--sep-thickness) solid #000 !important; }
+        .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
+        .stat-item { background: white; border: 2px solid #000; padding: 12px 5px; border-radius: 12px; text-align: center; box-shadow: 2px 2px 0 #000; }
+        .stat-item span { font-size: 12px; font-weight: 900; color: #555; display: block; margin-bottom: 5px; }
+        .stat-item b { font-size: 19px; font-weight: 900; display: block; }
 
-        /* العمليات */
-        .op-card { background: white; padding: 15px; border-radius: 12px; border: 2px solid #000; box-shadow: 4px 4px 0 #000; margin-bottom: 10px; }
-        
-        .stats-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 15px; }
-        .stat-item { background: white; border: 2px solid #000; padding: 10px; border-radius: 10px; text-align: center; box-shadow: 2px 2px 0 #000; }
-        .stat-item b { font-size: 18px; font-weight: 900; display: block; }
-
-        /* الفوتر ص وم */
         .mega-footer { background: #2c3e50; color: white; padding: 20px; border-radius: 15px; margin-top: 20px; border-bottom: 10px solid var(--warning); }
-        .mega-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .mega-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center; }
-        .mega-num { font-size: 24px; font-weight: 900; color: var(--warning); display: block; }
-        .mega-sub { font-size: 12px; display: block; margin-top: 5px; border-top: 1px solid #555; padding-top: 5px; }
+        .mega-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .mega-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+        .mega-num { font-size: 26px; font-weight: 900; color: var(--warning); display: block; }
+        .mega-sub { font-size: 12px; display: block; margin-top: 5px; border-top: 1px solid #555; padding-top: 5px; color: #ccc; }
 
-        /* إجمالي العهدة */
         .final-line { margin-top: 20px; text-align: center; padding: 20px; border: 3px dashed var(--warning); border-radius: 15px; background: rgba(255,255,255,0.05); }
-        .final-label { font-weight: 900; font-size: 20px; color: #fff; display: block; margin-bottom: 10px; }
-        .final-val { font-size: 42px; font-weight: 900; color: var(--info); display: block; text-shadow: 2px 2px 0 #000; }
+        .final-val { font-size: 45px; font-weight: 900; color: var(--info); display: block; }
 
-        /* المودالات */
-        .modal-bg { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-bg { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; backdrop-filter: blur(4px); overflow-y: auto; }
         .modal-bg.active { display: flex; }
-        .modal-win { background: #fff; border-radius: 20px; width: 95%; max-width: 450px; overflow: hidden; border: 3px solid #000; }
-        .modal-header { background: #212529; color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .modal-win { background: #fff; border-radius: 25px; width: 95%; max-width: 500px; border: 3px solid #000; margin: 20px auto; }
+        .modal-header { background: #212529; color: white; padding: 18px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
         .modal-body { padding: 20px; }
-        .input-box { background: #f8f9fa; padding: 12px; border-radius: 12px; margin-bottom: 12px; border-right: 10px solid #ccc; }
+        .input-box { background: #f8f9fa; padding: 12px; border-radius: 15px; margin-bottom: 15px; border-right: 12px solid #ccc; }
         .huge-input { width: 100%; border: none; background: none; font-size: 40px; font-weight: 900; text-align: center; }
 
-        .btn { padding: 12px 20px; border-radius: 8px; border: none; font-weight: 900; cursor: pointer; }
+        .btn { padding: 12px 20px; border-radius: 10px; border: none; font-weight: 900; cursor: pointer; transition: 0.2s; }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-warning { background: var(--warning); color: black; }
 
-        /* إدارة الحارات */
-        .add-lane-container { background: #f0fff4; border: 2px solid #198754; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-        .lane-manager-list { max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 10px; background: #fff; margin-top: 10px; }
-        .lane-item-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid #eee; font-weight: bold; }
+        .adj-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
+        .adj-label { font-weight: bold; font-size: 14px; }
+        .adj-input { width: 100%; padding: 8px; border: 2px solid #ccc; border-radius: 5px; text-align: center; font-weight: bold; font-size: 18px; }
 
         @media print { .no-print { display: none !important; } }
     </style>
@@ -104,7 +94,7 @@
 
     <div class="container">
         <div class="status-bar">
-            <div id="uiGateLabel" style="font-weight: 900; font-size: 20px; color: var(--warning);">تحميل...</div>
+            <div id="uiGateLabel" style="font-weight: 900; font-size: 22px; color: var(--warning);">تحميل...</div>
             <div class="clock" id="uiClock">00:00:00</div>
             <div id="uiShiftBadge" class="shift-badge">---</div>
         </div>
@@ -117,47 +107,30 @@
             </table>
         </div>
 
-        <button onclick="addLem()" class="btn btn-warning w-100 no-print" style="margin-top:10px; font-size:24px; border:3px solid #000; padding:15px;">+ إضافة لمة جديدة</button>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px;" class="no-print">
-            <div class="op-card" style="border-top:8px solid var(--danger);">
-                <b>📥 إضافة توريد:</b>
-                <div style="display:flex; gap:5px; margin-top:8px;">
-                    <input type="number" id="inTaw" class="btn" style="width:70%; border:1px solid #ccc; background:#fff;" placeholder="المبلغ">
-                    <button onclick="addFin('tawreed')" class="btn btn-danger">إضافة</button>
-                </div>
-                <div id="tawList" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:5px;"></div>
-            </div>
-            <div class="op-card" style="border-top:8px solid var(--success);">
-                <b>🛡️ إضافة رقابة:</b>
-                <div style="display:flex; gap:5px; margin-top:8px;">
-                    <input type="number" id="inReq" class="btn" style="width:70%; border:1px solid #ccc; background:#fff;" placeholder="المبلغ">
-                    <button onclick="addFin('reqaba')" class="btn btn-success">إضافة</button>
-                </div>
-                <div id="reqList" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:5px;"></div>
-            </div>
-        </div>
+        <button onclick="addLem()" class="btn btn-warning w-100 no-print" style="margin-top:12px; font-size:26px; border:3px solid #000; padding:18px;">+ إضافة لمة جديدة</button>
 
         <div class="stats-strip">
             <div class="stat-item" style="border-top:4px solid var(--success);"><span>💵 كاش حارات</span><b id="stCash">0</b></div>
-            <div class="stat-item" style="border-top:4px solid var(--info);"><span>💳 فيزا وردية</span><b id="stVisa" style="color:var(--primary);">0</b></div>
-            <div class="stat-item" style="border-top:4px solid var(--purple);"><span>📱 NFC وردية</span><b id="stNfc" style="color:var(--purple);">0</b></div>
-            <div class="stat-item" style="border-top:4px solid var(--danger);"><span>📥 إجمالي التوريد</span><b id="stTaw" style="color:var(--danger);">0</b></div>
-            <div class="stat-item" style="border-top:4px solid var(--success);"><span>🛡️ إجمالي الرقابة</span><b id="stReq" style="color:var(--success);">0</b></div>
-            <div class="stat-item" style="background:var(--dark); color:white;"><span>💰 خزينة كاش</span><b id="stSafe" style="color:var(--warning);">0</b></div>
+            <div class="stat-item" style="border-top:4px solid var(--info);"><span>💳 فيزا وردية</span><b id="stVisa">0</b></div>
+            <div class="stat-item" style="border-top:4px solid var(--purple);"><span>📱 NFC وردية</span><b id="stNfc">0</b></div>
+            <div class="stat-item" style="border-top:4px solid #000; background:#f8f9fa;"><span>📊 إجمالي (فيزا+NFC)</span><b id="stVisaNfc">0</b></div>
+            <div class="stat-item" style="border-top:4px solid var(--danger);"><span>📥 إجمالي التوريد</span><b id="stTaw">0</b></div>
+            <div class="stat-item" style="border-top:4px solid var(--success);"><span>🛡️ إجمالي الرقابة</span><b id="stReq">0</b></div>
+            <div class="stat-item" style="background:var(--dark); color:white; grid-column: span 2;"><span>💰 خزينة كاش المتبقي</span><b id="stSafe" style="color:var(--warning); font-size:24px;">0</b></div>
         </div>
 
         <div class="mega-footer">
             <div class="mega-grid">
-                <div class="mega-card"><span class="mega-num" id="mgRev">0</span><span>إيراد اليوم</span><span class="mega-sub">ص: <b id="dMornRev">0</b> | م: <b id="dEvenRev">0</b></span></div>
-                <div class="mega-card"><span class="mega-num" id="mgTaw" style="color:#ff7675;">0</span><span>توريد اليوم</span><span class="mega-sub">ص: <b id="dMornTaw">0</b> | م: <b id="dEvenTaw">0</b></span></div>
-                <div class="mega-card"><span class="mega-num" id="mgVis" style="color:var(--info);">0</span><span>فيزا اليوم</span><span class="mega-sub">ص: <b id="dMornVis">0</b> | م: <b id="dEvenVis">0</b></span></div>
-                <div class="mega-card"><span class="mega-num" id="mgNfc" style="color:var(--purple);">0</span><span>NFC اليوم</span><span class="mega-sub">ص: <b id="dMornNfc">0</b> | م: <b id="dEvenNfc">0</b></span></div>
+                <div class="mega-card"><span class="mega-num" id="mgRev">0</span><span>إيراد اليوم (ص+م)</span><span class="mega-sub">ص: <b id="dMornRev">0</b> | م: <b id="dEvenRev">0</b></span></div>
+                <div class="mega-card"><span class="mega-num" id="mgTaw" style="color:#ff7675;">0</span><span>توريد اليوم (ص+م)</span><span class="mega-sub">ص: <b id="dMornTaw">0</b> | م: <b id="dEvenTaw">0</b></span></div>
+                <div class="mega-card"><span class="mega-num" id="mgVis" style="color:var(--info);">0</span><span>فيزا اليوم (ص+م)</span><span class="mega-sub">ص: <b id="dMornVis">0</b> | م: <b id="dEvenVis">0</b></span></div>
+                <div class="mega-card"><span class="mega-num" id="mgNfc" style="color:var(--purple);">0</span><span>NFC اليوم (ص+م)</span><span class="mega-sub">ص: <b id="dMornNfc">0</b> | م: <b id="dEvenNfc">0</b></span></div>
+                <div class="mega-card" style="grid-column: span 2; background: rgba(255,255,255,0.1);">
+                    <span class="mega-num" id="mgTotalVisaNfc" style="color:#00d2d3;">0</span><span>إجمالي اليوم (فيزا + NFC)</span>
+                </div>
             </div>
-            
-            <!-- تم تعديل هذا الجزء ليحتوي على النص الكامل -->
             <div class="final-line">
-                <span class="final-label">إجمالي العُهدة الكلية (كاش الخزينة + فيزا + NFC):</span>
+                <span style="font-weight:900; font-size:20px; color:#fff; display:block; margin-bottom:10px;">إجمالي العُهدة الكلية (كاش الخزينة + فيزا + NFC):</span>
                 <b class="final-val" id="mgFinal">0</b>
             </div>
         </div>
@@ -172,47 +145,50 @@
                 <div class="input-box" style="border-color:var(--success);"><span>💵 كاش</span><input type="number" id="modCash" class="huge-input" placeholder="0"></div>
                 <div class="input-box" style="border-color:var(--info);"><span>💳 فيزا</span><input type="number" id="modVisa" class="huge-input" placeholder="0"></div>
                 <div class="input-box" style="border-color:var(--purple);"><span>📱 NFC</span><input type="number" id="modNfc" class="huge-input" placeholder="0"></div>
-                <button onclick="saveLaneData()" class="btn btn-success w-100">حفظ البيانات</button>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="saveLaneData()" class="btn btn-success" style="flex-grow:3; font-size:22px;">حفظ</button>
+                    <button onclick="clearEntryInputs()" class="btn btn-warning" style="flex-grow:1; font-size:18px;">تصفير 🔄</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- نافذة الإعدادات (تم إصلاح زر الإضافة ووضعه بالأسفل) -->
+    <!-- نافذة التصحيح الشامل (سطر ج) -->
+    <div id="adjModal" class="modal-bg">
+        <div class="modal-win" style="max-width: 600px;">
+            <div class="modal-header"><b>تصحيح الإجمالي (لمة واحدة)</b><span onclick="toggleModal('adjModal', false)" style="cursor:pointer; font-size:30px;">&times;</span></div>
+            <div class="modal-body">
+                <p style="font-weight:bold; color:red; font-size:14px; margin-bottom:15px;">* ادخل الإجمالي الفعلي لكل حارة، سيتم فتح سطر واحد فقط بكل التصحيحات.</p>
+                <div id="adjLanesList" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px;">
+                    <!-- ملء برمجي -->
+                </div>
+                <button onclick="applyBulkAdjustment()" class="btn btn-success w-100" style="font-size:22px;">حفظ سطر التصحيح الآن ✅</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- الإعدادات -->
     <div id="settingsModal" class="modal-bg">
         <div class="modal-win">
             <div class="modal-header"><b>⚙️ إعدادات الحارات</b><span onclick="toggleModal('settingsModal', false)" style="cursor:pointer; font-size:35px;">&times;</span></div>
             <div class="modal-body">
-                <div class="add-lane-container">
-                    <p style="font-weight:bold; color:var(--success); margin-top:0;">📝 بيانات الحارة الجديدة:</p>
-                    <input type="text" id="laneNameInput" class="btn" style="width:100%; border:1px solid #000; background:#fff; margin-bottom:10px;" placeholder="اكتب اسم الحارة">
+                <div style="background:#f0fff4; border:2px solid #198754; padding:15px; border-radius:15px; margin-bottom:20px;">
+                    <p style="font-weight:bold; color:var(--success); margin-top:0;">📝 حارة جديدة:</p>
+                    <input type="text" id="laneNameInput" class="btn" style="width:100%; border:1px solid #000; background:#fff; margin-bottom:10px;" placeholder="اسم الحارة">
                     <select id="laneTypeInput" class="btn" style="width:100%; border:1px solid #000; background:#fff; margin-bottom:15px;">
-                        <option value="دخول">نوع الحارة: دخول</option>
-                        <option value="خروج">نوع الحارة: خروج</option>
+                        <option value="دخول">دخول</option><option value="خروج">خروج</option>
                     </select>
-                    <button onclick="executeAddLane()" class="btn btn-success w-100" style="font-size:18px;">إضافة الحارة الآن +</button>
+                    <button onclick="executeAddLane()" class="btn btn-success w-100">إضافة الحارة الآن +</button>
                 </div>
-                
-                <p style="font-weight:bold;">📋 قائمة الحارات الحالية:</p>
-                <div id="laneListDisplay" class="lane-manager-list"></div>
+                <div id="laneListDisplay" style="max-height:200px; overflow-y:auto; border:1px solid #ddd; border-radius:10px; background:#fff; padding:10px;"></div>
                 <button onclick="resetGate()" class="btn btn-danger w-100" style="margin-top:20px;">⚠️ مسح بيانات البوابة</button>
             </div>
         </div>
     </div>
 
-    <div id="adjModal" class="modal-bg">
-        <div class="modal-win">
-            <div class="modal-header"><b>استكمال الإجمالي</b><span onclick="toggleModal('adjModal', false)" style="cursor:pointer;">&times;</span></div>
-            <div class="modal-body">
-                <input type="hidden" id="adjLaneName">
-                <div class="input-box" style="border-color:var(--primary);"><span>الإجمالي الصحيح:</span><input type="number" id="adjTarget" class="huge-input" placeholder="0"></div>
-                <button onclick="applyAdjustment()" class="btn btn-success w-100">تأكيد التصحيح</button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        let gates = JSON.parse(localStorage.getItem('app_v77_g')) || [{id:'h1', name:'بوابة حلوان'}];
-        let activeG = localStorage.getItem('app_v77_act') || 'h1';
+        let gates = JSON.parse(localStorage.getItem('app_v79_g')) || [{id:'h1', name:'بوابة حلوان'}];
+        let activeG = localStorage.getItem('app_v79_act') || 'h1';
         let lanes = []; let archives = {}; let curT = []; let curF = {reqaba:[], tawreed:[]}; let curLem = 1;
 
         window.onload = function() {
@@ -220,11 +196,17 @@
             renderGates(); switchG(activeG);
         };
 
+        function getLClass(l) {
+            if(l.name.includes('نقل')) return 'color-naql';
+            if(l.name.includes('موازين')) return 'color-mizan';
+            return l.type === 'دخول' ? 'color-entry' : 'color-exit';
+        }
+
         function switchG(id) {
-            activeG = id; localStorage.setItem('app_v77_act', id);
+            activeG = id; localStorage.setItem('app_v79_act', id);
             const gateObj = gates.find(g => g.id === id); document.getElementById('uiGateLabel').innerText = gateObj ? gateObj.name : '';
-            lanes = JSON.parse(localStorage.getItem(`l_v77_${activeG}`)) || [{name:'نقل 1',type:'دخول'}];
-            archives = JSON.parse(localStorage.getItem(`arc_v77_${activeG}`)) || {}; 
+            lanes = JSON.parse(localStorage.getItem(`l_v79_${activeG}`)) || [{name:'نقل 1',type:'دخول'},{name:'موازين 1',type:'خروج'}];
+            archives = JSON.parse(localStorage.getItem(`arc_v79_${activeG}`)) || {}; 
             refresh(); renderGates();
         }
 
@@ -247,15 +229,15 @@
             const shiftKey = document.getElementById('uiShiftBadge').innerText;
             const key = `${dateKey}_${shiftKey}`;
             archives[key] = { trans: curT, fin: curF, lem: curLem };
-            localStorage.setItem(`arc_v77_${activeG}`, JSON.stringify(archives)); 
-            localStorage.setItem(`l_v77_${activeG}`, JSON.stringify(lanes));
+            localStorage.setItem(`arc_v79_${activeG}`, JSON.stringify(archives)); 
+            localStorage.setItem(`l_v79_${activeG}`, JSON.stringify(lanes));
             renderSheet(); calcTotals();
         }
 
         function renderSheet() {
             const h = document.getElementById('uiHead'), b = document.getElementById('uiBody'), f = document.getElementById('uiFoot');
             let firstExitIdx = lanes.findIndex(l => l.type === 'خروج');
-            h.innerHTML = `<tr><th class="lemma-cell">م</th>${lanes.map((l,i)=>`<th class="${l.type==='دخول'?'color-entry':'color-exit'} ${i===firstExitIdx?'thick-separator':''}"><span class="lane-name">${l.name}</span><div class="lane-ctrls no-print"><button class="btn-ctrl" onclick="moveLane(${i},-1)">></button><button class="btn-ctrl" onclick="moveLane(${i},1)"><</button></div></th>`).join('')}<th>إجمالي</th></tr>`;
+            h.innerHTML = `<tr><th class="lemma-cell">م</th>${lanes.map((l,i)=>`<th class="${getLClass(l)} ${i===firstExitIdx?'thick-separator':''}"><span class="lane-name">${l.name}</span><div class="lane-ctrls no-print"><button class="btn-ctrl" onclick="moveLane(${i},-1)">></button><button class="btn-ctrl" onclick="moveLane(${i},1)"><</button></div></th>`).join('')}<th>إجمالي</th></tr>`;
 
             let bH = ''; let colT = {}, run = {}; lanes.forEach(l => { colT[l.name]=0; run[l.name]=0; });
             for(let i=1; i<=curLem; i++) {
@@ -266,46 +248,73 @@
                     const tx = curT.find(t => t.lem == i && t.lane === l.name) || {amt:0, visa:0, nfc:0};
                     let val = tx.amt + tx.visa + tx.nfc;
                     run[l.name] += val; colT[l.name] += val; rSum += val;
-                    bH += `<td class="${idx===firstExitIdx?'thick-separator':''}" onclick="openEntryUI(${i},'${l.name}')"><span class="amt-txt">${tx.amt || ''}</span><div>${tx.visa?`<span class="visa-txt">💳 ${tx.visa}</span>`:''} ${tx.nfc?`<span class="nfc-txt">📱 ${tx.nfc}</span>`:''}</div><span class="run-total">${run[l.name].toLocaleString()}</span></td>`;
+                    bH += `<td class="${idx===firstExitIdx?'thick-separator':''}" onclick="openEntryUI(${i},'${l.name}')">
+                        <span class="amt-txt">${tx.amt || ''}</span>
+                        ${tx.visa ? `<span class="visa-txt">💳 ${tx.visa}</span>` : ''}
+                        ${tx.nfc ? `<span class="nfc-txt">📱 ${tx.nfc}</span>` : ''}
+                        <span class="run-total">${run[l.name].toLocaleString()}</span>
+                    </td>`;
                 });
-                bH += `<td style="font-weight:bold; font-size:22px;">${rSum.toLocaleString()}</td></tr>`;
+                bH += `<td style="font-weight:bold; font-size:24px;">${rSum.toLocaleString()}</td></tr>`;
             }
             b.innerHTML = bH;
-            f.innerHTML = `<tr class="row-foot"><td>ج</td>${lanes.map((l,idx)=>`<td class="${idx===firstExitIdx?'thick-separator':''}" onclick="openAdj('${l.name}')">${colT[l.name].toLocaleString()}</td>`).join('')}<td class="grand-cell">${Object.values(colT).reduce((a,b)=>a+b,0).toLocaleString()}</td></tr>`;
+            f.innerHTML = `<tr class="row-foot"><td>ج</td>${lanes.map((l,idx)=>`<td class="${idx===firstExitIdx?'thick-separator':''}" onclick="openBulkAdj()">${colT[l.name].toLocaleString()}</td>`).join('')}<td class="grand-cell">${Object.values(colT).reduce((a,b)=>a+b,0).toLocaleString()}</td></tr>`;
         }
 
-        // دالة الإضافة النهائية
+        // منع الأسماء المتكررة
         function executeAddLane() {
-            const nInp = document.getElementById('laneNameInput');
-            const tInp = document.getElementById('laneTypeInput');
-            if (nInp.value.trim() !== "") {
-                lanes.push({ name: nInp.value.trim(), type: tInp.value });
-                nInp.value = "";
-                save(); 
-                renderLaneListDisplay(); 
-                renderSheet();
-            } else {
-                alert("يرجى كتابة اسم الحارة");
+            const n = document.getElementById('laneNameInput');
+            const t = document.getElementById('laneTypeInput');
+            const newName = n.value.trim();
+            if (newName !== "") {
+                const isExist = lanes.some(l => l.name === newName);
+                if(isExist) { alert("هذا الاسم موجود بالفعل! يرجى اختيار اسم مختلف للحارة."); return; }
+                lanes.push({ name: newName, type: t.value }); n.value = ""; save(); renderLaneListDisplay(); renderSheet();
             }
-        }
-
-        function openSettingsUI() {
-            toggleModal('settingsModal', true);
-            renderLaneListDisplay();
         }
 
         function renderLaneListDisplay() {
             const listUI = document.getElementById('laneListDisplay');
-            listUI.innerHTML = lanes.map((l, i) => `<div class="lane-item-row"><span>${l.name} (${l.type})</span><button onclick="removeLaneNow(${i})" style="color:red; background:none; border:none; font-weight:bold; cursor:pointer;">حذف</button></div>`).join('');
+            listUI.innerHTML = lanes.map((l, i) => `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${l.name} (${l.type})</span><button onclick="removeLaneNow(${i})" style="color:red; background:none; border:none; font-weight:bold; cursor:pointer;">حذف</button></div>`).join('');
         }
 
-        function removeLaneNow(i) {
-            if(confirm("حذف الحارة نهائياً؟")) {
-                lanes.splice(i, 1);
-                save();
-                renderLaneListDisplay();
-                renderSheet();
-            }
+        function removeLaneNow(i) { if(confirm("حذف الحارة؟")) { lanes.splice(i, 1); save(); renderLaneListDisplay(); renderSheet(); } }
+
+        // نافذة التصحيح الشامل لكل الحارات معاً
+        function openBulkAdj() {
+            const listUI = document.getElementById('adjLanesList');
+            listUI.innerHTML = lanes.map(l => {
+                let currentTotal = 0;
+                curT.forEach(t => { if(t.lane === l.name) currentTotal += (t.amt + t.visa + t.nfc); });
+                return `
+                    <div class="adj-row">
+                        <div class="adj-label">${l.name}<br><small>الحالي: ${currentTotal.toLocaleString()}</small></div>
+                        <input type="number" class="adj-input" data-lane="${l.name}" data-current="${currentTotal}" placeholder="الفعل">
+                    </div>
+                `;
+            }).join('');
+            toggleModal('adjModal', true);
+        }
+
+        function applyBulkAdjustment() {
+            const inputs = document.querySelectorAll('.adj-input');
+            let hasChanges = false;
+            let nextLem = curLem + 1;
+            
+            inputs.forEach(inp => {
+                const lane = inp.dataset.lane;
+                const current = parseFloat(inp.dataset.current) || 0;
+                const target = parseFloat(inp.value);
+                
+                if (!isNaN(target) && target !== current) {
+                    const diff = target - current;
+                    curT.push({ lem: nextLem, lane: lane, amt: diff, visa: 0, nfc: 0 });
+                    hasChanges = true;
+                }
+            });
+
+            if(hasChanges) { curLem = nextLem; save(); }
+            toggleModal('adjModal', false);
         }
 
         function openEntryUI(lem, l) {
@@ -315,27 +324,14 @@
             toggleModal('entryModal', true);
         }
 
+        function clearEntryInputs() { document.getElementById('modCash').value = ''; document.getElementById('modVisa').value = ''; document.getElementById('modNfc').value = ''; }
+
         function saveLaneData() {
             const lem = parseInt(document.getElementById('actN').value), lane = document.getElementById('actL').value;
             const c = parseFloat(document.getElementById('modCash').value) || 0, v = parseFloat(document.getElementById('modVisa').value) || 0, n = parseFloat(document.getElementById('modNfc').value) || 0;
             curT = curT.filter(t => !(t.lem == lem && t.lane === lane));
             if(c || v || n) curT.push({lem, lane, amt:c, visa:v, nfc:n});
             save(); toggleModal('entryModal', false);
-        }
-
-        function openAdj(lane) {
-            document.getElementById('adjLaneName').value = lane;
-            let current = 0; curT.forEach(t => { if(t.lane === lane) current += (t.amt + t.visa + t.nfc); });
-            document.getElementById('adjTarget').value = current;
-            toggleModal('adjModal', true);
-        }
-
-        function applyAdjustment() {
-            const lane = document.getElementById('adjLaneName').value, target = parseFloat(document.getElementById('adjTarget').value) || 0;
-            let current = 0; curT.forEach(t => { if(t.lane === lane) current += (t.amt + t.visa + t.nfc); });
-            const diff = target - current;
-            if(diff !== 0) { curLem++; curT.push({lem: curLem, lane: lane, amt: diff, visa: 0, nfc: 0}); save(); }
-            toggleModal('adjModal', false);
         }
 
         function calcTotals() {
@@ -353,6 +349,7 @@
             document.getElementById('stCash').innerText = cur.c.toLocaleString();
             document.getElementById('stVisa').innerText = cur.v.toLocaleString();
             document.getElementById('stNfc').innerText = cur.n.toLocaleString();
+            document.getElementById('stVisaNfc').innerText = (cur.v + cur.n).toLocaleString();
             document.getElementById('stReq').innerText = cur.r.toLocaleString();
             document.getElementById('stTaw').innerText = cur.t.toLocaleString();
             let safeM = (m.c + m.r) - m.t, safeE = safeM + (e.c + e.r) - e.t;
@@ -366,8 +363,7 @@
             document.getElementById('dMornVis').innerText = m.v.toLocaleString(); document.getElementById('dEvenVis').innerText = e.v.toLocaleString();
             document.getElementById('mgNfc').innerText = (m.n + e.n).toLocaleString();
             document.getElementById('dMornNfc').innerText = m.n.toLocaleString(); document.getElementById('dEvenNfc').innerText = e.n.toLocaleString();
-            
-            // حساب العهدة النهائية بدقة
+            document.getElementById('mgTotalVisaNfc').innerText = (m.v + e.v + m.n + e.n).toLocaleString();
             document.getElementById('mgFinal').innerText = (safeE + (m.v + e.v) + (m.n + e.n)).toLocaleString();
         }
 
@@ -379,7 +375,7 @@
             }
         }
         function renderFin() {
-            const mk = (list, type) => list.map(i => `<div style="background:#eee; padding:3px 8px; border-radius:5px; font-size:12px; border:1px solid #ccc;">${type==='tawreed'?`<b>${i.time}</b> | `:''}<b>${i.val}</b> <span onclick="delFin('${i.id}','${type}')" style="color:red; cursor:pointer;">×</span></div>`).join('');
+            const mk = (list, type) => list.map(i => `<div style="background:#eee; padding:3px 8px; border-radius:5px; font-size:12px; border:1px solid #ccc;">${type==='tawreed'?`<b>${i.time}</b> | `:''}<b>${i.val.toLocaleString()}</b> <span onclick="delFin('${i.id}','${type}')" style="color:red; cursor:pointer; margin-right:5px;">×</span></div>`).join('');
             document.getElementById('tawList').innerHTML = mk(curF.tawreed, 'tawreed');
             document.getElementById('reqList').innerHTML = mk(curF.reqaba, 'reqaba');
         }
@@ -388,8 +384,9 @@
         function addLem() { curLem++; save(); }
         function delLemRow(n) { if(confirm(`حذف اللمة ${n}؟`)) { curT = curT.filter(t => t.lem != n); curT.forEach(t => { if(t.lem > n) t.lem--; }); if(curLem > 1) curLem--; save(); } }
         function moveLane(i, d) { let t = i + d; if(t >= 0 && t < lanes.length) { [lanes[i], lanes[t]] = [lanes[t], lanes[i]]; save(); } }
+        function openSettingsUI() { toggleModal('settingsModal', true); renderLaneListDisplay(); }
         function resetGate() { if(confirm("مسح الكل؟")) { localStorage.clear(); location.reload(); } }
-        function addGatePrompt() { const n = prompt("اسم البوابة:"); if(n) { const id = 'g'+Date.now(); gates.push({id, name:n}); localStorage.setItem('app_v77_g', JSON.stringify(gates)); switchG(id); } }
+        function addGatePrompt() { const n = prompt("اسم البوابة:"); if(n) { const id = 'g'+Date.now(); gates.push({id, name:n}); localStorage.setItem('app_v79_g', JSON.stringify(gates)); switchG(id); } }
     </script>
 </body>
 </html>
