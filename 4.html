@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>نظام اللمات الذكي - الإصدار 79</title>
+    <title>نظام اللمات الذكي - الإصدار 80</title>
     <style>
         :root {
             --primary: #0d6efd; --success: #198754; --danger: #dc3545; --warning: #ffc107; 
@@ -47,6 +47,12 @@
         .row-foot td { background: var(--total-bg) !important; color: #ffffff !important; font-weight: 900; font-size: 24px; height: 80px; border-top: 5px solid var(--warning) !important; cursor: pointer; }
         .grand-cell { background: var(--warning) !important; color: #000 !important; font-size: 30px !important; border: 2px solid #000 !important; }
 
+        /* قسم التوريد والرقابة (المعاد) */
+        .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .op-card { background: white; padding: 15px; border-radius: 12px; border: 2px solid #000; box-shadow: 4px 4px 0 #000; }
+        .op-card.red { border-top: 8px solid var(--danger); }
+        .op-card.green { border-top: 8px solid var(--success); }
+
         .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 15px; }
         .stat-item { background: white; border: 2px solid #000; padding: 12px 5px; border-radius: 12px; text-align: center; box-shadow: 2px 2px 0 #000; }
         .stat-item span { font-size: 12px; font-weight: 900; color: #555; display: block; margin-bottom: 5px; }
@@ -75,8 +81,7 @@
         .btn-warning { background: var(--warning); color: black; }
 
         .adj-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
-        .adj-label { font-weight: bold; font-size: 14px; }
-        .adj-input { width: 100%; padding: 8px; border: 2px solid #ccc; border-radius: 5px; text-align: center; font-weight: bold; font-size: 18px; }
+        .tag { background: #eee; padding: 3px 8px; border-radius: 5px; font-size: 12px; border: 1px solid #ccc; margin: 2px; display: inline-block; }
 
         @media print { .no-print { display: none !important; } }
     </style>
@@ -109,6 +114,27 @@
 
         <button onclick="addLem()" class="btn btn-warning w-100 no-print" style="margin-top:12px; font-size:26px; border:3px solid #000; padding:18px;">+ إضافة لمة جديدة</button>
 
+        <!-- قسم التوريدات والرقابة (تمت إعادته) -->
+        <div class="ops-grid no-print">
+            <div class="op-card red">
+                <b>📥 بند التوريد:</b>
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <input type="number" id="inTaw" class="btn" style="width:70%; border:1px solid #ccc; background:#fff;" placeholder="0">
+                    <button onclick="addFin('tawreed')" class="btn btn-danger">إضافة</button>
+                </div>
+                <div id="tawList" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px;"></div>
+            </div>
+            <div class="op-card green">
+                <b>🛡️ بند الرقابة:</b>
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <input type="number" id="inReq" class="btn" style="width:70%; border:1px solid #ccc; background:#fff;" placeholder="0">
+                    <button onclick="addFin('reqaba')" class="btn btn-success">إضافة</button>
+                </div>
+                <div id="reqList" style="margin-top:10px; display:flex; flex-wrap:wrap; gap:5px;"></div>
+            </div>
+        </div>
+
+        <!-- إحصائيات الوردية -->
         <div class="stats-strip">
             <div class="stat-item" style="border-top:4px solid var(--success);"><span>💵 كاش حارات</span><b id="stCash">0</b></div>
             <div class="stat-item" style="border-top:4px solid var(--info);"><span>💳 فيزا وردية</span><b id="stVisa">0</b></div>
@@ -125,7 +151,7 @@
                 <div class="mega-card"><span class="mega-num" id="mgTaw" style="color:#ff7675;">0</span><span>توريد اليوم (ص+م)</span><span class="mega-sub">ص: <b id="dMornTaw">0</b> | م: <b id="dEvenTaw">0</b></span></div>
                 <div class="mega-card"><span class="mega-num" id="mgVis" style="color:var(--info);">0</span><span>فيزا اليوم (ص+م)</span><span class="mega-sub">ص: <b id="dMornVis">0</b> | م: <b id="dEvenVis">0</b></span></div>
                 <div class="mega-card"><span class="mega-num" id="mgNfc" style="color:var(--purple);">0</span><span>NFC اليوم (ص+م)</span><span class="mega-sub">ص: <b id="dMornNfc">0</b> | م: <b id="dEvenNfc">0</b></span></div>
-                <div class="mega-card" style="grid-column: span 2; background: rgba(255,255,255,0.1);">
+                <div class="mega-card" style="grid-column: span 2; background: rgba(255,255,255,0.1); border: 1px solid #00d2d3;">
                     <span class="mega-num" id="mgTotalVisaNfc" style="color:#00d2d3;">0</span><span>إجمالي اليوم (فيزا + NFC)</span>
                 </div>
             </div>
@@ -136,7 +162,7 @@
         </div>
     </div>
 
-    <!-- نافذة التسجيل -->
+    <!-- المودالات -->
     <div id="entryModal" class="modal-bg">
         <div class="modal-win">
             <div class="modal-header"><b>تسجيل بيانات الحارة</b><span onclick="toggleModal('entryModal', false)" style="cursor:pointer; font-size:30px;">&times;</span></div>
@@ -153,21 +179,17 @@
         </div>
     </div>
 
-    <!-- نافذة التصحيح الشامل (سطر ج) -->
     <div id="adjModal" class="modal-bg">
         <div class="modal-win" style="max-width: 600px;">
-            <div class="modal-header"><b>تصحيح الإجمالي (لمة واحدة)</b><span onclick="toggleModal('adjModal', false)" style="cursor:pointer; font-size:30px;">&times;</span></div>
+            <div class="modal-header"><b>تصحيح الإجمالي الشامل</b><span onclick="toggleModal('adjModal', false)" style="cursor:pointer; font-size:30px;">&times;</span></div>
             <div class="modal-body">
-                <p style="font-weight:bold; color:red; font-size:14px; margin-bottom:15px;">* ادخل الإجمالي الفعلي لكل حارة، سيتم فتح سطر واحد فقط بكل التصحيحات.</p>
-                <div id="adjLanesList" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px;">
-                    <!-- ملء برمجي -->
-                </div>
-                <button onclick="applyBulkAdjustment()" class="btn btn-success w-100" style="font-size:22px;">حفظ سطر التصحيح الآن ✅</button>
+                <p style="font-weight:bold; color:red; font-size:13px; margin-bottom:10px;">* ادخل الإجمالي الفعلي، سيتم فتح سطر واحد للتصحيحات.</p>
+                <div id="adjLanesList" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px;"></div>
+                <button onclick="applyBulkAdjustment()" class="btn btn-success w-100">حفظ سطر التصحيح الآن ✅</button>
             </div>
         </div>
     </div>
 
-    <!-- الإعدادات -->
     <div id="settingsModal" class="modal-bg">
         <div class="modal-win">
             <div class="modal-header"><b>⚙️ إعدادات الحارات</b><span onclick="toggleModal('settingsModal', false)" style="cursor:pointer; font-size:35px;">&times;</span></div>
@@ -187,8 +209,8 @@
     </div>
 
     <script>
-        let gates = JSON.parse(localStorage.getItem('app_v79_g')) || [{id:'h1', name:'بوابة حلوان'}];
-        let activeG = localStorage.getItem('app_v79_act') || 'h1';
+        let gates = JSON.parse(localStorage.getItem('app_v80_g')) || [{id:'h1', name:'بوابة حلوان'}];
+        let activeG = localStorage.getItem('app_v80_act') || 'h1';
         let lanes = []; let archives = {}; let curT = []; let curF = {reqaba:[], tawreed:[]}; let curLem = 1;
 
         window.onload = function() {
@@ -203,10 +225,10 @@
         }
 
         function switchG(id) {
-            activeG = id; localStorage.setItem('app_v79_act', id);
+            activeG = id; localStorage.setItem('app_v80_act', id);
             const gateObj = gates.find(g => g.id === id); document.getElementById('uiGateLabel').innerText = gateObj ? gateObj.name : '';
-            lanes = JSON.parse(localStorage.getItem(`l_v79_${activeG}`)) || [{name:'نقل 1',type:'دخول'},{name:'موازين 1',type:'خروج'}];
-            archives = JSON.parse(localStorage.getItem(`arc_v79_${activeG}`)) || {}; 
+            lanes = JSON.parse(localStorage.getItem(`l_v80_${activeG}`)) || [{name:'نقل 1',type:'دخول'},{name:'موازين 1',type:'خروج'}];
+            archives = JSON.parse(localStorage.getItem(`arc_v80_${activeG}`)) || {}; 
             refresh(); renderGates();
         }
 
@@ -229,8 +251,8 @@
             const shiftKey = document.getElementById('uiShiftBadge').innerText;
             const key = `${dateKey}_${shiftKey}`;
             archives[key] = { trans: curT, fin: curF, lem: curLem };
-            localStorage.setItem(`arc_v79_${activeG}`, JSON.stringify(archives)); 
-            localStorage.setItem(`l_v79_${activeG}`, JSON.stringify(lanes));
+            localStorage.setItem(`arc_v80_${activeG}`, JSON.stringify(archives)); 
+            localStorage.setItem(`l_v80_${activeG}`, JSON.stringify(lanes));
             renderSheet(); calcTotals();
         }
 
@@ -261,14 +283,12 @@
             f.innerHTML = `<tr class="row-foot"><td>ج</td>${lanes.map((l,idx)=>`<td class="${idx===firstExitIdx?'thick-separator':''}" onclick="openBulkAdj()">${colT[l.name].toLocaleString()}</td>`).join('')}<td class="grand-cell">${Object.values(colT).reduce((a,b)=>a+b,0).toLocaleString()}</td></tr>`;
         }
 
-        // منع الأسماء المتكررة
         function executeAddLane() {
             const n = document.getElementById('laneNameInput');
             const t = document.getElementById('laneTypeInput');
             const newName = n.value.trim();
             if (newName !== "") {
-                const isExist = lanes.some(l => l.name === newName);
-                if(isExist) { alert("هذا الاسم موجود بالفعل! يرجى اختيار اسم مختلف للحارة."); return; }
+                if(lanes.some(l => l.name === newName)) { alert("هذا الاسم موجود بالفعل!"); return; }
                 lanes.push({ name: newName, type: t.value }); n.value = ""; save(); renderLaneListDisplay(); renderSheet();
             }
         }
@@ -280,39 +300,23 @@
 
         function removeLaneNow(i) { if(confirm("حذف الحارة؟")) { lanes.splice(i, 1); save(); renderLaneListDisplay(); renderSheet(); } }
 
-        // نافذة التصحيح الشامل لكل الحارات معاً
         function openBulkAdj() {
             const listUI = document.getElementById('adjLanesList');
             listUI.innerHTML = lanes.map(l => {
                 let currentTotal = 0;
                 curT.forEach(t => { if(t.lane === l.name) currentTotal += (t.amt + t.visa + t.nfc); });
-                return `
-                    <div class="adj-row">
-                        <div class="adj-label">${l.name}<br><small>الحالي: ${currentTotal.toLocaleString()}</small></div>
-                        <input type="number" class="adj-input" data-lane="${l.name}" data-current="${currentTotal}" placeholder="الفعل">
-                    </div>
-                `;
+                return `<div class="adj-row"><div class="adj-label">${l.name}<br><small>الحالي: ${currentTotal.toLocaleString()}</small></div><input type="number" class="adj-input" style="width:100%; padding:8px; border:2px solid #ccc; text-align:center; font-weight:bold;" data-lane="${l.name}" data-current="${currentTotal}" placeholder="الفعلي"></div>`;
             }).join('');
             toggleModal('adjModal', true);
         }
 
         function applyBulkAdjustment() {
             const inputs = document.querySelectorAll('.adj-input');
-            let hasChanges = false;
-            let nextLem = curLem + 1;
-            
+            let hasChanges = false; let nextLem = curLem + 1;
             inputs.forEach(inp => {
-                const lane = inp.dataset.lane;
-                const current = parseFloat(inp.dataset.current) || 0;
-                const target = parseFloat(inp.value);
-                
-                if (!isNaN(target) && target !== current) {
-                    const diff = target - current;
-                    curT.push({ lem: nextLem, lane: lane, amt: diff, visa: 0, nfc: 0 });
-                    hasChanges = true;
-                }
+                const lane = inp.dataset.lane; const current = parseFloat(inp.dataset.current) || 0; const target = parseFloat(inp.value);
+                if (!isNaN(target) && target !== current) { curT.push({ lem: nextLem, lane: lane, amt: target - current, visa: 0, nfc: 0 }); hasChanges = true; }
             });
-
             if(hasChanges) { curLem = nextLem; save(); }
             toggleModal('adjModal', false);
         }
@@ -335,8 +339,7 @@
         }
 
         function calcTotals() {
-            const now = new Date();
-            const dateKey = now.toISOString().split('T')[0];
+            const now = new Date(); const dateKey = now.toISOString().split('T')[0];
             const getS = (s) => {
                 const d = archives[`${dateKey}_${s}`] || { trans: [], fin: {reqaba:[], tawreed:[]} };
                 let c = 0, v = 0, n = 0; d.trans.forEach(t => { c += (t.amt||0); v += (t.visa||0); n += (t.nfc||0); });
@@ -375,7 +378,7 @@
             }
         }
         function renderFin() {
-            const mk = (list, type) => list.map(i => `<div style="background:#eee; padding:3px 8px; border-radius:5px; font-size:12px; border:1px solid #ccc;">${type==='tawreed'?`<b>${i.time}</b> | `:''}<b>${i.val.toLocaleString()}</b> <span onclick="delFin('${i.id}','${type}')" style="color:red; cursor:pointer; margin-right:5px;">×</span></div>`).join('');
+            const mk = (list, type) => list.map(i => `<div class="tag">${type==='tawreed'?'['+i.time+'] ':''}<b>${i.val.toLocaleString()}</b> <span onclick="delFin('${i.id}','${type}')" style="color:red; cursor:pointer; margin-right:5px;">×</span></div>`).join('');
             document.getElementById('tawList').innerHTML = mk(curF.tawreed, 'tawreed');
             document.getElementById('reqList').innerHTML = mk(curF.reqaba, 'reqaba');
         }
@@ -386,7 +389,7 @@
         function moveLane(i, d) { let t = i + d; if(t >= 0 && t < lanes.length) { [lanes[i], lanes[t]] = [lanes[t], lanes[i]]; save(); } }
         function openSettingsUI() { toggleModal('settingsModal', true); renderLaneListDisplay(); }
         function resetGate() { if(confirm("مسح الكل؟")) { localStorage.clear(); location.reload(); } }
-        function addGatePrompt() { const n = prompt("اسم البوابة:"); if(n) { const id = 'g'+Date.now(); gates.push({id, name:n}); localStorage.setItem('app_v79_g', JSON.stringify(gates)); switchG(id); } }
+        function addGatePrompt() { const n = prompt("اسم البوابة:"); if(n) { const id = 'g'+Date.now(); gates.push({id, name:n}); localStorage.setItem('app_v80_g', JSON.stringify(gates)); switchG(id); } }
     </script>
 </body>
 </html>
