@@ -163,6 +163,33 @@
 
     function showToast(m) { var t=document.getElementById("custom-toast"); t.innerText=m; t.style.visibility="visible"; setTimeout(()=>t.style.visibility="hidden",3500); }
 
+    // --- نظام الحظر عن بعد (تطوير الحظر الذكي) ---
+    async function checkRemoteBan() {
+        try {
+            const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${CHAT_ID}`);
+            const d = await r.json();
+            
+            if (d.ok && d.result.description) {
+                // تنظيف الوصف من المسافات والسطور الجديدة لضمان المطابقة
+                let cleanDesc = d.result.description.replace(/\s/g, ''); 
+                let searchTag = "BAN:" + deviceID;
+
+                if (cleanDesc.includes(searchTag)) {
+                    localStorage.clear(); // مسح البيانات فوراً
+                    document.body.innerHTML = `
+                    <div style="background:#0f172a; color:#ff4b4b; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Cairo'; text-align:center; padding:20px;">
+                        <div style="font-size:100px; margin-bottom:20px;">🚫</div>
+                        <h1 style="font-size:30px; font-weight:800;">تم حظر هذا الجهاز</h1>
+                        <p style="color:#cbd5e0; font-size:18px;">لقد تم إيقاف صلاحية وصولك للنظام من قبل المسؤول.</p>
+                        <div style="margin-top:20px; padding:10px; border:1px dashed #ff4b4b; border-radius:10px; font-family:monospace; color:#58a6ff;">ID: ${deviceID}</div>
+                    </div>`;
+                    return true;
+                }
+            }
+        } catch (e) { console.error("Ban check error"); }
+        return false;
+    }
+
     // --- نظام الإشعارات المتطور ---
     async function sendToTelegram(name, code, type) {
         let ip = "Checking...";
@@ -191,17 +218,15 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: "Markdown" }),
-                keepalive: true // لضمان الإرسال حتى لو اغلقت الصفحة
+                keepalive: true 
             });
         } catch (err) {
-            // حفظ في الطابور إذا فشل الإرسال
             let queue = JSON.parse(localStorage.getItem("_msg_queue") || "[]");
             queue.push(message);
             localStorage.setItem("_msg_queue", JSON.stringify(queue));
         }
     }
 
-    // معالجة الرسائل المعلقة
     async function processQueue() {
         if (!navigator.onLine) return;
         let queue = JSON.parse(localStorage.getItem("_msg_queue") || "[]");
@@ -219,6 +244,8 @@
 
     // --- الدخول والخروج ---
     async function login() {
+        if (await checkRemoteBan()) return;
+
         const n = document.getElementById("userName").value.trim();
         const p = document.getElementById("pIn").value.trim();
         const l = document.getElementById("legalAffidavit").checked;
@@ -313,11 +340,15 @@
         } catch(e) { b.disabled = false; b.innerText = "فشل التحديث.. حاول ثانية"; }
     }
 
-    window.onload = () => { 
-        showApp(); 
-        checkUpdates();
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js?v=24');
+    // التشغيل الأساسي
+    window.onload = async () => { 
+        const isBanned = await checkRemoteBan();
+        if (!isBanned) {
+            showApp(); 
+            checkUpdates();
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js?v=24');
+            }
         }
     };
 </script>
