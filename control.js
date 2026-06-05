@@ -1,5 +1,5 @@
 var APK_REQUIRED_VERSION = "1.0"; 
-var HTML_VERSION = "2008"; // التحديث الجديد 2008
+var HTML_VERSION = "2009"; // التحديث الجديد 2009
 var APK_DOWNLOAD_LINK = "https://minaibrahimfawzy-droid.github.io/Manzoma-pro/app.apk";
 
 // كود تسجيل نظام الأوفلاين

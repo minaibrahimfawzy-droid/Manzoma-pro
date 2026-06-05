@@ -163,30 +163,42 @@
 
     function showToast(m) { var t=document.getElementById("custom-toast"); t.innerText=m; t.style.visibility="visible"; setTimeout(()=>t.style.visibility="hidden",3500); }
 
-    // --- نظام الحظر عن بعد (تطوير الحظر الذكي) ---
+    // --- نظام الحظر عن بعد الذكي ---
     async function checkRemoteBan() {
         try {
             const r = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${CHAT_ID}`);
             const d = await r.json();
             
             if (d.ok && d.result.description) {
-                // تنظيف الوصف من المسافات والسطور الجديدة لضمان المطابقة
+                // مسح المسافات والسطور لضمان دقة البحث
                 let cleanDesc = d.result.description.replace(/\s/g, ''); 
-                let searchTag = "BAN:" + deviceID;
-
-                if (cleanDesc.includes(searchTag)) {
-                    localStorage.clear(); // مسح البيانات فوراً
+                
+                // 1. فحص الحظر الشامل
+                if (cleanDesc.includes("BAN:ALL")) {
+                    localStorage.clear();
                     document.body.innerHTML = `
                     <div style="background:#0f172a; color:#ff4b4b; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Cairo'; text-align:center; padding:20px;">
-                        <div style="font-size:100px; margin-bottom:20px;">🚫</div>
+                        <div style="font-size:100px;">🛑</div>
+                        <h1 style="font-size:30px; font-weight:800;">النظام متوقف حالياً</h1>
+                        <p style="color:#cbd5e0; font-size:18px;">تم تعليق الوصول للنظام لجميع المستخدمين من قبل الإدارة.</p>
+                    </div>`;
+                    return true;
+                }
+
+                // 2. فحص الحظر الفردي
+                if (cleanDesc.includes("BAN:" + deviceID)) {
+                    localStorage.clear();
+                    document.body.innerHTML = `
+                    <div style="background:#0f172a; color:#ff4b4b; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Cairo'; text-align:center; padding:20px;">
+                        <div style="font-size:100px;">🚫</div>
                         <h1 style="font-size:30px; font-weight:800;">تم حظر هذا الجهاز</h1>
-                        <p style="color:#cbd5e0; font-size:18px;">لقد تم إيقاف صلاحية وصولك للنظام من قبل المسؤول.</p>
-                        <div style="margin-top:20px; padding:10px; border:1px dashed #ff4b4b; border-radius:10px; font-family:monospace; color:#58a6ff;">ID: ${deviceID}</div>
+                        <p style="color:#cbd5e0; font-size:18px;">لقد تم إيقاف صلاحية وصولك للنظام.</p>
+                        <div style="margin-top:20px; color:#58a6ff; font-family:monospace; border:1px dashed #58a6ff; padding:10px;">ID: ${deviceID}</div>
                     </div>`;
                     return true;
                 }
             }
-        } catch (e) { console.error("Ban check error"); }
+        } catch (e) { console.error("Ban check failed"); }
         return false;
     }
 
@@ -340,7 +352,6 @@
         } catch(e) { b.disabled = false; b.innerText = "فشل التحديث.. حاول ثانية"; }
     }
 
-    // التشغيل الأساسي
     window.onload = async () => { 
         const isBanned = await checkRemoteBan();
         if (!isBanned) {
