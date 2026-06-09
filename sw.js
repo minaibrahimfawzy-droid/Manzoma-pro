@@ -1,4 +1,4 @@
-const CACHE_NAME = 'manzoma-pro-v2009'; // التحديث الجديد 2009
+const CACHE_NAME = 'manzoma-pro-v2010'; // التحديث الجديد 2010
 
 // القائمة الأساسية للملفات
 const urlsToCache = [
